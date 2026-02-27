@@ -1,0 +1,2381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marian Garabana | Business Analytics & Data Science</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080c10;
+      --surface: #0d1219;
+      --surface2: #111820;
+      --border: rgba(0, 163, 255, 0.12);
+      --border2: rgba(0, 163, 255, 0.28);
+      --neon: #00a3ff;
+      --neon-dim: rgba(0, 163, 255, 0.10);
+      --neon-glow: rgba(0, 163, 255, 0.35);
+      --text: #dde4eb;
+      --muted: #4a5a6a;
+      --muted2: #7a8a9a;
+      --white: #ffffff;
+      --mono: 'JetBrains Mono', monospace;
+      --display: 'Syne', sans-serif;
+      --body: 'Inter', sans-serif;
+      --radius: 3px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0, 163, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 163, 255, 0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      width: 800px;
+      height: 800px;
+      top: -280px;
+      right: -280px;
+      background: radial-gradient(circle, rgba(0, 163, 255, 0.06) 0%, transparent 65%);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 3rem;
+      background: rgba(8, 12, 16, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: border-color .3s;
+    }
+
+    nav.scrolled {
+      border-bottom-color: var(--border2);
+    }
+
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--neon);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      text-decoration: none;
+      transition: color .2s;
+      position: relative;
+    }
+
+    .nav-links a::before {
+      content: '//';
+      font-size: .58rem;
+      color: var(--neon);
+      opacity: 0;
+      margin-right: .3rem;
+      transition: opacity .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--white);
+    }
+
+    .nav-links a:hover::before {
+      opacity: 1;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--text);
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 62px;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      z-index: 190;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--muted2);
+      text-decoration: none;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 3rem 5rem;
+      gap: 5rem;
+    }
+
+    .hero-text {
+      animation: fadeUp .8s ease both;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 1rem;
+    }
+
+    .hero-name {
+      font-family: var(--display);
+      font-size: clamp(2.8rem, 5vw, 4.8rem);
+      font-weight: 800;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 1.25rem;
+      letter-spacing: -.01em;
+    }
+
+    .hero-name .accent {
+      color: var(--neon);
+    }
+
+    .hero-title {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--muted2);
+      margin-bottom: 2rem;
+      padding: .65rem 1rem;
+      border-left: 2px solid var(--neon);
+      background: var(--neon-dim);
+      letter-spacing: .05em;
+    }
+
+    .hero-summary {
+      font-size: .94rem;
+      color: var(--muted2);
+      max-width: 460px;
+      margin-bottom: 2.75rem;
+      line-height: 1.78;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: .7rem 1.75rem;
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all .22s;
+      border-radius: var(--radius);
+    }
+
+    .btn-primary {
+      background: var(--neon);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover {
+      background: #33b5ff;
+      box-shadow: 0 0 28px var(--neon-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+      box-shadow: inset 0 0 16px var(--neon-dim);
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeUp .8s .15s ease both;
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 320px;
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 1px dashed rgba(0, 163, 255, 0.22);
+      animation: spin 22s linear infinite;
+    }
+
+    .avatar-ring::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon);
+      box-shadow: 0 0 14px var(--neon), 0 0 28px var(--neon-glow);
+      transform: translateX(-50%);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .avatar-circle {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--display);
+      font-size: 3.4rem;
+      font-weight: 800;
+      color: var(--neon);
+      letter-spacing: .04em;
+      box-shadow: 0 0 60px rgba(0, 163, 255, 0.1), inset 0 0 40px rgba(0, 163, 255, 0.04);
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar-badges {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: .4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .badge {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      padding: .25rem .7rem;
+      font-family: var(--mono);
+      font-size: .6rem;
+      color: var(--neon);
+      letter-spacing: .1em;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 2.75rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-num {
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--neon);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-top: .25rem;
+    }
+
+    /* ── SECTION SHELL ── */
+    section {
+      padding: 6rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    section:nth-child(even) {
+      background: var(--surface);
+    }
+
+    .section-eyebrow {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: .5rem;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(1.9rem, 3vw, 2.6rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -.01em;
+      margin-bottom: 1rem;
+    }
+
+    .section-line {
+      width: 40px;
+      height: 2px;
+      margin-bottom: 3rem;
+      background: linear-gradient(90deg, var(--neon), transparent);
+    }
+
+    /* ── ABOUT (expand in-place) ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-text p {
+      color: var(--muted2);
+      margin-bottom: 1.25rem;
+      font-size: .92rem;
+    }
+
+    .about-highlights {
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+    }
+
+    .exp-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--neon);
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color .25s, box-shadow .25s;
+      user-select: none;
+    }
+
+    .exp-card:hover {
+      border-color: var(--border2);
+      box-shadow: 0 0 24px var(--neon-dim);
+    }
+
+    .exp-card.open {
+      border-color: var(--border2);
+    }
+
+    .exp-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 1.4rem;
+      gap: 1rem;
+    }
+
+    .exp-card-header-text h4 {
+      font-family: var(--display);
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: .15rem;
+    }
+
+    .exp-card-header-text p {
+      font-size: .78rem;
+      color: var(--muted2);
+      margin: 0;
+    }
+
+    .exp-chevron {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      border: 1px solid var(--border2);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .25s;
+    }
+
+    .exp-chevron svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--neon);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform .35s;
+    }
+
+    .exp-card.open .exp-chevron {
+      background: var(--neon-dim);
+    }
+
+    .exp-card.open .exp-chevron svg {
+      transform: rotate(180deg);
+    }
+
+    .exp-card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .45s cubic-bezier(.4, 0, .2, 1), padding .35s;
+      padding: 0 1.4rem;
+    }
+
+    .exp-card.open .exp-card-body {
+      max-height: 400px;
+      padding: 0 1.4rem 1.4rem;
+    }
+
+    .exp-card-body-inner {
+      border-top: 1px solid var(--border);
+      padding-top: 1.1rem;
+    }
+
+    .exp-card-body p {
+      font-size: .84rem;
+      color: var(--muted2);
+      line-height: 1.7;
+      margin-bottom: .75rem;
+    }
+
+    .exp-card-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .exp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-top: .75rem;
+    }
+
+    .exp-tag {
+      font-family: var(--mono);
+      font-size: .62rem;
+      padding: .2rem .65rem;
+      background: rgba(0, 163, 255, 0.07);
+      border: 1px solid rgba(0, 163, 255, 0.18);
+      color: var(--neon);
+      letter-spacing: .06em;
+    }
+
+    /* ── SKILLS GRID ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .skill-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1.6rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+      user-select: none;
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .skill-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px var(--neon-dim);
+    }
+
+    .skill-card:hover::before {
+      opacity: 1;
+    }
+
+    .skill-card-label {
+      font-family: var(--mono);
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--neon);
+      margin-bottom: .65rem;
+    }
+
+    .skill-card h3 {
+      font-family: var(--display);
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: .4rem;
+    }
+
+    .skill-card p {
+      font-size: .82rem;
+      color: var(--muted2);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+    }
+
+    .skill-tag {
+      font-family: var(--mono);
+      font-size: .62rem;
+      padding: .2rem .65rem;
+      background: rgba(0, 163, 255, 0.07);
+      border: 1px solid rgba(0, 163, 255, 0.18);
+      color: var(--neon);
+      letter-spacing: .06em;
+    }
+
+    .card-open-hint {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      margin-top: 1.1rem;
+      padding-top: .9rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: .62rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      transition: color .2s;
+    }
+
+    .card-open-hint svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--neon);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .skill-card:hover .card-open-hint {
+      color: var(--neon);
+    }
+
+    /* ── PROJECTS GRID ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.4rem;
+    }
+
+    .project-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+      align-self: start;
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+    }
+
+    .project-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 65%, rgba(0, 163, 255, 0.05));
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+
+    .project-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0, 163, 255, 0.1);
+    }
+
+    .project-card:hover::after {
+      opacity: 1;
+    }
+
+    .project-card-header {
+      height: 200px;
+      min-height: 200px;
+      max-height: 200px;
+      position: relative;
+      overflow: hidden;
+      background: #050d18;
+    }
+
+    .project-card-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.85;
+      transition: opacity .3s;
+    }
+
+    .project-card:hover .project-card-header img {
+      opacity: 1;
+    }
+
+    .project-card-title-bg {
+      font-family: var(--display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(0, 163, 255, 0.12);
+    }
+
+    .project-card-num {
+      position: absolute;
+      bottom: 10px;
+      right: 14px;
+      font-family: var(--mono);
+      font-size: .62rem;
+      color: rgba(0, 163, 255, 0.3);
+      letter-spacing: .1em;
+    }
+
+    .project-card-body {
+      padding: 1.4rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--border);
+    }
+
+    .project-card-label {
+      font-family: var(--mono);
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+
+    .project-card-body h3 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: .5rem;
+    }
+
+    .project-card-body p {
+      font-size: .82rem;
+      color: var(--muted2);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .project-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.1rem;
+      padding-top: .9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .project-award-pill {
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--neon);
+      background: rgba(0, 163, 255, 0.07);
+      border: 1px solid rgba(0, 163, 255, 0.2);
+      padding: .22rem .6rem;
+    }
+
+    .project-card:hover .card-open-hint {
+      color: var(--neon);
+    }
+
+    /* ════════════════════════════════════════
+       FULL-SCREEN MODAL TAKEOVER
+    ════════════════════════════════════════ */
+    .fs-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: var(--bg);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .fs-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* top scanline animation on open */
+    .fs-modal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 40%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent);
+      z-index: 1;
+    }
+
+    .fs-modal.active::before {
+      animation: scanline .6s .1s ease forwards;
+    }
+
+    @keyframes scanline {
+      from {
+        left: -40%;
+      }
+
+      to {
+        left: 110%;
+      }
+    }
+
+    /* modal grid lines bg */
+    .fs-modal::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0, 163, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 163, 255, 0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    /* ── MODAL TOPBAR ── */
+    .fs-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8, 12, 16, 0.9);
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    .fs-breadcrumb {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .fs-breadcrumb .sep {
+      color: var(--border2);
+    }
+
+    .fs-breadcrumb .current {
+      color: var(--neon);
+    }
+
+    /* close button */
+    .fs-close {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      background: transparent;
+      border: 1px solid var(--border2);
+      padding: .5rem 1.1rem;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      transition: border-color .2s, color .2s, background .2s;
+    }
+
+    .fs-close:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+      background: var(--neon-dim);
+    }
+
+    .fs-close svg {
+      width: 11px;
+      height: 11px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    /* ── MODAL BODY ── */
+    .fs-body {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+      z-index: 2;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+
+    .fs-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .fs-body::-webkit-scrollbar-thumb {
+      background: var(--border2);
+    }
+
+    .fs-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 4rem 3rem 6rem;
+      animation: fsContentIn .45s .15s ease both;
+    }
+
+    @keyframes fsContentIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* two-col layout inside modal */
+    .fs-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* left col */
+    .fs-left {}
+
+    .fs-category {
+      font-family: var(--mono);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: var(--neon);
+      margin-bottom: .6rem;
+    }
+
+    .fs-title {
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.05;
+      letter-spacing: -.01em;
+      margin-bottom: 1.5rem;
+    }
+
+    .fs-award {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--neon);
+      background: rgba(0, 163, 255, 0.07);
+      border: 1px solid rgba(0, 163, 255, 0.25);
+      padding: .35rem 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .fs-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin-bottom: 2rem;
+    }
+
+    .fs-tag {
+      font-family: var(--mono);
+      font-size: .65rem;
+      padding: .25rem .8rem;
+      background: rgba(0, 163, 255, 0.07);
+      border: 1px solid rgba(0, 163, 255, 0.2);
+      color: var(--neon);
+      letter-spacing: .06em;
+    }
+
+    .fs-section-label {
+      font-family: var(--mono);
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--muted);
+      margin-bottom: .9rem;
+    }
+
+    .fs-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    .fs-paragraphs p {
+      font-size: .95rem;
+      color: var(--muted2);
+      line-height: 1.82;
+      margin-bottom: 1.1rem;
+    }
+
+    .fs-paragraphs p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* right col — sticky sidebar */
+    .fs-right {
+      position: sticky;
+      top: 2rem;
+    }
+
+    .fs-meta-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--neon);
+      padding: 1.5rem;
+    }
+
+    .fs-meta-box-title {
+      font-family: var(--mono);
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .fs-meta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .fs-meta-row {
+      display: flex;
+      flex-direction: column;
+      gap: .18rem;
+    }
+
+    .fs-meta-key {
+      font-family: var(--mono);
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+    }
+
+    .fs-meta-val {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--neon);
+    }
+
+    /* nav arrows at bottom */
+    .fs-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .fs-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: .6rem 1.2rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .fs-nav-btn:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+      background: var(--neon-dim);
+    }
+
+    .fs-nav-btn:disabled {
+      opacity: .25;
+      pointer-events: none;
+    }
+
+    .fs-nav-btn svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .fs-nav-counter {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+    }
+
+    .fs-nav-counter span {
+      color: var(--neon);
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+      max-width: 820px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--neon), rgba(0, 163, 255, 0.08));
+    }
+
+    .tl-item {
+      padding-left: 54px;
+      margin-bottom: 2.75rem;
+      position: relative;
+    }
+
+    .tl-dot {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 32px;
+      height: 32px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: .66rem;
+      color: var(--neon);
+    }
+
+    .tl-date {
+      font-family: var(--mono);
+      font-size: .66rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+
+    .tl-company {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--white);
+    }
+
+    .tl-role {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--neon);
+      margin-bottom: .9rem;
+      letter-spacing: .04em;
+    }
+
+    .tl-bullets {
+      list-style: none;
+    }
+
+    .tl-bullets li {
+      font-size: .87rem;
+      color: var(--muted2);
+      padding: .28rem 0 .28rem 1.3rem;
+      position: relative;
+    }
+
+    .tl-bullets li::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: var(--neon);
+      font-family: var(--mono);
+      font-size: .72rem;
+    }
+
+    .tl-bullets strong {
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    /* ── EDUCATION ── */
+    .edu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4rem;
+    }
+
+    .edu-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--neon);
+      transition: box-shadow .25s;
+      overflow: hidden;
+    }
+
+    .edu-card-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .edu-card-body {
+      padding: 2rem;
+    }
+
+    .edu-card:hover {
+      box-shadow: 0 0 30px var(--neon-dim);
+    }
+
+    .edu-year {
+      font-family: var(--mono);
+      font-size: .66rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .6rem;
+    }
+
+    .edu-school {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: .25rem;
+    }
+
+    .edu-degree {
+      font-size: .87rem;
+      color: var(--neon);
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    .edu-notes {
+      font-size: .8rem;
+      color: var(--muted2);
+      line-height: 1.65;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--surface);
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .contact-info p {
+      font-size: .9rem;
+      color: var(--muted2);
+      margin-bottom: 2rem;
+      line-height: 1.78;
+    }
+
+    .contact-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-list li {
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      font-size: .88rem;
+    }
+
+    .c-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .c-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--neon);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .contact-list span,
+    .contact-list a {
+      color: var(--muted2);
+      text-decoration: none;
+    }
+
+    .contact-list a:hover {
+      color: var(--neon);
+    }
+
+    .contact-form-wrap {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .45rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: .7rem .9rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      border-radius: var(--radius);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--neon);
+      box-shadow: 0 0 14px var(--neon-dim);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    ::placeholder {
+      color: var(--muted);
+      font-family: var(--body);
+    }
+
+    .btn-send {
+      width: 100%;
+      padding: .8rem;
+      background: var(--neon);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      transition: background .2s, box-shadow .2s;
+      border-radius: var(--radius);
+    }
+
+    .btn-send:hover {
+      background: #33b5ff;
+      box-shadow: 0 0 24px var(--neon-glow);
+    }
+
+    footer {
+      background: var(--bg);
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: .66rem;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+
+    footer span {
+      color: var(--neon);
+    }
+
+    .fs-photo {
+      width: 100%;
+      border: 1px solid var(--border2);
+      margin-bottom: 1.75rem;
+      display: block;
+      object-fit: cover;
+      max-height: 320px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 900px) {
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      #hero {
+        grid-template-columns: 1fr;
+        padding: 7rem 1.5rem 3rem;
+        gap: 3rem;
+        text-align: center;
+      }
+
+      .hero-visual {
+        order: -1;
+      }
+
+      .hero-summary {
+        margin: 0 auto 2.5rem;
+      }
+
+      .hero-btns {
+        justify-content: center;
+      }
+
+      .hero-stats {
+        justify-content: center;
+      }
+
+      section {
+        padding: 4rem 1.5rem;
+      }
+
+      .about-grid,
+      .edu-grid,
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .avatar-wrap {
+        width: 240px;
+        height: 280px;
+      }
+
+      .avatar-circle {
+        width: 160px;
+        height: 160px;
+        font-size: 2.8rem;
+      }
+
+      .avatar-ring {
+        width: 210px;
+        height: 210px;
+      }
+
+      .fs-topbar {
+        padding: 1rem 1.5rem;
+      }
+
+      .fs-inner {
+        padding: 2rem 1.5rem 4rem;
+      }
+
+      .fs-layout {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+
+      .fs-right {
+        position: static;
+      }
+
+      .fs-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ════════════ FULL-SCREEN MODAL ════════════ -->
+  <div class="fs-modal" id="fsModal" role="dialog" aria-modal="true">
+    <!-- top bar -->
+    <div class="fs-topbar">
+      <div class="fs-breadcrumb">
+        <span>PORTFOLIO</span>
+        <span class="sep">/</span>
+        <span class="current" id="fsBreadSection">SKILLS</span>
+        <span class="sep">/</span>
+        <span id="fsBreadTitle">—</span>
+      </div>
+      <button class="fs-close" onclick="closeModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+        ESC TO CLOSE
+      </button>
+    </div>
+
+    <!-- scrollable body -->
+    <div class="fs-body" id="fsBody">
+      <div class="fs-inner" id="fsInner">
+        <!-- injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a class="nav-logo" href="#hero">Marian<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about" onclick="toggleMenu()">About</a>
+    <a href="#skills" onclick="toggleMenu()">Skills</a>
+    <a href="#experience" onclick="toggleMenu()">Experience</a>
+    <a href="#projects" onclick="toggleMenu()">Projects</a>
+    <a href="#education" onclick="toggleMenu()">Education</a>
+    <a href="#contact" onclick="toggleMenu()">Contact</a>
+  </div>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">// hello, I'm</p>
+      <h1 class="hero-name">Marian<br>Garabana<br><span class="accent">Garrido</span></h1>
+      <p class="hero-title">MSc Business Analytics &amp; Data Science &nbsp;—&nbsp; IE University, Madrid</p>
+      <p class="hero-summary">Business Analyst with hands-on experience in BI, predictive modeling, SQL and Python-based
+        pipelines, and data-driven decision-making across retail and service sectors.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn btn-primary">Get In Touch</a>
+        <a href="#projects" class="btn btn-outline">View Projects</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">400K+</div>
+          <div class="stat-label">Sales Records Analyzed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">75%</div>
+          <div class="stat-label">Forecast Accuracy</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">80%</div>
+          <div class="stat-label">Manual Work Reduced</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        <div class="avatar-circle">MG</div>
+        <div class="avatar-badges">
+          <span class="badge">MEXICAN</span><span class="badge">SPANISH</span>
+          <span class="badge">ATHLETE</span><span class="badge">DATA SCIENTIST</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-eyebrow reveal">// 01 &mdash; profile</p>
+    <h2 class="section-title reveal">About Marian</h2>
+    <div class="section-line reveal"></div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm a data-driven problem solver currently pursuing my MSc in Business Analytics & Data Science at IE
+          University in Madrid — a journey fueled by a genuine passion for turning raw data into strategic decisions
+          that matter.</p>
+        <p>My background bridges business and technology: I've built forecasting models on hundreds of thousands of
+          records, automated reporting workflows that slashed manual workload by half, and designed dashboards that
+          bring clarity to complex operations.</p>
+        <p>Beyond analytics, I'm a former collegiate soccer player — an experience that shaped my discipline, teamwork,
+          and resilience. I thrive at the intersection of numbers and people, translating technical insights into
+          narratives that move organizations forward.</p>
+        <p>I hold dual Mexican and Spanish citizenship, am fluent in both Spanish and English, and am actively seeking
+          global opportunities in analytics and data science.</p>
+      </div>
+      <div class="about-highlights reveal">
+        <div class="exp-card" onclick="toggleExpCard(this)">
+          <div class="exp-card-header">
+            <div class="exp-card-header-text">
+              <h4>Class Representative</h4>
+              <p>MSc BADS cohort · IE University, Madrid</p>
+            </div>
+            <div class="exp-chevron"><svg viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9" />
+              </svg></div>
+          </div>
+          <div class="exp-card-body">
+            <div class="exp-card-body-inner">
+              <p>Elected as the official representative of the MSc Business Analytics & Data Science cohort at IE
+                University. Serve as the primary liaison between students and faculty, facilitating communication,
+                addressing academic concerns, and fostering a collaborative learning environment across an international
+                class.</p>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card" onclick="toggleExpCard(this)">
+          <div class="exp-card-header">
+            <div class="exp-card-header-text">
+              <h4>MXT Program Member</h4>
+              <p>IE University's international talent program</p>
+            </div>
+            <div class="exp-chevron"><svg viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9" />
+              </svg></div>
+          </div>
+          <div class="exp-card-body">
+            <div class="exp-card-body-inner">
+              <p>Selected for IE University's MXT cross-disciplinary program, which brings together top-performing
+                students across different master's programs to collaborate on complex, real-world challenges. Emphasizes
+                interdisciplinary thinking, global perspective, and high-impact project delivery.</p>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card" onclick="toggleExpCard(this)">
+          <div class="exp-card-header">
+            <div class="exp-card-header-text">
+              <h4>Wellness Ambassador</h4>
+              <p>Student well-being initiative · IE University</p>
+            </div>
+            <div class="exp-chevron"><svg viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9" />
+              </svg></div>
+          </div>
+          <div class="exp-card-body">
+            <div class="exp-card-body-inner">
+              <p>Appointed as a Wellness Ambassador to promote mental health awareness, work-life balance, and community
+                well-being within the IE University student body. Organize activities, support peer networks, and act as
+                a resource for students navigating the pressures of a demanding academic environment.</p>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card" onclick="toggleExpCard(this)">
+          <div class="exp-card-header">
+            <div class="exp-card-header-text">
+              <h4>Athletic Scholar — Women's Soccer</h4>
+              <p>Keiser University · Academic All-Star 3 years</p>
+            </div>
+            <div class="exp-chevron"><svg viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9" />
+              </svg></div>
+          </div>
+          <div class="exp-card-body">
+            <div class="exp-card-body-inner">
+              <p>Competed on the Keiser University Women's Soccer team for three years under an athletic scholarship
+                while maintaining Summa Cum Laude academic standing. Earned All-Academic Awards in 2022, 2023, and 2024.
+              </p>
+              <div class="exp-tags"><span class="exp-tag">ATHLETIC SCHOLARSHIP</span><span class="exp-tag">ALL-ACADEMIC
+                  2022–2024</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card" onclick="toggleExpCard(this)">
+          <div class="exp-card-header">
+            <div class="exp-card-header-text">
+              <h4>Model UN — Best Delegate</h4>
+              <p>Best Delegate 2022 · Outstanding 2021 · Honorific 2020</p>
+            </div>
+            <div class="exp-chevron"><svg viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9" />
+              </svg></div>
+          </div>
+          <div class="exp-card-body">
+            <div class="exp-card-body-inner">
+              <p>Participated in Model United Nations competitions over three consecutive years, earning escalating
+                recognition: Honorific Mention (2020), Outstanding Delegate (2021), and Best Delegate (2022). Built
+                strong foundations in international diplomacy, persuasive argumentation, and cross-cultural
+                communication.</p>
+              <div class="exp-tags"><span class="exp-tag">BEST DELEGATE 2022</span><span class="exp-tag">PUBLIC
+                  SPEAKING</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <p class="section-eyebrow reveal">// 02 &mdash; capabilities</p>
+    <h2 class="section-title reveal">My Strengths</h2>
+    <div class="section-line reveal"></div>
+    <div class="skills-grid">
+
+      <div class="skill-card reveal" onclick="openModal('skill','bi')">
+        <p class="skill-card-label">BI &amp; Visualization</p>
+        <h3>Business Intelligence</h3>
+        <p>Building end-to-end BI pipelines from raw data to executive dashboards that drive real decisions.</p>
+        <div class="skill-tags"><span class="skill-tag">Tableau</span><span class="skill-tag">Power Query</span><span
+            class="skill-tag">Excel</span></div>
+        <div class="card-open-hint"><svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>VIEW FULL DETAILS</div>
+      </div>
+
+      <div class="skill-card reveal" onclick="openModal('skill','python')">
+        <p class="skill-card-label">Programming</p>
+        <h3>Data Science With Python</h3>
+        <p>Writing clean, production-grade Python for data wrangling, statistical analysis, and predictive modeling.</p>
+        <div class="skill-tags"><span class="skill-tag">Python</span><span class="skill-tag">Pandas</span><span
+            class="skill-tag">Scikit-learn</span><span class="skill-tag">Polars</span></div>
+        <div class="card-open-hint"><svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>VIEW FULL DETAILS</div>
+      </div>
+
+      <div class="skill-card reveal" onclick="openModal('skill','db')">
+        <p class="skill-card-label">Databases</p>
+        <h3>Database Management</h3>
+        <p>Designing and querying relational databases to structure, clean, and extract meaningful signals from large
+          datasets.</p>
+        <div class="skill-tags"><span class="skill-tag">SQL</span><span class="skill-tag">MySQL</span><span
+            class="skill-tag">PostgreSQL</span></div>
+        <div class="card-open-hint"><svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>VIEW FULL DETAILS</div>
+      </div>
+
+      <div class="skill-card reveal" onclick="openModal('skill','ml')">
+        <p class="skill-card-label">Machine Learning</p>
+        <h3>Predictive Modeling</h3>
+        <p>Building and validating regression and forecasting models to anticipate business outcomes and optimize
+          strategy.</p>
+        <div class="skill-tags"><span class="skill-tag">Linear Regression</span><span
+            class="skill-tag">Forecasting</span><span class="skill-tag">ML</span></div>
+        <div class="card-open-hint"><svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>VIEW FULL DETAILS</div>
+      </div>
+
+      <div class="skill-card reveal" onclick="openModal('skill','auto')">
+        <p class="skill-card-label">Efficiency</p>
+        <h3>Automation &amp; Reporting</h3>
+        <p>Automating repetitive reporting workflows to free teams for higher-value analytical work.</p>
+        <div class="skill-tags"><span class="skill-tag">Power Query</span><span class="skill-tag">SQL
+            Automation</span><span class="skill-tag">Python Scripts</span></div>
+        <div class="card-open-hint"><svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>VIEW FULL DETAILS</div>
+      </div>
+
+      <div class="skill-card reveal" onclick="openModal('skill','comm')">
+        <p class="skill-card-label">Communication</p>
+        <h3>Stakeholder Communication</h3>
+        <p>Translating complex technical results into clear narratives for diverse audiences — from engineers to
+          C-suite.</p>
+        <div class="skill-tags"><span class="skill-tag">Public Speaking</span><span
+            class="skill-tag">Storytelling</span><span class="skill-tag">Presentations</span></div>
+        <div class="card-open-hint"><svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>VIEW FULL DETAILS</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <p class="section-eyebrow reveal">// 03 &mdash; career</p>
+    <h2 class="section-title reveal">Work Experience</h2>
+    <div class="section-line reveal"></div>
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-dot">01</div>
+        <p class="tl-date">Apr 2026 – Jun 2026 &nbsp;·&nbsp; Madrid, Spain</p>
+        <p class="tl-company">IEX Labs · IE University</p>
+        <p class="tl-role">Student Research Intern — Think Tank Lab &nbsp;<span
+            style="font-size:.65rem;color:var(--muted);font-family:var(--mono)">(UPCOMING)</span></p>
+        <ul class="tl-bullets">
+          <li>Selected by Dean Ikhlaq Sidhu (IE Sci-Tech &amp; Berkeley Co-Lab Co-chair) for a research internship
+            within IEX Labs, in partnership with the Berkeley International Co-Lab and CITRIS HQ at Berkeley.</li>
+          <li>Systematically identifying and assessing <strong>emerging technologies and ventures</strong> that could
+            materially impact insurance risk, underwriting, and cost structures — translating venture intelligence into
+            strategic insight.</li>
+          <li>Producing Venture Track Briefs, industry reports, and summary slides across 8–12 week research sprints;
+            maintaining a live venture tracking database (6–10 hrs/week).</li>
+        </ul>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot">02</div>
+        <p class="tl-date">May 2025 – Aug 2025 · Puebla, Mexico</p>
+        <p class="tl-company">Kreston BSG</p>
+        <p class="tl-role">Tax Reporting Automation &amp; Project Lead (Internship)</p>
+        <ul class="tl-bullets">
+          <li>Automated recurring reporting workflows, reducing manual workload by <strong>50%</strong> using SQL per
+            project.</li>
+          <li>Collaborated with coworkers to transform and reduce manual tax reporting by <strong>80%</strong>.</li>
+          <li>Cleaned and structured large datasets to improve quality and accuracy by <strong>20%</strong> using Python
+            and Power Query.</li>
+        </ul>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot">03</div>
+        <p class="tl-date">Aug 2024 – May 2025 · Puebla, Mexico</p>
+        <p class="tl-company">DICORSA</p>
+        <p class="tl-role">Junior Business Analyst — Sales Analytics &amp; Forecasting</p>
+        <ul class="tl-bullets">
+          <li>Built and validated a linear regression forecasting model on <strong>400K+ sales records</strong>,
+            achieving 75% forecast accuracy.</li>
+          <li>Developed a MySQL database and designed <strong>6 Tableau dashboards</strong> for operations visibility.
+          </li>
+          <li>Implemented 3 cost-saving strategies and route optimization plans.</li>
+        </ul>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot">04</div>
+        <p class="tl-date">Sep 2023 – May 2025 · West Palm Beach, Florida</p>
+        <p class="tl-company">Sodexo</p>
+        <p class="tl-role">Barista</p>
+        <ul class="tl-bullets">
+          <li>Enhanced customer service and communication, increasing revenue by <strong>20%</strong> year over year.
+          </li>
+          <li>Led smooth closing operations including inventory control and restocking, finishing on time
+            <strong>90%</strong> of shifts.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-eyebrow reveal">// 04 &mdash; work</p>
+    <h2 class="section-title reveal">Major Projects</h2>
+    <div class="section-line reveal"></div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal" onclick="openModal('project','datathon')">
+        <div class="project-card-header"><img src="https://i.imgur.com/CLg2Zfx.jpg"
+            alt="IE Sustainability Datathon" /><span class="project-card-num">PRJ_01</span></div>
+        <div class="project-card-body">
+          <p class="project-card-label">Datathon · Nov–Dec 2025</p>
+          <h3>IE Sustainability Datathon</h3>
+          <p>Data visualization & analysis of EU aviation emissions and SAF adoption using PostgreSQL and Tableau.</p>
+          <div class="project-card-footer">
+            <span class="project-award-pill">1ST PLACE</span>
+            <span class="card-open-hint"><svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>VIEW DETAILS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="openModal('project','bootcamp')">
+        <div class="project-card-header"><img src="https://i.imgur.com/XnXUf4Y.jpg"
+            alt="IE Tech Venture Bootcamp" /><span class="project-card-num">PRJ_02</span></div>
+        <div class="project-card-body">
+          <p class="project-card-label">Bootcamp · Oct 2025</p>
+          <h3>IE Tech Venture Bootcamp</h3>
+          <p>Tech startup concept designed and pitched in 12 days using the Berkeley Method for Innovation.</p>
+          <div class="project-card-footer">
+            <span></span>
+            <span class="card-open-hint"><svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>VIEW DETAILS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="openModal('project','thesis')">
+        <div class="project-card-header"><img src="https://i.imgur.com/sDjHUZo.jpg"
+            alt="Sales Forecasting Thesis" /><span class="project-card-num">PRJ_03</span></div>
+        <div class="project-card-body">
+          <p class="project-card-label">Capstone · Jan–Apr 2025</p>
+          <h3>Sales Forecasting Thesis</h3>
+          <p>BI-driven forecasting model on 400K+ records achieving 75% accuracy — published capstone research.</p>
+          <div class="project-card-footer">
+            <span class="project-award-pill">3RD PLACE</span>
+            <span class="card-open-hint"><svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>VIEW DETAILS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" onclick="openModal('project','sql')">
+        <div class="project-card-header"><span class="project-card-title-bg">DATABASE</span><span
+            class="project-card-num">PRJ_04</span></div>
+        <div class="project-card-body">
+          <p class="project-card-label">Academic &middot; IE University &middot; 2026</p>
+          <h3>Cinema Chain Database</h3>
+          <p>End-to-end relational database for a multi-location cinema chain — full DDL, DML, and 5 complex business
+            SQL queries.</p>
+          <div class="project-card-footer"><span></span><span class="card-open-hint"><svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>VIEW DETAILS</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <p class="section-eyebrow reveal">// 05 &mdash; academic</p>
+    <h2 class="section-title reveal">Education</h2>
+    <div class="section-line reveal"></div>
+    <div class="edu-grid">
+      <div class="edu-card reveal">
+        <img class="edu-card-img" src="https://i.imgur.com/NftAZ77.jpg" alt="IE University" />
+        <div class="edu-card-body">
+          <p class="edu-year">Sep 2025 – Jul 2026 · Madrid, Spain</p>
+          <p class="edu-school">IE University</p>
+          <p class="edu-degree">MSc Business Analytics &amp; Data Science</p>
+          <p class="edu-notes">Class Representative · MXT Program Member · Wellness Ambassador</p>
+        </div>
+      </div>
+      <div class="edu-card reveal">
+        <img class="edu-card-img" src="https://i.imgur.com/i6JUu34.jpg" alt="Keiser University" />
+        <div class="edu-card-body">
+          <p class="edu-year">Sep 2022 – May 2025 · West Palm Beach, Florida</p>
+          <p class="edu-school">Keiser University</p>
+          <p class="edu-degree">BA Business Analytics — Summa Cum Laude</p>
+          <p class="edu-notes">Athletic Scholarship · Women's Soccer · Dean's President List (4 semesters) ·
+            All-Academic
+            Award (2022–2024)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-eyebrow reveal">// 06 &mdash; connect</p>
+    <h2 class="section-title reveal">Contact Me</h2>
+    <div class="section-line reveal"></div>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <p>I'm actively seeking global opportunities in Business Analytics, Data Science, and BI. Whether it's a
+          full-time role, internship, or a conversation about data — I'd love to hear from you.</p>
+        <ul class="contact-list">
+          <li><span class="c-icon"><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                  stroke="none" fill="#00a3ff" />
+              </svg></span><span>Madrid, Spain 28036</span></li>
+          <li><span class="c-icon"><svg viewBox="0 0 24 24">
+                <path
+                  d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.59A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.09 6.09l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+              </svg></span><span>+34 600 67 03 45</span></li>
+          <li><span class="c-icon"><svg viewBox="0 0 24 24">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg></span><a
+              href="/cdn-cgi/l/email-protection#1b767a69727a75357c7a697a797a757a5b686f6e7f7e756f35727e357e7f6e"><span
+                class="__cf_email__"
+                data-cfemail="4f222e3d262e2161282e3d2e2d2e212e0f3c3b3a2b2a213b61262a612a2b3a">[email&#160;protected]</span></a>
+          </li>
+          <li><span class="c-icon"><svg viewBox="0 0 24 24">
+                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+                <circle cx="4" cy="4" r="2" />
+              </svg></span><a href="https://www.linkedin.com/in/marian-garabana-garrido/"
+              target="_blank">linkedin.com/in/marian-garabana-garrido</a></li>
+          <li><span class="c-icon"><svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+              </svg></span><span>Mexican &amp; Spanish Citizenships</span></li>
+        </ul>
+      </div>
+      <div class="contact-form-wrap reveal">
+        <div class="form-group"><label for="cname">Your Name</label><input type="text" id="cname"
+            placeholder="Jane Smith" /></div>
+        <div class="form-group"><label for="cemail">Your Email</label><input type="email" id="cemail"
+            placeholder="jane@company.com" /></div>
+        <div class="form-group"><label for="cmsg">Message</label><textarea id="cmsg"
+            placeholder="Tell me about the opportunity..."></textarea></div>
+        <button class="btn-send" onclick="handleSend()">Send Message</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 <span>Marian Garabana Garrido</span> · Business Analytics &amp; Data Science</p>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    /* ══════════════ DATA ══════════════ */
+    const DATA = {
+      skill: [
+        {
+          id: 'bi', section: 'SKILLS', category: 'BI & Visualization', title: 'Business Intelligence',
+          tags: ['Tableau', 'Power Query', 'Excel', 'Microsoft Access'],
+          body: [
+            'Designed and deployed 6 Tableau dashboards at DICORSA to monitor sales performance across distribution routes in real time, enabling data-driven operational decisions for a $3M USD beverage distribution company.',
+            'Proficient in Microsoft Excel with Power Query for ETL workflows — automating data transformation pipelines that previously required hours of manual processing each reporting cycle.',
+            'Consolidated multi-source datasets at the IE Sustainability Datathon, merging EU aviation data from multiple carriers and regulatory bodies into a unified PostgreSQL schema for emissions trend analysis and SAF adoption modeling.',
+            'Experienced in Microsoft Access for lightweight database management and reporting within business contexts where enterprise databases are not in place.'
+          ],
+          meta: [{ k: 'PRIMARY TOOL', v: 'Tableau' }, { k: 'CONTEXT', v: 'DICORSA / IE Datathon' }, { k: 'OUTPUT', v: '6 Dashboards Built' }, { k: 'LEVEL', v: 'Professional' }]
+        },
+        {
+          id: 'python', section: 'SKILLS', category: 'Programming', title: 'Python & Data Science',
+          tags: ['Python', 'Pandas', 'NumPy', 'Scikit-learn', 'Matplotlib', 'Polars', 'Plotly', 'OOP'],
+          body: [
+            'Applied Python extensively at Kreston BSG for data cleaning and transformation, reducing dataset inconsistencies by 20% and significantly cutting preparation time across recurring tax reporting cycles.',
+            'Core data science stack: Pandas for data manipulation, NumPy for numerical computing, Matplotlib and Plotly for exploratory visualization, and Scikit-learn for machine learning model development and validation.',
+            'Currently deepening expertise through the MSc Business Analytics & Data Science program at IE University, with advanced coursework in machine learning, statistical modeling, deep learning, and Polars library.',
+            'Emphasis on writing clean, readable, production-quality code that can be maintained and extended by collaborators — not just scripts that work once.'
+          ],
+          meta: [{ k: 'EXPERIENCE', v: '2+ Years' }, { k: 'WHERE APPLIED', v: 'Kreston BSG / IE University' }, { k: 'FOCUS', v: 'Data Engineering & ML' }, { k: 'LEVEL', v: 'Intermediate–Advanced' }]
+        },
+        {
+          id: 'db', section: 'SKILLS', category: 'Databases', title: 'Database Management',
+          tags: ['SQL', 'MySQL', 'PostgreSQL', 'DBMS Architectures', 'ETL', 'ELT', 'OLAP/OLTP'],
+          body: [
+            'Designed and implemented a MySQL database at DICORSA from the ground up to centralize 400K+ historical sales records across distribution channels, enabling structured querying and repeatable reporting at scale.',
+            'Used PostgreSQL at the IE Sustainability Datathon to consolidate multiple EU aviation datasets into a unified schema, supporting cross-carrier emissions analysis and Sustainable Aviation Fuel adoption modeling.',
+            'At Kreston BSG, automated SQL-based reporting workflows with Microsoft Access and Power Query that eliminated 50% of manual workload per project cycle, significantly reducing the time the tax reporting team spent on data preparation.',
+            'Comfortable with full database lifecycle tasks: schema design, de/normalization, query optimization, data cleaning, and integrating databases with visualization and analytics tools such as Tableau and PowerBI.'
+          ],
+          meta: [{ k: 'DATABASES', v: 'MySQL, PostgreSQL, Microsoft Access' }, { k: 'CONTEXT', v: 'DICORSA / Kreston BSG / IE University' }, { k: 'SCALE', v: '400K+ Records' }, { k: 'LEVEL', v: 'Proficient' }]
+        },
+        {
+          id: 'ml', section: 'SKILLS', category: 'Machine Learning', title: 'Predictive Modeling',
+          tags: ['Linear Regression', 'Forecasting', 'Model Validation', 'Scikit-learn', 'Statistical Analysis'],
+          body: [
+            'Built and validated a linear regression forecasting model at DICORSA trained on 400K+ historical sales records, achieving 75% forecast accuracy. The central deliverable of my undergraduate capstone thesis.',
+            'The model directly informed three cost-saving strategies and route optimization plans that were implemented across DICORSA\'s distribution network, creating tangible operational impact for the business.',
+            'The research was recognized with Third Place at the Keiser University Undergraduate Research Symposium (2025), presented competitively alongside graduate-level submissions.',
+            'Currently expanding into more advanced modeling techniques through IE University\'s MSc program, including classification, clustering, time series, and neural network approaches.'
+          ],
+          meta: [{ k: 'MODEL', v: 'Linear Regression' }, { k: 'DATASET', v: '400K+ Records' }, { k: 'ACCURACY', v: '75%' }, { k: 'RECOGNITION', v: '3rd — Research Symposium' }]
+        },
+        {
+          id: 'auto', section: 'SKILLS', category: 'Efficiency', title: 'Automation & Reporting',
+          tags: ['Power Query', 'SQL Automation', 'Python Scripts', 'Workflow Design'],
+          body: [
+            'Led a full reporting automation initiative at Kreston BSG, redesigning manual tax workflows using SQL and Power Query. Result: 50% reduction in manual workload per project and 80% less manual intervention in the overall tax reporting process.',
+            'Cleaned and restructured large, inconsistent datasets to improve data quality by 20%, enabling more reliable downstream analysis and reporting for the firm\'s clients — reducing revision cycles and increasing stakeholder confidence.',
+            'Designed automation solutions with maintainability in mind: parameterized queries, documented scripts, and modular Power Query steps that non-technical team members could update without breaking pipelines.',
+            'Strong belief that automation work is only valuable when the freed-up capacity is redirected toward higher-order analysis — not just cost reduction.'
+          ],
+          meta: [{ k: 'TOOLS', v: 'SQL, Power Query, Python' }, { k: 'CONTEXT', v: 'Kreston BSG' }, { k: 'WORKLOAD REDUCED', v: '50–80%' }, { k: 'QUALITY GAIN', v: '+20% Accuracy' }]
+        },
+        {
+          id: 'comm', section: 'SKILLS', category: 'Storytelling', title: 'Data Storytelling',
+          tags: ['Public Speaking', 'Data Storytelling', 'Executive Presentations', 'Pitch Design', 'Bilingual'],
+          body: [
+            'Delivered the final presentation at the IE Sustainability Datathon to a panel of industry judges, translating complex EU aviation emissions data into a strategic narrative that secured first place among all competing teams.',
+            'Led the storytelling and pitch strategy for the IE Tech Venture Bootcamp — distilling a 12-day product development sprint into a compelling 2-minute investor-style presentation, balancing technical depth with business clarity.',
+            'Presented capstone research findings at the Keiser University Undergraduate Research Symposium, earning Third Place recognition for translating a rigorous quantitative forecasting model into accessible, actionable insights.',
+            'Strong bilingual communication skills (Spanish/English) across academic and professional contexts, consistently serving as a bridge between technical analytics teams and non-technical stakeholders in both languages.'
+          ],
+          meta: [{ k: 'LANGUAGES', v: 'Spanish & English' }, { k: 'AUDIENCES', v: 'Judges, Execs, Faculty' }, { k: 'FORMATS', v: 'Dashboards, Reports, Live Pitches' }, { k: 'RECOGNITION', v: 'Multiple Awards' }]
+        }
+      ],
+      project: [
+        {
+          id: 'datathon', imgKey: 'datathon', section: 'PROJECTS', category: 'Datathon · Nov–Dec 2025', title: 'IE Sustainability Datathon',
+          award: '1ST PLACE WINNERS',
+          tags: ['PostgreSQL', 'Tableau', 'EU Aviation Data', 'SAF Analysis', 'Machine Learning', 'Sustainability'],
+          body: [
+            'Competed in the IE Sustainability Datathon, a competitive data challenge requiring teams to extract actionable sustainability insights from real-world industry datasets under strict time constraints.',
+            'Led the data gathering and visualization track: consolidated multiple European Union aviation datasets from different carriers and regulatory bodies into a unified PostgreSQL schema, enabling cross-source analysis of carbon emissions trends and Sustainable Aviation Fuel (SAF) adoption rates across routes and regions.',
+            'Built a suite of interactive Tableau dashboards that communicated complex emissions patterns to a mixed technical and business audience — translating raw data into a clear narrative about aviation\'s sustainability trajectory and the levers available to accelerate SAF adoption.',
+            'Delivered the team\'s final presentation to a panel of industry judges, distilling technical findings into strategic policy implications. The combination of analytical rigor and communication clarity was a key factor in securing first place among all competing teams.'
+          ],
+          meta: [{ k: 'TOOLS', v: 'PostgreSQL, Tableau' }, { k: 'ROLE', v: 'Data Lead & Presenter' }, { k: 'TEAM', v: 'International Cohort' }, { k: 'RESULT', v: '1st Place' }]
+        },
+        {
+          id: 'bootcamp', imgKey: 'bootcamp', section: 'PROJECTS', category: 'Bootcamp · Oct 2025', title: 'IE Tech Venture Bootcamp',
+          award: null,
+          tags: ['Berkeley Method', 'Product Design', 'Startup Pitch', 'Innovation', 'Cross-cultural Teams'],
+          body: [
+            'Participated in IE University\'s intensive Tech Venture Bootcamp — a 12-day sprint designed to simulate building a real tech startup from zero to pitch, structured around the Berkeley Method for Innovation, a framework used widely in Silicon Valley product development.',
+            'Led three critical workstreams: idea generation (guiding the team through hypothesis testing and problem validation with real potential users), front-end platform design (wireframing and defining the end-to-end user experience), and pitch storytelling (crafting the narrative arc and visual structure for the final investor-style presentation).',
+            'Operated within a culturally and academically diverse team — navigating different working styles, communication preferences, and levels of technical knowledge to synthesize a coherent product vision under intense time pressure.',
+            'The experience reinforced the ability to move fast from abstract insight to structured solution, to communicate across functional boundaries, and to make confident decisions with incomplete information.'
+          ],
+          meta: [{ k: 'DURATION', v: '12 Days' }, { k: 'METHOD', v: 'Berkeley Innovation' }, { k: 'ROLE', v: 'Ideation Lead & Strategist' }, { k: 'FORMAT', v: '2-Min Investor Pitch' }]
+        },
+        {
+          id: 'thesis', imgKey: 'thesis', section: 'PROJECTS', category: 'Capstone · Jan–Apr 2025', title: 'Sales Forecasting Thesis',
+          award: '3RD PLACE — Undergraduate Research Symposium 2025',
+          tags: ['Python', 'SQL', 'Tableau', 'Linear Regression', 'MySQL', 'Business Intelligence'],
+          body: [
+            'Authored a full capstone thesis titled "Integrating Business Intelligence for Sales Forecasting and Strategic Decision-Making," completed during the final semester at Keiser University in direct partnership with DICORSA, a $3M USD beverage distribution company in Puebla, Mexico.',
+            'The core deliverable was a linear regression forecasting model trained and validated on over 400,000 historical sales records. The model achieved a 75% accuracy rate and was used to directly inform three cost-saving strategies and route optimization plans that the company subsequently implemented.',
+            'Supplemented the model with 6 custom Tableau dashboards and a fully designed MySQL database architecture, providing DICORSA with a complete self-serve analytics infrastructure that remained actively in use after the project concluded.',
+            'Presented the research at the Keiser University Undergraduate Research Symposium, where the project earned Third Place recognition out of all undergraduate research submissions — competing alongside work from students across multiple disciplines and program years.'
+          ],
+          meta: [{ k: 'TOOLS', v: 'Python, SQL, Tableau' }, { k: 'DATASET', v: '400K+ Records' }, { k: 'ACCURACY', v: '75%' }, { k: 'RECOGNITION', v: '3rd — Research Symposium' }]
+        },
+        {
+          id: 'sql', section: 'PROJECTS', category: 'Academic - IE University - 2026', title: 'Cinema Chain Database',
+          award: null,
+          tags: ['MySQL', 'SQL', 'Database Design', 'DDL/DML', '3NF', 'Analytics'],
+          body: ['Designed and implemented a fully normalised relational database for a multi-location cinema chain operating across Madrid, Barcelona, and Sevilla. The schema spans 16 tables across five domains - Location, Films & Scheduling, Movie Tickets, Concessions, and Shared Entities - satisfying Third Normal Form (3NF) throughout.',
+            'Key design decisions included auditorium-based dynamic pricing via a Price_Multiplier, a many-to-many film-genre junction table, and separate ticketing systems: movie tickets requiring customer registration and card payment, versus concessions supporting anonymous walk-ins with any payment method. A Showtime Group time-range mechanism bridges both revenue streams for unified time-of-day analytics.',
+            'Wrote complete DDL with all constraints and foreign keys, plus DML populating 255 movie tickets and 104 concession orders across 12 months. Answered 5 complex business queries: most profitable film (Dune: Part Two, evenings), Popcorn & Coke combo purchase rate (68.27%), peak sales window (Evening, 242 combined transactions), 12-month revenue by location exported to Excel, and highest avg revenue per auditorium type (VIP at 30.53 avg; IMAX leading on total volume at 1,571.79).',
+            'Presented design rationale to faculty, demonstrating how each structural choice - from a denormalized Location_ID on movie_ticket for query performance, to a nullable Customer_ID on shop_ticket for walk-in support - was grounded in real operational requirements rather than convention.'],
+          meta: [{ k: 'TOOLS', v: 'MySQL, SQL' }, { k: 'SCALE', v: '16 Tables, 255+ Records' }, { k: 'QUERIES', v: '5 Business Questions' }, { k: 'DESIGN', v: '3NF Normalised Schema' }],
+          links: [
+            { label: 'View on GitHub', icon: 'github', url: 'https://github.com/MarianGarabana/SQL-Cinema-Project' },
+            { label: 'Download Report', icon: 'pdf', url: 'https://raw.githubusercontent.com/MarianGarabana/SQL-Cinema-Project/main/SQL_Project.pdf' }
+          ]
+        }
+      ]
+    };
+
+    var IMGS = {
+      datathon: 'https://i.imgur.com/CLg2Zfx.jpg',
+      bootcamp: 'https://i.imgur.com/XnXUf4Y.jpg',
+      thesis: 'https://i.imgur.com/sDjHUZo.jpg'
+    };
+
+    /* ══════════════ MODAL LOGIC ══════════════ */
+    let currentType = null;
+    let currentIdx = 0;
+
+    function openModal(type, id) {
+      currentType = type;
+      currentIdx = DATA[type].findIndex(d => d.id === id);
+      renderModal();
+      const modal = document.getElementById('fsModal');
+      modal.classList.add('active');
+      document.body.classList.add('modal-open');
+      document.getElementById('fsBody').scrollTop = 0;
+    }
+
+    function renderModal() {
+      const items = DATA[currentType];
+      const d = items[currentIdx];
+
+      document.getElementById('fsBreadSection').textContent = d.section;
+      document.getElementById('fsBreadTitle').textContent = d.title;
+
+      const imgSrc = d.imgKey ? IMGS[d.imgKey] : null;
+      const imgHTML = imgSrc ? `<img class="fs-photo" src="${imgSrc}" alt="${d.title}"/>` : '';
+      const tagHTML = d.tags.map(t => `<span class="fs-tag">${t}</span>`).join('');
+      const awardHTML = d.award ? `<div class="fs-award">${d.award}</div>` : '';
+      const paraHTML = d.body.map(p => `<p>${p}</p>`).join('');
+      const metaHTML = d.meta.map(m => `
+    <div class="fs-meta-row">
+      <div class="fs-meta-key">${m.k}</div>
+      <div class="fs-meta-val">${m.v}</div>
+    </div>`).join('');
+
+      const linksHTML = d.links ? d.links.map(l => {
+        const iconSVG = l.icon === 'github'
+          ? `<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>`
+          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
+        return `<a href="${l.url}" target="_blank" rel="noopener" class="fs-link-btn">${iconSVG}${l.label}</a>`;
+      }).join('') : '';
+
+      const linksBlockHTML = d.links ? `
+        <div class="fs-links-block">
+          <div class="fs-meta-box-title">LINKS</div>
+          <div class="fs-links-list">${linksHTML}</div>
+        </div>` : '';
+
+      const prev = currentIdx > 0 ? items[currentIdx - 1].title : null;
+      const next = currentIdx < items.length - 1 ? items[currentIdx + 1].title : null;
+
+      document.getElementById('fsInner').innerHTML = `
+    <div class="fs-layout">
+      <div class="fs-left">
+        <p class="fs-category">${d.category}</p>
+        <h1 class="fs-title">${d.title}</h1>
+        ${imgHTML}
+        ${awardHTML}
+        <div class="fs-tags">${tagHTML}</div>
+        <p class="fs-section-label">OVERVIEW</p>
+        <div class="fs-divider" style="margin-top:0"></div>
+        <div class="fs-paragraphs">${paraHTML}</div>
+
+        <div class="fs-nav-row">
+          <button class="fs-nav-btn" onclick="navigateModal(-1)" ${!prev ? 'disabled' : ''}>
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            ${prev ? prev : 'PREVIOUS'}
+          </button>
+          <span class="fs-nav-counter"><span>${currentIdx + 1}</span> / ${items.length}</span>
+          <button class="fs-nav-btn" onclick="navigateModal(1)" ${!next ? 'disabled' : ''}>
+            ${next ? next : 'NEXT'}
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="fs-right">
+        <div class="fs-meta-box">
+          <div class="fs-meta-box-title">AT A GLANCE</div>
+          <div class="fs-meta-list">${metaHTML}</div>
+        </div>
+        ${linksBlockHTML}
+      </div>
+    </div>`;
+
+      document.getElementById('fsBody').scrollTop = 0;
+    }
+
+    function navigateModal(dir) {
+      const items = DATA[currentType];
+      const next = currentIdx + dir;
+      if (next < 0 || next >= items.length) return;
+      currentIdx = next;
+      renderModal();
+    }
+
+    function closeModal() {
+      document.getElementById('fsModal').classList.remove('active');
+      document.body.classList.remove('modal-open');
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    /* ══════════════ ABOUT EXPAND ══════════════ */
+    function toggleExpCard(card) {
+      const isOpen = card.classList.contains('open');
+      card.closest('.about-highlights').querySelectorAll('.exp-card.open').forEach(c => c.classList.remove('open'));
+      if (!isOpen) card.classList.add('open');
+    }
+
+    /* ══════════════ NAV ══════════════ */
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+
+    /* ══════════════ REVEAL ══════════════ */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 55);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ══════════════ CONTACT ══════════════ */
+    function handleSend() {
+      const name = document.getElementById('cname').value;
+      const email = document.getElementById('cemail').value;
+      const msg = document.getElementById('cmsg').value;
+      if (!name || !email || !msg) { alert('Please fill in all fields.'); return; }
+      window.location.href = `mailto:marian.garabana@student.ie.edu?subject=Portfolio Enquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(msg)}%0A%0AFrom: ${encodeURIComponent(name)} (${encodeURIComponent(email)})`;
+    }
+  </script>
+</body>
+
+</html>
