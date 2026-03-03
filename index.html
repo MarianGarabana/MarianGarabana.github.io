@@ -2065,16 +2065,19 @@
 
       <div class="project-card reveal" onclick="openModal('project','madrid-ml')">
         <div class="project-card-header"><img src="https://i.imgur.com/UtqjNum.jpg"
-            alt="Madrid Rental Housing ML Pipeline" /><span class="project-card-num">PRJ_05</span></div>
+            alt="Madrid Rental Market — Interactive ML Dashboard" /><span class="project-card-num">PRJ_05</span></div>
         <div class="project-card-body">
           <p class="project-card-label">Academic &middot; IE University &middot; 2026</p>
-          <h3>Madrid Rental Housing — ML Pipeline</h3>
-          <p>End-to-end ML pipeline on 2,100 Madrid listings — segmentation, association analysis, linear and logistic
-            regression.</p>
-          <div class="project-card-footer"><span></span><span class="card-open-hint"><svg viewBox="0 0 24 24">
+          <h3>Madrid Rental Market — ML Dashboard</h3>
+          <p>Live Streamlit app bringing a full ML pipeline to life — K-Means clustering, OLS regression, and logistic
+            classification on 2,100 Madrid listings.</p>
+          <div class="project-card-footer">
+            <span class="project-award-pill">LIVE APP</span>
+            <span class="card-open-hint"><svg viewBox="0 0 24 24">
                 <line x1="5" y1="12" x2="19" y2="12" />
                 <polyline points="12 5 19 12 12 19" />
-              </svg>VIEW DETAILS</span></div>
+              </svg>VIEW DETAILS</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2288,19 +2291,20 @@
           ]
         }
         , {
-          id: 'madrid-ml', imgKey: 'madridml', section: 'PROJECTS', category: 'Academic · IE University · 2026', title: 'Madrid Rental Housing — ML Pipeline',
-          award: null,
-          tags: ['Python', 'K-Means', 'Linear Regression', 'Logistic Regression', 'sklearn', 'statsmodels', 'Apriori', 'EDA'],
+          id: 'madrid-ml', imgKey: 'madridml', section: 'PROJECTS', category: 'Academic · IE University · 2026', title: 'Madrid Rental Market — Interactive ML Dashboard',
+          award: 'LIVE STREAMLIT APP',
+          tags: ['Python', 'Streamlit', 'K-Means', 'OLS Regression', 'Logistic Regression', 'Plotly', 'sklearn', 'statsmodels', 'EDA'],
           body: [
-            'End-to-end machine learning pipeline applied to 2,100 rental property listings scraped from idealista.com, covering the full analytical lifecycle from raw data to predictive modelling in the context of the Madrid real estate market.',
-            'Phase 1 — Segmentation: clustered properties using K-Means on five structural variables (surface area, bedrooms, floor, outer/inner, special features), then profiled each segment across all remaining variables including district, rent, and amenities. Applied the lean clustering, rich profiling methodology to separate what drives structure from what describes it.',
-            'Phase 2 — Association Analysis: ran Apriori on key segments to discover co-occurring property features, evaluated by support, confidence, and lift to extract actionable market patterns.',
-            'Phase 3 — Linear Regression (OLS via statsmodels): built an interpretable model to predict monthly rent (€), with iterative VIF-based multicollinearity removal and train/test validation. Designed to help a real estate agency price listings and identify undervalued properties.',
-            'Phase 4 — Logistic Regression: classified properties as High Rent (≥ €1,800/month) using LASSO and RFECV for feature selection, evaluated with confusion matrix, ROC-AUC, precision and recall. Key drivers identified: surface area, district, floor level, and premium amenities.'
+            'Built a fully interactive Streamlit web application that brings a complete machine learning pipeline to life using ~2,100 Madrid rental listings from Idealista. Rather than a static notebook, the app lets users explore, predict, and classify in real time — all models are trained live from the raw data at startup.',
+            'Market Explorer: filter listings by district and rent range, exploring rent distributions, median rent by district, rent vs. size scatter plots, and a full correlation heatmap — turning EDA into an interactive experience.',
+            'Property Segments (K-Means, k=5): after validating with the elbow method and silhouette scores, five distinct market segments emerged — Entry-Level Interior, High-Rise Exterior, Grand Estate, Standard Exterior Living, and Urban Premium. Users enter any property attributes and the app classifies it into its market segment with a radar chart profile.',
+            'Rent Predictor (OLS Linear Regression): uses VIF-based multicollinearity filtering and RFECV feature selection (Repeated K-Fold, 5×3) via statsmodels. Users get a monthly rent prediction with a 95% prediction interval, plus a visual of where it sits in the full market distribution.',
+            'High Rent Classifier (Logistic Regression): classifies any property as High Rent (≥ €1,800/month) with an interactive ROC curve, confusion matrix, odds ratio chart, and a probability gauge — making model outputs tangible and actionable for a real estate audience.'
           ],
-          meta: [{ k: 'TOOLS', v: 'Python, sklearn, statsmodels' }, { k: 'DATASET', v: '2,100 Properties' }, { k: 'PHASES', v: 'EDA · Clustering · Regression · Classification' }, { k: 'CONTEXT', v: 'Group Assignment — ML I' }],
+          meta: [{ k: 'TOOLS', v: 'Python, Streamlit, Plotly, sklearn, statsmodels' }, { k: 'DATASET', v: '2,100 Listings · Idealista' }, { k: 'PAGES', v: 'Market Explorer · Segments · Rent Predictor · Classifier' }, { k: 'CONTEXT', v: 'Machine Learning I — IE University' }],
           links: [
-            { label: 'View on GitHub', icon: 'github', url: 'https://github.com/MarianGarabana/Madrid-Rental-Analysis_ML' }
+            { label: 'Open Live App', icon: 'globe', url: 'https://madridrentalapp-mariangarabana.streamlit.app/' },
+            { label: 'View on GitHub', icon: 'github', url: 'https://github.com/mariangarabana/MadridRental' }
           ]
         }
       ]
@@ -2348,7 +2352,9 @@
       const linksHTML = d.links ? d.links.map(l => {
         const iconSVG = l.icon === 'github'
           ? `<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>`
-          : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
+          : l.icon === 'globe'
+            ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-right:7px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
         return `<a href="${l.url}" target="_blank" rel="noopener" class="fs-link-btn">${iconSVG}${l.label}</a>`;
       }).join('') : '';
 
