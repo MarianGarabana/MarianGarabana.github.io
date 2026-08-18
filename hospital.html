@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hospital Readmission MLOps · Marian Garabana</title>
+<meta name="description" content="MLOps pipeline predicting 30-day hospital readmission for diabetic patients: XGBoost, MLflow, FastAPI, Docker, drift monitoring, and SHAP explanations." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/hospital.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#0a1020" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Hospital Readmission MLOps · Marian Garabana" />
+<meta property="og:description" content="MLOps pipeline predicting 30-day hospital readmission for diabetic patients: XGBoost, MLflow, FastAPI, Docker, drift monitoring, and SHAP explanations." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/hospital.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Hospital Readmission MLOps · Marian Garabana" />
+<meta name="twitter:description" content="MLOps pipeline predicting 30-day hospital readmission for diabetic patients: XGBoost, MLflow, FastAPI, Docker, drift monitoring, and SHAP explanations." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="preload" as="image" href="assets/hero-hospital-poster.webp" fetchpriority="high" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* ===== dark theme scoped to this page (overrides the light tokens) ===== */
+  body.theme-dark{
+    --bg:#0a1020; --surface:#111a2e; --surface2:#0e1626;
+    --ink:#e8eefc; --ink-soft:#c4d0e6; --muted:#8394b3;
+    --teal:#34d399; --blue:#5b8def; --red:#c4364f; --gold:#f5a623; --purple:#a78bfa;
+    /* chartkit reads these for its tick/axis/value type scale */
+    --ck-muted:#9fb0cd; --ck-ink:#e8eefc;
+  }
+  body.theme-dark{background:radial-gradient(1200px 600px at 70% -10%, #12203c 0%, #0a1020 55%)}
+  .theme-dark .nav{border-color:rgba(255,255,255,.14)}
+  .theme-dark .nav.scrolled{background:rgba(17,26,46,.62)}
+  .theme-dark .nav-ava{background:linear-gradient(135deg,#22314f,#16223c);color:#9db4e0}
+  .theme-dark .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-dark ::selection{background:var(--teal);color:#06210f}
+
+  /* ===== IMAGE HERO =====
+     Uses the shared .vhero + .lg system in styles.css, not a fork of it. Only
+     the tints, the veil and the crop are per-page. The backdrop is a real
+     high-structure render, which is the one case the glass recipe allows, and
+     the veil (not the tint) does the contrast work so the pane stays glassy. */
+  /* The band is contained to the page measure rather than full-bleed. The source
+     is 1100px wide after its crop, so at the ~1116px band it draws at 1:1 and
+     never stretches. Restore full-bleed by deleting the three margin/width
+     lines below, but expect visible softness: there is no larger source. */
+  .hosp-hero{margin-inline:0;width:auto;max-width:none;
+    border-radius:24px;min-height:clamp(300px,40vh,420px);
+    background:#05070e;margin-top:calc(var(--nav-h) + 1.4rem);margin-bottom:1.8rem}
+  /* The footage's glowing core sits dead centre in the original 1920 frame,
+     which is exactly where the panel lands. Cover crops vertically only at this
+     aspect, so object-position could not move it; the fix is in the encode, a
+     crop off the RIGHT edge that carries the core out to ~71%. No CSS transform
+     here: the still and the video must agree frame for frame. */
+  .hosp-hero .vhero-bg video,.hosp-hero .vhero-bg img{object-position:50% 46%}
+  /* the footage is near-black already, so the veil only has to protect the text
+     side and close the bottom edge. Anything heavier and the panel has nothing
+     left to refract. The vertical stop must reach full opacity or bright pixels
+     cut against the page canvas in a straight line. */
+  .hosp-hero .vhero-veil{
+    background:
+      linear-gradient(100deg,rgba(4,7,16,.62) 0%,rgba(4,7,16,.40) 44%,
+                      rgba(4,7,16,.10) 76%,rgba(4,7,16,0) 100%),
+      linear-gradient(180deg,rgba(4,7,16,.30) 0%,rgba(4,7,16,0) 30%,
+                      rgba(10,16,32,0) 74%,rgba(10,16,32,.40) 88%,
+                      rgba(10,16,32,.94) 97%,rgba(10,16,32,1) 100%)}
+  .hosp-hero .vhero-in{padding:2.6rem 2.4rem 2.8rem}
+  /* 600px lets the title set on two lines instead of three, which is most of the
+     height saving. The core sits at ~71% (793px), so the pane still clears it. */
+  .hosp-panel{max-width:min(600px,54%);padding:1.7rem 2rem 1.7rem;
+    --lg-tint-1:rgba(16,30,58,.42);--lg-tint-2:rgba(6,12,26,.50);--lg-sat:170%}
+
+  /* ===== fact belt, below the band ===== */
+  .pd-belt{display:flex;justify-content:space-between;align-items:flex-end;
+    gap:1.5rem 2.5rem;flex-wrap:wrap;margin-bottom:3.4rem}
+  .pd-belt .pd-facts{margin-top:0;gap:2rem}
+  .pd-belt .pd-links{margin-top:0}
+  @media(max-width:720px){
+    .pd-belt{margin-bottom:2.4rem}
+    .pd-belt .pd-facts{gap:1.1rem 1.6rem}
+  }
+  /* rim light carries the teal accent rather than plain white, so the pane reads
+     as part of this page and not as a component borrowed from index */
+  .hosp-panel .lg-fx::after{
+    background:radial-gradient(130% 90% at 6% -8%,rgba(190,255,232,.24),rgba(190,255,232,0) 46%);
+    box-shadow:inset 0 1px 0 rgba(206,255,238,.46),inset 1px 0 0 rgba(206,255,238,.22),
+               inset -1px 0 0 rgba(206,255,238,.14),inset 0 -1px 0 rgba(206,255,238,.24)}
+  /* Back link and badge are both utility chrome, so they share one row and the
+     teal eyebrow below is left as the only mono-caps line before the title.
+     Stacked, they made three rows of tiny caps above the h1. */
+  .hosp-panel .pd-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+    margin-bottom:2rem}
+  .hosp-panel .pd-back{margin-bottom:0;color:#ccd8ec}
+  .hosp-panel .pd-back:hover{color:#fff}
+  .hosp-panel .h-badge{margin-bottom:0;background:rgba(52,211,153,.18);
+    border-color:rgba(52,211,153,.5);color:#d8f7ea}
+  .hosp-panel .pd-cat{margin-bottom:.7rem}
+  .hosp-panel .pd-title{font-size:clamp(2rem,3.4vw,2.7rem);color:#fff}
+  /* --t-2 tied the paragraph to the metadata values and ran ~80 characters wide.
+     --t-3 restores the step down from the title and pulls the measure to ~62ch */
+  .hosp-panel .pd-sub{margin-top:.95rem;font-size:var(--t-3);color:#dbe5f7;max-width:33rem}
+  /* no backdrop-filter: the shared fallback is neutral black, retint it navy */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .hosp-panel .lg-face{background:rgba(6,12,26,.84)}
+  }
+  @media(max-width:900px){.hosp-panel{max-width:100%}}
+  @media(max-width:720px){
+    .hosp-hero{min-height:clamp(280px,44vh,400px);border-radius:18px}
+    .hosp-hero .vhero-in{padding:2rem 1.1rem 2.2rem}
+    .hosp-panel{padding:1.3rem 1.2rem 1.3rem}
+    .hosp-panel .lg-face{background:rgba(6,12,26,.66)}
+    /* .68rem at .14em over 31 characters pushed the badge label onto a second
+       line inside its own pill, which read as a broken chip */
+    .hosp-panel .h-badge{font-size:.6rem;letter-spacing:.07em}
+    .hosp-panel .pd-top{margin-bottom:1.5rem}
+  }
+
+  /* ===== SECTION RAIL =====
+     Was a tablist that hid four fifths of the case study behind a click. The
+     panels are real sections now and this is a scrollspy over them. Anchors,
+     not buttons, so every label still jumps with the script blocked; the pill
+     styling is the same set of --secnav-* properties the buttons used. Same
+     rail as madrid, trading, titan and datathon. */
+  .secnav{--secnav-hover:rgba(255,255,255,.07);--secnav-focus:var(--teal);
+          --secnav-on-bg:var(--teal);--secnav-on-ink:#06210f;
+          position:sticky;z-index:6;top:calc(var(--nav-h) - 2px);
+          padding-top:.75rem;background:var(--bg);transition:top .3s var(--ease)}
+  /* main.js hides the nav on scroll-down; the rail rides up with it rather than
+     leaving a 76px hole. The page canvas is a radial gradient, so the rail's own
+     background has to be the flat base colour or the strip it paints would not
+     match the canvas behind it. */
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--muted);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  .secnav a:hover{background:var(--secnav-hover);border-color:var(--border);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--secnav-focus);outline-offset:2px}
+  .secnav a[aria-current="true"]{background:var(--secnav-on-bg);
+    color:var(--secnav-on-ink);border-color:var(--secnav-on-bg)}
+  /* Clears the nav and the rail together, so a jump never lands under the pills. */
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  .case-sec > .h-sec:first-child{margin-top:4rem}
+  #s-results > .h-sec:first-child{margin-top:1.75rem}
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+
+  /* ===== header ===== */
+  .h-cat{color:var(--teal)}
+  .h-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);padding:.4rem .8rem;border-radius:100px;margin-bottom:1.4rem}
+  .h-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(52,211,153,.18)}
+
+  /* ===== THE PIPELINE DIAGRAM =====
+     Four stages left to right, connected, with each stage's sentence in a
+     tooltip on hover and on keyboard focus. CSS only: no script is involved, so
+     it works with JS blocked, and the same sentences also ship as static text in
+     the sr-only list under the diagram, so nothing is reachable only by pointer.
+     Replaces a 440px animated stage whose "live dashboard" numbers appear in no
+     source. */
+  .pipe{margin-top:1.4rem}
+  .fl{list-style:none;margin:0;padding:0;display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));gap:1.9rem}
+  .fl-n{position:relative;border:1px solid var(--border);border-radius:12px;
+    padding:1rem 1.05rem 1.1rem;background:rgba(255,255,255,.022);cursor:help;
+    transition:border-color .18s var(--ease),background-color .18s var(--ease)}
+  .fl-n:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  /* the connector runs through the gap; measured from the gap, not guessed */
+  .fl-n:not(:first-child)::before{content:'';position:absolute;top:50%;left:-1.9rem;
+    width:1.9rem;height:1px;
+    background:linear-gradient(90deg,color-mix(in srgb,var(--teal) 18%,transparent),
+                                     color-mix(in srgb,var(--teal) 60%,transparent))}
+  .fl-n:not(:first-child)::after{content:'';position:absolute;top:50%;left:-.5rem;
+    width:5px;height:5px;border-top:1px solid color-mix(in srgb,var(--teal) 60%,transparent);
+    border-right:1px solid color-mix(in srgb,var(--teal) 60%,transparent);
+    transform:translateY(-50%) rotate(45deg)}
+  .fl-i{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:var(--teal);
+    display:block}
+  .fl-t{display:block;margin-top:.35rem;font-size:var(--t-2);font-weight:600;color:var(--ink)}
+  .fl-p{position:absolute;left:50%;top:calc(100% + 11px);z-index:5;
+    width:max-content;max-width:15rem;
+    transform:translateX(-50%) scale(.97);transform-origin:top center;
+    opacity:0;pointer-events:none;
+    background:rgba(9,15,30,.96);border:1px solid rgba(255,255,255,.18);
+    border-radius:9px;padding:.55rem .7rem;box-shadow:0 8px 22px rgba(0,0,0,.45);
+    font-size:.76rem;line-height:1.45;color:var(--ink-soft);font-weight:400;
+    transition:opacity .15s var(--ease),transform .15s var(--ease)}
+  /* the outer two would run off the panel if they centred on their own node */
+  .fl-n:first-child .fl-p{left:0;transform:translateX(0) scale(.97);transform-origin:top left}
+  .fl-n:last-child .fl-p{left:auto;right:0;transform:translateX(0) scale(.97);
+    transform-origin:top right}
+  @media(hover:hover) and (pointer:fine){
+    .fl-n:hover{border-color:color-mix(in srgb,var(--teal) 38%,var(--border));
+      background:rgba(255,255,255,.045)}
+    .fl-n:hover .fl-p{opacity:1;transform:translateX(-50%) scale(1)}
+    .fl-n:first-child:hover .fl-p,.fl-n:last-child:hover .fl-p{opacity:1;transform:translateX(0) scale(1)}
+  }
+  .fl-n:focus .fl-p{opacity:1;transform:translateX(-50%) scale(1)}
+  .fl-n:first-child:focus .fl-p,.fl-n:last-child:focus .fl-p{
+    opacity:1;transform:translateX(0) scale(1)}
+  /* The four stages stay side by side well below the desktop measure: dropping to
+     the stacked layout at 820px meant a browser window at anything under a full
+     screen lost the hover behaviour entirely. Only the gap and the tooltip
+     measure tighten here. */
+  @media(max-width:820px){
+    .fl{gap:1.15rem}
+    .fl-n{padding:.85rem .85rem .95rem}
+    .fl-n:not(:first-child)::before{left:-1.15rem;width:1.15rem}
+    .fl-n:not(:first-child)::after{left:-.34rem}
+    .fl-p{max-width:12.5rem;font-size:.72rem}
+  }
+  /* Below this the columns are too narrow to read, so the stages stack and every
+     sentence is simply printed under its title: there is no hover on a phone.
+     The :first-child / :last-child tooltip overrides above are (0,3,0) and beat a
+     bare .fl-p, so they have to be named here or those two keep the collapsed
+     scale(.97) and render 3% smaller than the other two. */
+  @media(max-width:620px){
+    .fl{grid-template-columns:minmax(0,1fr);gap:1.4rem}
+    .fl-n:not(:first-child)::before{top:-1.4rem;left:1.5rem;width:1px;height:1.4rem;
+      background:linear-gradient(180deg,color-mix(in srgb,var(--teal) 18%,transparent),
+                                       color-mix(in srgb,var(--teal) 60%,transparent))}
+    .fl-n:not(:first-child)::after{top:-.28rem;left:1.32rem;transform:rotate(135deg)}
+    .fl-n .fl-p,
+    .fl-n:first-child .fl-p,
+    .fl-n:last-child .fl-p{position:static;display:block;opacity:1;transform:none;
+      width:auto;max-width:none;background:none;border:0;box-shadow:none;
+      padding:.4rem 0 0;font-size:var(--t-1)}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .fl-n,.fl-p,.cm-tip{transition-duration:.01ms}
+  }
+
+  /* ===== KPI cards =====
+     Were four glass panes over the hero render. The image behind them is gone,
+     so glass has nothing left to refract: these are the sitewide .k4/.kc cards
+     now, the same ones titan and datathon use, with this page's accent in the
+     KPI tokens. #a8d8d0 is a teal tint at luminance 0.620, so the value
+     gradient's far stop is the lighter end of the ramp and cannot be the failing
+     one. */
+  body.theme-dark{--kpi-accent:#a8d8d0;--kpi-accent-rgb:52,211,153;--kpi-v2:#a8d8d0}
+
+  /* ===== explain =====
+     The risk card (a 30.8% hero number, a 0-100 scale marking the 11.3% average,
+     and the model name) is gone: it was one patient's score explained three ways,
+     and the paragraph above says it in one sentence. The SHAP chart, which is the
+     thing that cannot be said in a sentence, has the full measure. */
+  .h-explain{margin-top:1.3rem}
+  .h-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.6rem}
+  .h-card h3{font-weight:600;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+  /* MUST out-specify .h-card, which sets padding:1.6rem and is declared here,
+     AFTER the pipeline block above: the reserved bottom space is what the stage
+     tooltips live in, and .tg clips anything outside it. Same specificity trap
+     this file documents for .tg and for .cm .cell > .fill. */
+  .h-card.pipe{padding:1.4rem 1.6rem 5.6rem}
+  /* the small-screen padding has to be declared here too, after the rule above:
+     the pipeline block's own media query sits EARLIER in this file, so at equal
+     specificity the desktop value would win at every width. */
+  @media(max-width:620px){ .h-card.pipe{padding:1.4rem 1.3rem} }
+
+  /* ===== TERMINAL GLASS =====
+     Rolled forward from titan.html. The cards were --surface (#111a2e) with a
+     grey hairline, which is the browser default dressed up, and five of them in
+     a column read as five spreadsheets. This is one surface class instead: a
+     dark glass panel lit from the top left in the page's own accent, a faint
+     plot grid so it reads as an instrument face rather than a box, an
+     accent-tinted hairline and a wide soft shadow so it sits above the canvas.
+     Everything derives from --tg, which is the one token a page changes; the two
+     gradient stops are this page's own navy (--surface and a step below --bg)
+     rather than titan's violet.
+     MUST STAY BELOW .h-card: both are 0-1-0, so the later rule is the one that
+     wins on background, border and radius. */
+  body.theme-dark{--tg:var(--teal)}
+  .tg{position:relative;border-radius:18px;
+    background:linear-gradient(180deg,rgba(17,26,46,.82) 0%,rgba(8,13,26,.94) 100%);
+    border:1px solid color-mix(in srgb,var(--tg) 22%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(214,240,232,.10),0 1px 2px rgba(0,0,0,.45),
+               0 30px 62px -44px color-mix(in srgb,var(--tg) 55%,#000);
+    overflow:hidden}
+  @supports (backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px)){
+    .tg{-webkit-backdrop-filter:blur(14px) saturate(125%);backdrop-filter:blur(14px) saturate(125%)}
+  }
+  /* Grid + top-left glow, drawn under the content rather than over it. The grid
+     is 32px and 2.2% white: visible as texture at a glance, gone by the time you
+     are reading a word on top of it. */
+  .tg::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(120% 90% at 4% -14%,color-mix(in srgb,var(--tg) 13%,transparent),transparent 58%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px)}
+  .tg > *{position:relative;z-index:1}
+  /* the risk readout (hero number, 0-100 scale, model name) is gone: the
+     paragraph above the chart carries the one patient's score, its multiple of
+     the average, and the model name in a sentence. */
+
+  .shap-legend{display:flex;gap:1.2rem;font-size:.76rem;color:var(--ink-soft);margin-top:1rem}
+  .shap-legend b{color:var(--ink-soft);font-weight:600}
+  .shap-legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:.4rem;vertical-align:-1px}
+
+  /* ===== performance =====
+     Was a 1fr/300px pair: the matrix beside a four-row "derived metrics" card.
+     Recall and precision were already in the KPI band, specificity and F1 are
+     read straight off the matrix, and the sentence under it says both. The card
+     is gone and the matrix has the full measure. */
+  .h-perf{margin-top:1.3rem}
+  /* ===== confusion matrix =====
+     Shaded by ROW, not by the global maximum. Scaled globally, 88.7% of patients
+     sit in the top row and the whole grid just renders the class imbalance: the
+     553 misses and the 571 catches came out at the same 0.32, two cells that
+     mean opposite things looking identical. Per row, each cell shows how the
+     model treated that actual class, so the bottom row IS recall and the top row
+     IS specificity, read straight off the grid.
+     It is a real <table> now: the old version rotated its row headers with
+     writing-mode, which was both hard to read and invisible to row/column
+     association in assistive tech. */
+  .cm{width:100%;border-collapse:separate;border-spacing:8px;margin:-8px}
+  .cm caption{text-align:left;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);padding:0 8px .5rem}
+  .cm th{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);font-weight:400;padding:.3rem .4rem;white-space:nowrap}
+  .cm thead th{text-align:center}
+  .cm tbody th{text-align:right;vertical-align:middle}
+  .cm td.cell{border-radius:10px;height:104px;text-align:center;vertical-align:middle;
+    border:1px solid var(--border);position:relative;background:var(--surface2)}
+  /* The cell shows its row share and nothing else. The count and the
+     true/false label moved into a tooltip on hover and on keyboard focus, and
+     also ship as static text in the sr-only summary under the table, so no
+     number depends on a pointer.
+     CSS-only: no script anywhere in this, so it works with JS blocked. */
+  .cm .cp{font-size:1.9rem;font-weight:500;letter-spacing:-.01em;color:#fff;
+    display:block;line-height:1}
+  .cm td.cell{cursor:help}
+  .cm td.cell:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  /* MUST be `.cm .cell > .cm-tip` (0,3,0): `.cm .cell > *` below sets
+     position:relative at (0,2,0) and would beat a bare .cm-tip, which left the
+     tooltip in the flow with no box and pushed the percentage off centre. This is
+     the third time this same trap has bitten in this file. */
+  .cm .cell > .cm-tip{position:absolute;left:50%;bottom:calc(100% + 9px);z-index:5;
+    width:max-content;max-width:14rem;white-space:nowrap;text-align:center;
+    transform:translateX(-50%) scale(.97);transform-origin:bottom center;
+    opacity:0;pointer-events:none;
+    background:rgba(9,15,30,.96);border:1px solid rgba(255,255,255,.18);
+    border-radius:8px;padding:.4rem .6rem;box-shadow:0 8px 22px rgba(0,0,0,.45);
+    font-size:.74rem;font-weight:400;line-height:1.35;color:var(--ink);
+    transition:opacity .15s var(--ease),transform .15s var(--ease)}
+  .cm-tip b{font-weight:600}
+  /* touch devices fire :hover on tap, so the tooltip is hover-gated and the
+     small-screen rule below prints the same text inline instead */
+  @media(hover:hover) and (pointer:fine){
+    .cm td.cell:hover > .cm-tip{opacity:1;transform:translateX(-50%) scale(1)}
+  }
+  .cm td.cell:focus > .cm-tip{opacity:1;transform:translateX(-50%) scale(1)}
+  @media(max-width:620px){
+    .cm .cell > .cm-tip{position:static;opacity:1;transform:none;width:auto;
+      max-width:none;white-space:normal;background:none;border:0;box-shadow:none;
+      padding:.4rem 0 0;font-size:.62rem;color:var(--ink-soft)}
+  }
+  /* MUST out-specify `.cm .cell > *` below. Both were (0,2,0) and the later rule
+     won, so .fill computed to position:relative and laid out 0x0: the entire
+     row-share encoding painted nothing at all. `> .fill` makes it (0,3,0). */
+  /* The row-share encoding ships in the markup as an inline opacity per cell,
+     not applied by a watcher: with the script blocked the shading has to be
+     there, the same rule as everything else on these pages. */
+  .cm .cell > .fill{position:absolute;inset:0;z-index:0;border-radius:10px}
+  /* the two hues need different alphas to carry equal visual weight: teal sits at
+     OKLCH L .77 and the crimson at .55, so matching the numbers would make every
+     "wrong" cell disappear. Tuned so weight tracks row share, not hue lightness. */
+  .cm .cell.good .fill{background:rgba(52,211,153,.32)}
+  /* .92 was tuned against a fill that was not painting; at real size it made the
+     false-negative cell a near-solid block */
+  .cm .cell.bad .fill{background:rgba(196,54,79,.55)}
+  .cm .cell.good{border-color:rgba(52,211,153,.34)}
+  .cm .cell.bad{border-color:rgba(196,54,79,.42)}
+  .cm .cell > *{position:relative;z-index:1}
+  .cm td.tot{font-size:var(--t-1);color:var(--ink-soft);text-align:center;white-space:nowrap}
+  .cm td.tot b{display:block;font-size:var(--t-3);color:var(--ink);font-weight:700}
+  .cm-axis{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:.9rem}
+  .cm .rowtot{display:none}
+  @media(max-width:620px){
+    .cm{border-spacing:5px;margin:-5px}
+    .cm td.cell{height:auto;padding:1rem .3rem}
+    .cm .cp{font-size:1.5rem}
+    .cm th{font-size:.54rem}
+    /* four columns do not fit at 390px. The totals column folds into the row
+       header rather than scrolling the table sideways or dropping the number. */
+    .cm td.tot,.cm thead th:last-child{display:none}
+    .cm .rowtot{display:block;color:var(--ink-soft);margin-top:.25rem;
+      font-size:.58rem;letter-spacing:.04em}
+  }
+  /* the .metric-list rules went with the derived-metrics card (markup removed) */
+  .metric-note{font-size:var(--t-1);color:var(--muted);margin-top:1rem;line-height:1.55}
+
+  /* ===== charts =====
+     All three are drawn by chartkit.js: true-pixel geometry redrawn on resize,
+     gridlines that ARE the labelled values, one type scale. Nothing here gates
+     visibility, so the charts are complete the moment they are drawn. */
+  .ck{display:block;width:100%}
+  .ck-grid{stroke:rgba(255,255,255,.09);stroke-width:1}
+  .ck-zero{stroke:rgba(255,255,255,.28);stroke-width:1}
+  .ck-axis{stroke:rgba(255,255,255,.16);stroke-width:1}
+
+  /* ---- hover / focus layer ----
+     Pure enhancement. Every value a tooltip shows is ALREADY printed on the
+     chart or named in the svg's aria-label, so nothing is hover-gated. The
+     crosshair and dot are positioned divs rather than SVG nodes: chartkit
+     rewrites innerHTML on every render, and re-rendering the chart on each
+     pointermove to move a line would be absurd. */
+  .ck-wrap{position:relative}
+  .ck-tip{position:absolute;left:0;top:0;pointer-events:none;opacity:0;
+    background:rgba(9,15,30,.95);border:1px solid rgba(255,255,255,.18);
+    border-radius:9px;padding:.45rem .65rem;font-size:.74rem;line-height:1.4;
+    color:var(--ink);white-space:nowrap;z-index:3;
+    box-shadow:0 8px 22px rgba(0,0,0,.45);transition:opacity .12s var(--ease)}
+  .ck-tip.on{opacity:1}
+  .ck-tip .tk{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);display:block}
+  .ck-tip .tv{font-weight:700}
+  /* driven by transform, never left/top: those force layout on every pointermove */
+  .ck-cross{position:absolute;left:0;top:0;width:1px;pointer-events:none;
+    background:rgba(255,255,255,.32);opacity:0;z-index:2;will-change:transform}
+  .ck-dot{position:absolute;left:0;top:0;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
+    border-radius:50%;background:var(--blue);box-shadow:0 0 0 2px #070c18;
+    pointer-events:none;opacity:0;z-index:2;will-change:transform}
+  .ck-cross.on,.ck-dot.on{opacity:1}
+  @media(prefers-reduced-motion:no-preference){
+    .ck-cross.on,.ck-dot.on{transition:transform .09s linear}
+    .ck-tip.on{transition:opacity .12s var(--ease),transform .09s linear}
+  }
+  .ck [data-i]{transition:opacity .12s var(--ease)}
+  .ck.dim [data-i]{opacity:.45}
+  .ck.dim [data-i].hot{opacity:1}
+  .ck-wrap:focus-within .ck-tip{opacity:1}
+  #mon:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:6px}
+  /* ---- entrance ----
+     Declared ONLY inside no-preference, so the base style is the finished bar.
+     Under reduced motion the rule never applies and nothing can be left at
+     scaleX(0). Only the bars scale; every number is plain text and is never
+     touched, so no value is ever gated behind the animation.
+     chartkit re-renders on ResizeObserver, and with the tabs gone every chart is
+     in the document from first paint, so this now fires on load. */
+  @media(prefers-reduced-motion:no-preference){
+    #shap g[data-i] rect[data-bar]{
+      transform-box:fill-box;transform-origin:var(--o,left) center;
+      animation:ckGrow .42s cubic-bezier(.22,.61,.36,1) both;
+      animation-delay:calc(var(--i,0) * 38ms)}
+    @keyframes ckGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    #riskBar{transform-box:fill-box;transform-origin:left center;
+      animation:ckGrow .45s cubic-bezier(.22,.61,.36,1) both}
+    /* the series wipes in by scaling its clip rect. A stroke-dasharray reveal
+       would animate dashoffset, which is neither opacity nor transform. */
+    #monClipR{transform-box:fill-box;transform-origin:left center;
+      animation:ckWipe .5s cubic-bezier(.22,.61,.36,1) both}
+    @keyframes ckWipe{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .ck-tip,.ck [data-i]{transition:none}
+  }
+
+  .h-sec .eyebrow{color:var(--teal)}
+  .h-sec .lead{color:var(--ink-soft);max-width:44rem;margin-top:1rem}
+  .pd-links a{border-color:var(--teal);background:var(--teal);color:#06210f}
+  .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+</style>
+</head>
+<body class="theme-dark">
+<!-- Shared PixelSnow background, same file as index; the hero's opaque #0c0e11
+     video layer keeps it out of the top of the page, so it only reads once the
+     scroll passes into the case study. Coloured with this page's own --teal. -->
+<canvas id="snowBg" data-color="#34d399" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- NAV -->
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+  <section class="vhero hosp-hero">
+    <div class="vhero-bg" aria-hidden="true">
+      <video autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-hospital-poster.webp">
+        <source src="assets/hero-hospital.mp4" type="video/mp4" />
+      </video>
+      <img class="vhero-still" src="assets/hero-hospital-poster.webp" alt=""
+           width="1350" height="1080" hidden />
+      <div class="vhero-veil"></div>
+    </div>
+    <div class="vhero-in">
+      <div class="lg hosp-panel">
+        <div class="lg-fx" aria-hidden="true">
+          <span class="lg-face"></span>
+          <span class="lg-edge t"></span><span class="lg-edge b"></span>
+          <span class="lg-edge l"></span><span class="lg-edge r"></span>
+        </div>
+        <div class="pd-top">
+          <a href="index.html#projects" class="pd-back">← All projects</a>
+          <div class="h-badge"><span class="dot"></span>Live model · deployed on Render</div>
+        </div>
+        <div class="pd-cat h-cat">MLOps · Production ML · Explainable AI</div>
+        <h1 class="pd-title" style="view-transition-name:vt-hospital">Hospital Readmission MLOps</h1>
+        <p class="pd-sub">A production pipeline that predicts whether a diabetic patient will be readmitted within 30 days, from raw data to a live, monitored API with a full clinical interface and explainable predictions on top.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- the metadata sits on the page, not in the glass: it is reference material,
+       and inside the pane it was forcing the band to 862px, a 1.29:1 near-square -->
+  <div class="pd-belt">
+    <div class="pd-facts">
+      <div class="pd-fact"><div class="k">Role</div><div class="v">ML Engineer (team)</div></div>
+      <div class="pd-fact"><div class="k">Course</div><div class="v">MLOps · IE</div></div>
+      <div class="pd-fact"><div class="k">Year</div><div class="v">2026</div></div>
+      <div class="pd-fact"><div class="k">Stack</div><div class="v">XGBoost · MLflow · FastAPI · Docker</div></div>
+    </div>
+    <div class="pd-links"><a href="https://github.com/NOSIEMPRE/Hospital-Prediction-System" target="_blank" rel="noopener">View on GitHub <span>↗</span></a></div>
+  </div>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-results">The results</a>
+    <a href="#s-explain">Explainability</a>
+    <a href="#s-performance">Performance</a>
+    <a href="#s-pipeline">The pipeline</a>
+  </nav>
+
+  <section id="s-results" class="case-sec" data-screen-label="Results">
+  <div class="h-sec">
+    <span class="eyebrow">The results</span>
+    <h2>Measured on <em style="font-family:var(--serif);font-style:italic;font-weight:400">real</em> data.</h2>
+    <p class="lead">Every number here comes from the model's own test set of 9,970 patients, not a demo. This is an imbalanced problem, so the model is tuned to catch readmissions rather than to look good on raw accuracy.</p>
+  </div>
+  <div class="k4" id="kpis">
+    <div class="kc"><div class="k">Patients evaluated</div><div class="v">9,970</div><div class="s">Held-out test set</div></div>
+    <div class="kc"><div class="k">Overall accuracy</div><div class="v">66%</div><div class="s">Correct predictions</div></div>
+    <div class="kc"><div class="k">Readmissions caught</div><div class="v">51%</div><div class="s">Recall on readmitted patients</div></div>
+    <div class="kc"><div class="k">Precision</div><div class="v">17%</div><div class="s">Of flagged patients, share that readmit</div></div>
+  </div>
+  </section>
+
+  <section id="s-explain" class="case-sec" data-screen-label="Explainability">
+  <div class="h-sec">
+    <span class="eyebrow">Explainable by design</span>
+    <h2>A score you can <em style="font-family:var(--serif);font-style:italic;font-weight:400">read</em>.</h2>
+    <p class="lead">Take one example patient, scored at <strong>30.8%</strong> risk of readmission within 30 days by <strong>XGBoost-Readmit-V4</strong>. That is <strong>2.7 times</strong> the average patient, whose actual readmission rate was 11.3%. The SHAP chart ranks what drove that number: red pushes the risk up, teal pulls it down, so the score is never a black box.</p>
+  </div>
+  <div class="h-explain">
+    <div class="h-card tg">
+      <h3>Model interpretability · SHAP</h3>
+      <div class="ck-wrap"><svg class="ck" id="shap" role="img" aria-label="Horizontal SHAP bar chart for the example patient scored at 30.8% risk. Bars to the right raise the risk, bars to the left lower it. Lab intensity plus 0.82, diagnosis count plus 0.27, time in hospital plus 0.15, medication consistency minus 0.06, age bracket plus 0.05, race or ethnicity plus 0.03, gender factor minus 0.02, inpatient visits plus 0.01."></svg><div class="ck-tip" role="presentation"></div></div>
+      <div class="shap-legend"><span><span class="sw" style="background:var(--red)"></span><b>Raises</b> risk</span><span><span class="sw" style="background:var(--teal)"></span><b>Lowers</b> risk</span></div>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-performance" class="case-sec" data-screen-label="Performance">
+  <div class="h-sec">
+    <span class="eyebrow">How it performs</span>
+    <h2>Where it is right, and wrong.</h2>
+    <p class="lead">The confusion matrix is the honest view: each cell is the share of its own row, so the bottom row is recall and the top row is specificity. Of the 1,124 patients who did come back, the model caught <strong>50.8%</strong>; of the 8,846 who did not, it cleared <strong>68.4%</strong>. With only 11% of patients actually readmitted, it leans toward catching them, which trades precision for recall, and it has to pass a PR-AUC quality gate before it can ship. Hover or tab into a cell for the patient count behind each share.</p>
+  </div>
+  <div class="h-perf">
+    <div class="h-card tg">
+      <h3>Confusion matrix · 9,970 patients</h3>
+      <table class="cm" id="cm">
+        <caption>Shaded by row: each row shows how the model treated that group of patients</caption>
+        <thead>
+          <tr><td></td><th scope="col">Predicted: No</th><th scope="col">Predicted: Yes</th><th scope="col">Patients</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Actual: No<span class="rowtot">8,846 patients</span></th>
+            <td class="cell good" tabindex="0" data-n="6052" data-row="8846"><span class="fill" style="opacity:.73"></span><span class="cp">68.4%</span><span class="cm-tip" role="tooltip"><b>6,052 patients</b> · True negative</span></td>
+            <td class="cell bad" tabindex="0" data-n="2794" data-row="8846"><span class="fill" style="opacity:.41"></span><span class="cp">31.6%</span><span class="cm-tip" role="tooltip"><b>2,794 patients</b> · False positive</span></td>
+            <td class="tot"><b>8,846</b>did not readmit</td>
+          </tr>
+          <tr>
+            <th scope="row">Actual: Yes<span class="rowtot">1,124 patients</span></th>
+            <td class="cell bad" tabindex="0" data-n="553" data-row="1124"><span class="fill" style="opacity:.56"></span><span class="cp">49.2%</span><span class="cm-tip" role="tooltip"><b>553 patients</b> · False negative</span></td>
+            <td class="cell good" tabindex="0" data-n="571" data-row="1124"><span class="fill" style="opacity:.58"></span><span class="cp">50.8%</span><span class="cm-tip" role="tooltip"><b>571 patients</b> · True positive</span></td>
+            <td class="tot"><b>1,124</b>readmitted</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="sr-only">Of the 8,846 patients who did not readmit, 6,052 were correctly cleared (true negative) and 2,794 were wrongly flagged (false positive). Of the 1,124 who did readmit, 571 were caught (true positive) and 553 were missed (false negative).</p>
+    </div>
+  </div>
+
+  <!-- ===== DISTRIBUTION ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">Who gets flagged</span>
+    <h2>An imbalanced problem.</h2>
+    <p class="lead">This is the cost of tuning for recall. Only <strong>11.3%</strong> of the test set actually readmitted within 30 days, but the model flags <strong>33.8%</strong> of patients as likely to: <strong>three times</strong> as many people as come back. That is a deliberate trade. A missed readmission is a patient who returns unprepared, while a false flag is a patient who gets a follow-up call they may not have needed, so the model is set to over-flag rather than under-catch.</p>
+  </div>
+  <div class="h-card tg" style="margin-top:1.3rem">
+    <h3>Flagged versus actual · 9,970 patients</h3>
+    <div class="ck-wrap"><svg class="ck" id="dist" role="img" aria-label="Two bars on a shared 0 to 100 percent scale. Patients actually readmitted within 30 days: 11.3 percent, drawn in neutral grey. Patients the model predicts will readmit: 33.8 percent, drawn in red. The model flags 3.0 times as many patients as actually readmit."></svg><div class="ck-tip" role="presentation"></div></div>
+  </div>
+  </section>
+
+  <section id="s-pipeline" class="case-sec" data-screen-label="Pipeline">
+  <div class="h-sec">
+    <span class="eyebrow">The pipeline</span>
+    <h2>Built to last.</h2>
+    <p class="lead">Feature engineering feeds experiment tracking in MLflow. The champion model is served through FastAPI, packaged with Docker, watched for drift with Evidently, and shipped through CI/CD to a live cloud deployment. The engineering around the model is the point: reproducible training, versioned models, tests, and monitoring are what keep machine learning alive in production.</p>
+  </div>
+
+  <!-- Four stages, left to right, each carrying its own sentence in a tooltip on
+       hover and on keyboard focus. No script: the reveal is CSS, and the same
+       sentences ship as static text in the sr-only list below, so nothing here is
+       reachable only with a pointer. -->
+  <div class="h-card tg pipe">
+    <h3>The pipeline · hover a stage</h3>
+    <ol class="fl">
+      <li class="fl-n" tabindex="0">
+        <span class="fl-i">01</span>
+        <span class="fl-t">Patient data</span>
+        <span class="fl-p" role="tooltip">Age, labs, medications, diagnoses and prior visits come in as raw features.</span>
+      </li>
+      <li class="fl-n" tabindex="0">
+        <span class="fl-i">02</span>
+        <span class="fl-t">XGBoost model</span>
+        <span class="fl-p" role="tooltip">A gradient-boosted model, tracked in MLflow, scores the 30-day readmission risk.</span>
+      </li>
+      <li class="fl-n" tabindex="0">
+        <span class="fl-i">03</span>
+        <span class="fl-t">Explainable risk</span>
+        <span class="fl-p" role="tooltip">Each score ships with a SHAP breakdown of what pushed the risk up or down.</span>
+      </li>
+      <li class="fl-n" tabindex="0">
+        <span class="fl-i">04</span>
+        <span class="fl-t">Live dashboard</span>
+        <span class="fl-p" role="tooltip">Clinicians see the result, and the system watches its own latency and drift.</span>
+      </li>
+    </ol>
+  </div>
+
+  <!-- "In production" was its own tab: one paragraph and one chart. Monitoring is
+       the last stage of the pipeline, so it closes this section instead. -->
+  <div class="h-sec">
+    <span class="eyebrow">In production</span>
+    <h2>It watches itself.</h2>
+    <p class="lead">Once deployed, the service tracks its own request latency and checks for data drift, so the team knows when the model needs attention. The line below illustrates the rolling-latency view from monitoring.</p>
+  </div>
+  <div class="h-card tg" style="margin-top:1.3rem">
+    <h3>API latency · rolling (ms)</h3>
+    <div class="ck-wrap"><svg class="ck" id="mon" role="img" aria-label="Line chart illustrating the rolling API latency view from monitoring: 15 readings that stay flat overall, moving between 160 and 238 milliseconds around an average near 187, starting at 186 and ending at 176."></svg><span class="ck-cross" aria-hidden="true"></span><span class="ck-dot" aria-hidden="true"></span><div class="ck-tip" role="presentation"></div><p class="sr-only" aria-live="polite" id="monLive"></p></div>
+  </div>
+
+  <div class="pd-links" style="margin-top:2rem"><a href="https://github.com/NOSIEMPRE/Hospital-Prediction-System" target="_blank" rel="noopener">View on GitHub <span>↗</span></a></div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="rl.html">Reinforcement Learning Bot <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script src="chartkit.js"></script>
+<script>
+/* ================= DATA (real, from the model's test set) ================= */
+var CM = { tn:6052, fp:2794, fn:553, tp:571 };
+var SHAP = [
+  { f:'Lab Intensity', v:0.82 },
+  { f:'Diagnosis Count', v:0.27 },
+  { f:'Time in Hospital', v:0.15 },
+  { f:'Medication Consistency', v:-0.06 },
+  { f:'Age Bracket', v:0.05 },
+  { f:'Race / Ethnicity', v:0.03 },
+  { f:'Gender Factor', v:-0.02 },
+  { f:'Inpatient Visits', v:0.01 }
+];
+var RISK = 30.8;
+var LAT = [186,168,201,175,238,192,166,210,183,171,205,160,197,182,176];
+
+/* ================= helpers =================
+   Fires cb() once, the first time el has been reached, where "reached" includes
+   SCROLLED PAST. Not IntersectionObserver, for the reason madrid.html documents
+   at length: IO only fires on a state CHANGE, and the section rail makes
+   one-step jumps ordinary, so an element that goes from below the fold to above
+   the viewport in a single jump never intersects and never gets a callback.
+   Position is tested on scroll instead. */
+var WATCH=[], vraf=0;
+function vReached(e){
+  var r=e.el.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return false;
+  return r.bottom<=0 || r.top<innerHeight-40;
+}
+function vSweep(){
+  vraf=0;
+  for(var i=WATCH.length-1;i>=0;i--){ if(vReached(WATCH[i])){ WATCH.splice(i,1)[0].cb(); } }
+}
+function vKick(){ if(!vraf) vraf=requestAnimationFrame(vSweep); }
+function onView(el,cb){
+  if(!el) return;
+  var e={el:el,cb:cb};
+  if(vReached(e)){ cb(); return; }
+  WATCH.push(e); vKick();
+}
+addEventListener('scroll',vKick,{passive:true});
+addEventListener('resize',vKick);
+addEventListener('load',vKick);
+
+/* the pipeline strip's row-lighting script is gone: the diagram that replaced it
+   reveals each stage's sentence in CSS, on hover and on focus, so there is
+   nothing here for a script to do. */
+
+/* ================= chart interaction layer =================
+   Shared by all three charts. Every value shown here is already printed on the
+   chart or named in the svg's aria-label, so this adds no information that a
+   pointer is required to reach. The latency chart, whose 15 readings are not
+   all labelled, additionally takes keyboard focus and announces each reading
+   through a live region. */
+function ckTip(wrap){
+  var tip=wrap.querySelector('.ck-tip'), svg=wrap.querySelector('.ck');
+  return {
+    show:function(html, cx, cy, mode){
+      var first=!tip.classList.contains('on');
+      if(first) tip.style.transition='none';   // else it flies in from 0,0
+      tip.innerHTML=html; tip.classList.add('on');
+      var w=wrap.getBoundingClientRect(), t=tip.getBoundingClientRect(), x, y;
+      if(mode==='side'){
+        /* beside the bar end, vertically centred on its own row. Centred-above
+           flipped below on the top row and parked the panel over the next bar. */
+        x=Math.min(Math.max(cx+12, 4), w.width - t.width - 4);
+        y=Math.min(Math.max(cy - t.height/2, 4), w.height - t.height - 4);
+      } else {
+        x=Math.min(Math.max(cx - t.width/2, 4), w.width - t.width - 4);
+        y=cy - t.height - 12;
+        if(y<2) y=cy+16;                     // flip below when it would clip the top
+      }
+      tip.style.transform='translate('+x.toFixed(0)+'px,'+y.toFixed(0)+'px)';
+      if(first){ void tip.offsetWidth; tip.style.transition=''; }
+    },
+    hide:function(){ tip.classList.remove('on'); svg.classList.remove('dim'); }
+  };
+}
+/* bar charts: delegate off the transparent hit strips */
+function ckBars(svg, describe, mode){
+  var wrap=svg.closest('.ck-wrap'); if(!wrap) return;
+  var tip=ckTip(wrap);
+  function at(e){
+    var t=e.target.closest('[data-i]'); if(!t){ tip.hide(); return; }
+    var i=+t.getAttribute('data-i');
+    svg.classList.add('dim');
+    svg.querySelectorAll('[data-i]').forEach(function(n){
+      n.classList.toggle('hot', +n.getAttribute('data-i')===i);
+    });
+    /* [data-bar] is the mark itself. A row wrapped in <g data-i> would otherwise
+       measure the union of the bar AND its full-width hit strip. */
+    var el=svg.querySelector('[data-i="'+i+'"] [data-bar]') ||
+           svg.querySelector('[data-i="'+i+'"]:not([data-hit])');
+    var r=el.getBoundingClientRect(), w=wrap.getBoundingClientRect();
+    tip.show(describe(i), r.right-w.left, (mode==='side' ? r.top+r.height/2 : r.top)-w.top, mode);
+  }
+  svg.addEventListener('pointermove', at);
+  svg.addEventListener('pointerleave', function(){
+    tip.hide(); svg.querySelectorAll('.hot').forEach(function(n){n.classList.remove('hot');});
+  });
+}
+
+/* ================= SHAP: diverging bars =================
+   The zero line is a real axis, not a decorative tick, so the eye can compare a
+   +0.05 against a -0.06 instead of guessing from bar colour alone. */
+(function(){
+  var svg=document.getElementById('shap'); if(!svg||!window.chartkit) return;
+  /* The domain comes from the data, not from a hand-picked constant. It used to
+     be -0.30..0.90 against data of -0.06..0.82, so ~30% of the plot was
+     permanently blank and every positive bar was a third shorter than it should
+     have been. That, more than anything, made this read as a list of progress
+     bars rather than a chart. */
+  var lo=Math.min.apply(null,SHAP.map(function(d){return d.v;})),
+      hi=Math.max.apply(null,SHAP.map(function(d){return d.v;}));
+  var MIN=Math.min(0,lo*1.55), MAX=hi*1.06;
+  var rowH=function(w){ return w<470 ? 46 : 32; };
+  chartkit.mount(svg,{
+    pad:{l:8,r:14,t:26,b:26},
+    heightOf:function(w){ return SHAP.length*rowH(w) + 52; },
+    draw:function(c){
+      /* at narrow the label rides ABOVE its bar; a side gutter needed ~112px for
+         "Medication Consistency" and only had 92, so it rendered clipped */
+      var ROW=rowH(c.w), labW=c.narrow?0:132, bh=c.narrow?18:22;
+      var x0=c.pad.l+labW, plotW=c.w-x0-c.pad.r;
+      var X=function(v){ return x0 + (v-MIN)/(MAX-MIN)*plotW; };
+      var g='';
+      chartkit.niceTicks(MIN,MAX,c.narrow?4:6).forEach(function(v){
+        var gx=X(v);
+        g+='<line class="ck-grid" x1="'+gx.toFixed(1)+'" y1="'+(c.pad.t-8)+'" x2="'+gx.toFixed(1)+'" y2="'+(c.h-c.pad.b+2)+'"/>';
+        g+=chartkit.text(gx, c.h-c.pad.b+16, v.toFixed(1), 'tick', {anchor:'middle'});
+      });
+      var zx=X(0);
+      g+='<line class="ck-zero" x1="'+zx.toFixed(1)+'" y1="'+(c.pad.t-10)+'" x2="'+zx.toFixed(1)+'" y2="'+(c.h-c.pad.b+2)+'"/>';
+      SHAP.forEach(function(d,i){
+        var y=c.pad.t+i*ROW, by=c.narrow ? y+22 : y+(ROW-bh)/2;
+        var pos=d.v>=0, bx=pos?zx:X(d.v), bw=Math.abs(X(d.v)-zx);
+        /* one <g> per row so hover dims the labels with the bar, not just the
+           rect, and so the entrance stagger has something to key off */
+        g+='<g data-i="'+i+'" style="--i:'+i+';--o:'+(pos?'left':'right')+'">';
+        g+='<rect data-bar="1" x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+Math.max(bw,2).toFixed(1)+
+           '" height="'+bh+'" rx="3" fill="'+(pos?'var(--red)':'var(--teal)')+'"/>';
+        g+= c.narrow
+          ? chartkit.text(x0, y+13, d.f, 'tick', {anchor:'start', size:10.5})
+          : chartkit.text(x0-10, by+bh-7, d.f, 'tick', {anchor:'end', size:11.5});
+        /* label inside the bar when it fits. Outside-right, a bar at MAX had
+           nowhere to put "+0.82" and it was clipped by the svg edge at 390. */
+        var inside = bw>60;
+        /* a short negative bar sits hard against the left edge, so labelling it
+           outside-LEFT ran off the svg at 390. Outside goes on the zero side. */
+        var vx = pos ? (inside ? bx+bw-8 : bx+bw+7) : (inside ? bx+8 : zx+7);
+        var anch = pos ? (inside?'end':'start') : (inside?'start':'start');
+        var opt = {anchor:anch, size:11};
+        if(inside) opt.fill = pos ? '#fff' : '#0a1020';   /* 5.2:1 and 9.5:1 */
+        g+=chartkit.text(vx, by+bh-7, (pos?'+':'')+d.v.toFixed(2), 'value', opt);
+        /* full-width transparent strip: most bars are a few px wide */
+        g+='<rect data-hit="1" x="'+x0+'" y="'+y.toFixed(1)+'" width="'+plotW.toFixed(1)+
+           '" height="'+ROW+'" fill="transparent"/>';
+        g+='</g>';
+      });
+      return g;
+    }
+  });
+  ckBars(svg, function(i){
+    var d=SHAP[i];
+    return '<span class="tk">'+d.f+'</span><span class="tv">'+(d.v>=0?'+':'')+d.v.toFixed(2)+'</span> '+
+           (d.v>=0?'raises':'lowers')+' the risk';
+  }, 'side');
+})();
+
+/* ================= distribution: two bars, shared scale ================= */
+(function(){
+  var svg=document.getElementById('dist'); if(!svg||!window.chartkit) return;
+  /* Red is semantic on this page: wrong cell, raises risk. It was on the GROUND
+     TRUTH here, the patients who genuinely did readmit, while the model's actual
+     failure - flagging three times too many - was gold. Truth is now neutral and
+     red marks the over-flagging, which is the thing the section is about. */
+  var ROWS=[
+    {l:'Actually readmitted within 30 days', v:11.3, c:'var(--ink-soft)'},
+    {l:'Predicted to readmit',               v:33.8, c:'var(--red)'}
+  ];
+  var RATIO=(ROWS[1].v/ROWS[0].v).toFixed(1);
+  chartkit.mount(svg,{
+    /* the 0% and 100% ticks are centred on the plot edges, so the padding has to
+       carry half a label on each side or they clip against the card */
+    pad:{l:22,r:34,t:16,b:30},
+    heightOf:function(){ return 182; },
+    draw:function(c){
+      var barH=30, gap=48, top=c.pad.t+16;
+      var x0=c.pad.l, plotW=c.w-x0-c.pad.r;
+      var X=function(v){ return x0 + v/100*plotW; };
+      var g='';
+      chartkit.niceTicks(0,100,c.narrow?3:5).forEach(function(v){
+        var gx=X(v);
+        g+='<line class="ck-grid" x1="'+gx.toFixed(1)+'" y1="'+top+'" x2="'+gx.toFixed(1)+'" y2="'+(c.h-c.pad.b+2)+'"/>';
+        g+=chartkit.text(gx, c.h-c.pad.b+16, v+'%', 'tick', {anchor:'middle'});
+      });
+      ROWS.forEach(function(r,i){
+        var y=top + i*(barH+gap);
+        g+='<g data-i="'+i+'">';
+        g+=chartkit.text(x0, y-7, r.l, 'axis', {size:12});
+        /* no track rect: the gridlines already carry the scale, and a grey
+           capsule behind every bar is the browser download UI, not a chart.
+           width is the SPAN from the origin, not the x coordinate: X(v) already
+           includes x0, so using it as the width overstated every bar. */
+        g+='<rect data-bar="1" x="'+x0+'" y="'+y+'" width="'+(X(r.v)-x0).toFixed(1)+'" height="'+barH+
+           '" rx="5" fill="'+r.c+'"/>';
+        g+=chartkit.text(X(r.v)+9, y+barH/2+4, r.v.toFixed(1)+'%', 'value', {size:13});
+        g+='<rect data-hit="1" x="'+x0+'" y="'+(y-18)+'" width="'+plotW.toFixed(1)+
+           '" height="'+(barH+18)+'" fill="transparent"/>';
+        g+='</g>';
+      });
+      /* the comparison IS the point of the card, and until now it existed only in
+         the aria-label. Draw the relationship between the two bar ends. */
+      var y1=top+barH, y2=top+barH+gap, midY=(y1+y2)/2;
+      g+='<path class="ck-axis" fill="none" d="M'+X(ROWS[0].v).toFixed(1)+' '+(y1+5)+
+         ' V'+midY.toFixed(1)+' H'+X(ROWS[1].v).toFixed(1)+' V'+(y2-5)+'"/>';
+      g+=chartkit.text((X(ROWS[0].v)+X(ROWS[1].v))/2, midY-6, RATIO+'x more flagged', 'value',
+                       {anchor:'middle', size:11.5, fill:'var(--ck-muted)'});
+      return g;
+    }
+  });
+  ckBars(svg, function(i){
+    var r=ROWS[i], n=Math.round(9970*r.v/100);
+    return '<span class="tk">'+r.l+'</span><span class="tv">'+r.v.toFixed(1)+'%</span> · about '+
+           n.toLocaleString('en-US')+' of 9,970';
+  });
+})();
+
+/* the risk-scale chart went with the risk card (markup removed): the patient's
+   score, its multiple of the average and the model name are in the section's
+   opening paragraph now. */
+
+/* the confusion-matrix row shading and the distribution reveal that used to
+   sit here are gone: the shading is an inline opacity per cell in the markup, so
+   it needs no watcher, and the distribution script was an empty callback. */
+
+/* ================= monitoring: latency line =================
+   The old version stretched a fixed 1000x180 viewBox with
+   preserveAspectRatio="none", so the line was distorted at every width and had
+   no axis at all. Now the gridlines are the labelled millisecond values. */
+(function(){
+  var svg=document.getElementById('mon'); if(!svg||!window.chartkit) return;
+  var MIN=140, MAX=250;
+  var avg = LAT.reduce(function(a,b){return a+b;},0)/LAT.length;
+  var L=null;   // last layout, so the hover layer maps pixels back to readings
+  chartkit.mount(svg,{
+    height:250, mobileHeight:210, pad:{l:44,r:52,t:22,b:32},
+    draw:function(c){
+      var n=LAT.length, step=c.plotW/(n-1);
+      var X=function(i){ return c.pad.l + i*step; };
+      var Y=function(v){ return c.pad.t + (MAX-v)/(MAX-MIN)*c.plotH; };
+      L={X:X, Y:Y, n:n, padL:c.pad.l, padR:c.pad.r, w:c.w, h:c.h, padT:c.pad.t, padB:c.pad.b};
+      var g='';
+      chartkit.niceTicks(MIN,MAX,c.narrow?3:4).forEach(function(v){
+        var gy=Y(v);
+        g+='<line class="ck-grid" x1="'+c.pad.l+'" y1="'+gy.toFixed(1)+'" x2="'+(c.w-c.pad.r)+'" y2="'+gy.toFixed(1)+'"/>';
+        g+=chartkit.text(c.pad.l-9, gy+4, v, 'tick', {anchor:'end'});
+      });
+      var stepEvery=c.narrow?4:2;
+      for(var i=0;i<n;i+=stepEvery){
+        g+=chartkit.text(X(i), c.h-c.pad.b+18, i+1, 'tick', {anchor:'middle'});
+      }
+      /* the loop steps by 4 at narrow, so it emitted 1,5,9,13 and never 15. The
+         last reading is the one the eye looks for, so force it when it is missed. */
+      if((n-1)%stepEvery) g+=chartkit.text(X(n-1), c.h-c.pad.b+18, n, 'tick', {anchor:'middle'});
+      /* No 'ms' or 'reading 1-15' labels: the card heading already reads
+         "API latency · rolling (ms)" and the x ticks are self-evidently readings. */
+      var ay=Y(avg);
+      g+='<line class="ck-axis" stroke-dasharray="4 5" x1="'+c.pad.l+'" y1="'+ay.toFixed(1)+
+         '" x2="'+(c.w-c.pad.r)+'" y2="'+ay.toFixed(1)+'"/>';
+      var d='M'+X(0).toFixed(1)+' '+Y(LAT[0]).toFixed(1);
+      for(var j=1;j<n;j++) d+=' L'+X(j).toFixed(1)+' '+Y(LAT[j]).toFixed(1);
+      /* A flat-opacity slab closed to Y(140) reads as magnitude-from-zero off a
+         baseline that is not zero, and exaggerates the variation. The fade drops
+         to nothing before it reaches the axis, so it shades the line rather than
+         claiming an area. */
+      g='<defs><linearGradient id="monFade" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#5b8def" stop-opacity=".34"/>'+
+        '<stop offset=".72" stop-color="#5b8def" stop-opacity=".05"/>'+
+        '<stop offset="1" stop-color="#5b8def" stop-opacity="0"/></linearGradient>'+
+        '<clipPath id="monClip" clipPathUnits="userSpaceOnUse">'+
+        '<rect id="monClipR" x="'+c.pad.l+'" y="0" width="'+c.plotW.toFixed(1)+'" height="'+c.h+'"/>'+
+        '</clipPath></defs>' + g;
+      /* only the series is clipped, so the wipe never gates a number */
+      g+='<g clip-path="url(#monClip)">';
+      g+='<path d="'+d+' L'+X(n-1).toFixed(1)+' '+(c.h-c.pad.b)+' L'+X(0).toFixed(1)+' '+(c.h-c.pad.b)+
+         ' Z" fill="url(#monFade)"/>';
+      g+='<path d="'+d+'" fill="none" stroke="var(--blue)" stroke-width="2.5" '+
+         'stroke-linecap="round" stroke-linejoin="round"/>';
+      g+='</g>';
+      /* the avg chip and the peak label sit OUTSIDE the clip: never animated,
+         and the chip carries its own scrim because the series crosses it at 390 */
+      var lw=c.narrow?46:52, lx=c.w-c.pad.r-4;
+      g+='<rect x="'+(lx-lw)+'" y="'+(ay-18)+'" width="'+lw+'" height="15" rx="4" fill="rgba(10,16,32,.88)"/>';
+      g+=chartkit.text(lx-3, ay-7, 'avg '+Math.round(avg), 'value',
+                       {size:11, anchor:'end', fill:'var(--ck-muted)'});
+      /* mark the peak: it is the only reading the copy asks you to notice */
+      var pk=LAT.indexOf(Math.max.apply(null,LAT));
+      g+='<circle cx="'+X(pk).toFixed(1)+'" cy="'+Y(LAT[pk]).toFixed(1)+'" r="3.5" fill="var(--blue)"/>';
+      g+=chartkit.text(X(pk), Y(LAT[pk])-11, LAT[pk]+' ms', 'value', {anchor:'middle', size:11.5});
+      return g;
+    }
+  });
+
+  /* ---- crosshair, tooltip and keyboard stepping ---- */
+  var wrap=svg.closest('.ck-wrap'); if(!wrap) return;
+  var tip=ckTip(wrap), cross=wrap.querySelector('.ck-cross'),
+      dot=wrap.querySelector('.ck-dot'), live=wrap.querySelector('#monLive');
+  var cur=-1;
+  function place(i, announce){
+    if(!L||i<0||i>=L.n) return;
+    cur=i;
+    var sx=L.X(i), sy=L.Y(LAT[i]);
+    var box=svg.getBoundingClientRect(), wb=wrap.getBoundingClientRect();
+    var scale=box.width/L.w;                       // viewBox units -> CSS px
+    var px=(box.left-wb.left)+sx*scale, py=(box.top-wb.top)+sy*scale;
+    /* jumping straight to the new row on first show would fly in from 0,0, so
+       the very first placement is written without a transition */
+    var first=!cross.classList.contains('on');
+    if(first){ cross.style.transition='none'; dot.style.transition='none'; }
+    cross.style.height=((L.h-L.padT-L.padB)*scale).toFixed(1)+'px';
+    cross.style.transform='translate('+px.toFixed(1)+'px,'+((box.top-wb.top)+L.padT*scale).toFixed(1)+'px)';
+    dot.style.transform='translate('+px.toFixed(1)+'px,'+py.toFixed(1)+'px)';
+    cross.classList.add('on'); dot.classList.add('on');
+    if(first){ void cross.offsetWidth; cross.style.transition=''; dot.style.transition=''; }
+    tip.show('<span class="tk">Reading '+(i+1)+' of '+L.n+'</span><span class="tv">'+
+             LAT[i]+' ms</span> · '+(LAT[i]>=avg?'above':'below')+' average', px, py);
+    if(announce && live) live.textContent='Reading '+(i+1)+' of '+L.n+', '+LAT[i]+' milliseconds.';
+  }
+  function clear(){ cur=-1; tip.hide(); cross.classList.remove('on'); dot.classList.remove('on'); }
+  svg.addEventListener('pointermove', function(e){
+    if(!L) return;
+    var box=svg.getBoundingClientRect(), scale=box.width/L.w;
+    var vx=(e.clientX-box.left)/scale;
+    var i=Math.round((vx-L.padL)/((L.w-L.padL-L.padR)/(L.n-1)));
+    if(i<0||i>=L.n){ clear(); return; }
+    place(i,false);
+  });
+  svg.addEventListener('pointerleave', clear);
+  /* the 15 readings are not individually labelled on the chart, so the pointer
+     affordance needs a keyboard equivalent, not just a text alternative */
+  svg.setAttribute('tabindex','0');
+  svg.addEventListener('focus', function(){ place(cur<0?0:cur, true); });
+  svg.addEventListener('blur', clear);
+  svg.addEventListener('keydown', function(e){
+    var n=null;
+    if(e.key==='ArrowRight') n=Math.min((cur<0?-1:cur)+1, L.n-1);
+    else if(e.key==='ArrowLeft') n=Math.max((cur<0?1:cur)-1, 0);
+    else if(e.key==='Home') n=0;
+    else if(e.key==='End') n=L.n-1;
+    else if(e.key==='Escape'){ clear(); return; }
+    if(n===null) return;
+    e.preventDefault(); place(n,true);
+  });
+  addEventListener('resize', function(){ if(cur>=0) place(cur,false); });
+})();
+</script>
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The anchors work without this. It adds which pill is lit, an offset jump that
+   clears the sticky rail, and keeping the lit pill inside the rail's own
+   horizontal scroll on a phone. aria-current, not aria-selected: links, not
+   tabs. Same script as madrid.html, trading.html, titan.html and datathon.html. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    var a=links[i];
+    /* scrollIntoView would scroll the page as well, which fights the reader. */
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* Reading position, not intersection ratio: these sections are wildly
+     different heights, so the tallest would hold the marker while a short one
+     owns the screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  /* Jump target is computed here rather than handed to Lenis as an element plus
+     an offset. Measured on trading.html: passing {offset:-(navH+70)} landed the
+     section 52px too high, with the eyebrow entirely behind the rail, because
+     Lenis resolves an element target from offsetTop and does not account for
+     this page's sticky chrome the way the CSS scroll-margin path does. An
+     absolute pixel target has no such ambiguity, and the chrome is measured at
+     click time so a hidden nav (scroll-down) and a restored one (scroll-up)
+     both work. fix() re-asserts the landing after the travel, because the nav
+     can change state mid-flight and shift the rail under the heading we just
+     parked. */
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      var top=secs[i].getBoundingClientRect().top;
+      var need=rail.getBoundingClientRect().bottom+12;
+      if(top<need-1){
+        var to=Math.max(0,scrollY-(need-top));
+        if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+        else window.scrollTo(0,to);
+      }
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+<!-- Shared with index and the other project pages: snow-bg.js, the #snowBg
+     rules live in styles.css, which this page already loads. -->
+<script src="snow-bg.js" defer></script>
+</body>
+</html>

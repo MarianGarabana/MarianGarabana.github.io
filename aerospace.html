@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aerospace Predictive Maintenance · Marian Garabana</title>
+<meta name="description" content="Deep learning project: a stacked LSTM with attention predicts aircraft engine remaining useful life from NASA CMAPSS telemetry, served through FastAPI and a React dashboard." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/aerospace.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#060a14" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Aerospace Predictive Maintenance · Marian Garabana" />
+<meta property="og:description" content="Deep learning project: a stacked LSTM with attention predicts aircraft engine remaining useful life from NASA CMAPSS telemetry, served through FastAPI and a React dashboard." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/aerospace.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Aerospace Predictive Maintenance · Marian Garabana" />
+<meta name="twitter:description" content="Deep learning project: a stacked LSTM with attention predicts aircraft engine remaining useful life from NASA CMAPSS telemetry, served through FastAPI and a React dashboard." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="preload" as="image" href="assets/hero-aerospace-poster.webp" fetchpriority="high" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* ===== cockpit / telemetry theme ===== */
+  body.theme-aero{
+    --bg:#080b12; --surface:#111826; --surface2:#0d131f;
+    --ink:#e7edf7; --ink-soft:#c3cede; --muted:#7d8aa0;
+    --cyan:#00d4ff; --green:#22c55e; --amber:#f59e0b; --red:#ef4444;
+    /* chartkit reads these for its tick/axis/value type scale */
+    --ck-muted:#9fb0cd; --ck-ink:#e8eefc;
+    /* KPI card: label + hover rim, the same hue as rgb for the glow, and the far
+       stop of the value gradient. 9.86:1 and 11.25:1 on the composited card. */
+    --kpi-accent:var(--cyan); --kpi-accent-rgb:0,212,255; --kpi-v2:#9fd8ee;
+  }
+  body.theme-aero{background:radial-gradient(1100px 560px at 70% -12%,#0d1c33 0%,var(--bg) 55%)}
+  .theme-aero .nav{border-color:rgba(255,255,255,.14)}
+  .theme-aero .nav.scrolled{background:rgba(15,23,40,.62)}
+  .theme-aero .nav-ava{background:linear-gradient(135deg,#13293f,#0d1c2d);color:#7dd3fc}
+  .theme-aero .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-aero ::selection{background:var(--cyan);color:#04121a}
+  .theme-aero .pd-cat{color:var(--cyan)}
+  .theme-aero .h-sec .eyebrow{color:var(--cyan)}
+  .theme-aero .pd-links a{border-color:var(--cyan);background:var(--cyan);color:#04121a}
+  .theme-aero .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+  .ae-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.3);padding:.4rem .8rem;border-radius:100px;margin-bottom:1.4rem}
+  .ae-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 3px rgba(0,212,255,.18)}
+
+  /* ===== VIDEO HERO =====
+     Uses the shared .vhero + .lg system in styles.css, not a fork of it.
+     hero-aerospace.mp4 was added Aug 10 2026; this page shipped on a still
+     first and the markup did not change to take the video, which is the point
+     of keeping the <video> element in place with only its <source> missing.
+
+     The clip is CROPPED to the telemetry waveform panel of the source footage.
+     The full frame also carries a legible EQUITY / HOLDINGS / INVESTED panel
+     with invented percentages, which has nothing to do with engine wear and
+     would have put fabricated numbers under the title of a page whose whole
+     claim rests on real CMAPSS figures. Crop, do not un-crop.
+
+     The <img class="vhero-still"> is deliberately NOT given the `hidden`
+     attribute the other project pages use: styles.css hides .vhero-bg video
+     under prefers-reduced-motion (line ~717), so the img is what carries the
+     hero for those readers. In normal flow the video (100% height, first
+     child) fills the box and .vhero-bg's overflow:hidden clips the img sitting
+     below it, so the img only becomes visible when the video is removed from
+     flow. Verified in both modes, see plan-b-aerospace-report.md. */
+  .aero-panel{max-width:min(600px,54%);padding:1.7rem 2rem 1.7rem;
+    --lg-tint-1:rgba(6,22,34,.42);--lg-tint-2:rgba(3,9,16,.56);--lg-sat:170%}
+  .aero-panel .lg-fx::after{
+    background:radial-gradient(130% 90% at 6% -8%,rgba(190,240,255,.24),rgba(190,240,255,0) 46%);
+    box-shadow:inset 0 1px 0 rgba(206,245,255,.46),inset 1px 0 0 rgba(206,245,255,.22),
+               inset -1px 0 0 rgba(206,245,255,.14),inset 0 -1px 0 rgba(206,245,255,.24)}
+  .aero-panel .pd-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .aero-panel .pd-back{margin-bottom:0;color:#cdeaf7}
+  .aero-panel .pd-back:hover{color:#fff}
+  .aero-panel .ae-badge{margin-bottom:0}
+  .aero-panel .pd-cat{margin-bottom:.7rem}
+  .aero-panel .pd-title{font-size:clamp(1.9rem,3.2vw,2.6rem);color:#fff}
+  .aero-panel .pd-sub{margin-top:.95rem;font-size:var(--t-3);color:#dcedf7;max-width:33rem}
+  /* no backdrop-filter: the shared fallback is neutral black, retint it toward ink-cyan */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .aero-panel .lg-face{background:rgba(3,9,16,.84)}
+  }
+  @media(max-width:900px){.aero-panel{max-width:100%}}
+  @media(max-width:720px){
+    .aero-panel{padding:1.3rem 1.2rem 1.3rem}
+    .aero-panel .lg-face{background:rgba(3,9,16,.66)}
+    .aero-panel .pd-top{margin-bottom:1.3rem}
+  }
+
+  /* ===== fact belt, below the band ===== */
+  .pd-belt{display:flex;justify-content:space-between;align-items:flex-end;
+    gap:1.5rem 2.5rem;flex-wrap:wrap;margin-bottom:3.4rem}
+  .pd-belt .pd-facts{margin-top:0;gap:2rem}
+  .pd-belt .pd-links{margin-top:0}
+  @media(max-width:720px){
+    .pd-belt{margin-bottom:2.4rem}
+    .pd-belt .pd-facts{gap:1.1rem 1.6rem}
+  }
+
+  /* ===== SECTION RAIL =====
+     Was a tablist that hid four fifths of the case study behind a click. The
+     panels are real sections now and this is a scrollspy over them. Anchors, not
+     buttons, so every label still jumps with the script blocked; the pill styling
+     is the same set of --secnav-* properties the buttons used. Same rail as the
+     other case studies. */
+  .secnav{--secnav-hover:rgba(255,255,255,.07);--secnav-focus:var(--cyan);
+          --secnav-on-bg:var(--cyan);--secnav-on-ink:#04121a;
+          position:sticky;z-index:6;top:calc(var(--nav-h) - 2px);padding-top:.75rem;
+          background:var(--bg);transition:top .3s var(--ease)}
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--ink-soft);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  .secnav a:hover{background:var(--secnav-hover);border-color:var(--border);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--secnav-focus);outline-offset:2px}
+  .secnav a[aria-current="true"]{background:var(--secnav-on-bg);
+    color:var(--secnav-on-ink);border-color:var(--secnav-on-bg)}
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  .case-sec > .h-sec:first-child{margin-top:4rem}
+  #s-telemetry > .h-sec:first-child{margin-top:1.75rem}
+  /* The first section opens directly under the rail, so it does not get the full
+     section rhythm: measured 108px of dead band, cut to 27. */
+  #s-telemetry > .t-split{margin-top:.8rem}
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+
+  /* ===== TERMINAL GLASS =====
+     Rolled forward from titan, hospital, rl, spain and dicorsa. The cards were
+     --surface (#111826) with a grey hairline, which is the browser default
+     dressed up. One surface class instead: dark glass lit from the top left in
+     this page's cyan, a faint plot grid so each card reads as an instrument
+     face, an accent-tinted hairline and a wide soft shadow. Everything derives
+     from --tg; the two gradient stops are this page's own cockpit black.
+     MUST stay scoped to body.theme-aero: styles.css styles this page's cards
+     through body.theme-aero .card (0,2,1), so a bare .tg (0,1,0) would silently
+     lose background, border and radius and leave the old box with a grid drawn
+     on top. */
+  body.theme-aero{--tg:var(--cyan)}
+  body.theme-aero .tg{position:relative;border-radius:18px;
+    background:linear-gradient(180deg,rgba(14,26,42,.82) 0%,rgba(8,11,18,.94) 100%);
+    border:1px solid color-mix(in srgb,var(--tg) 24%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(206,245,255,.08),0 1px 2px rgba(0,0,0,.45),
+               0 30px 62px -44px color-mix(in srgb,var(--tg) 50%,#000);
+    overflow:hidden}
+  @supports (backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px)){
+    body.theme-aero .tg{-webkit-backdrop-filter:blur(14px) saturate(125%);
+      backdrop-filter:blur(14px) saturate(125%)}
+  }
+  body.theme-aero .tg::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(120% 90% at 4% -14%,color-mix(in srgb,var(--tg) 13%,transparent),transparent 58%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px)}
+  body.theme-aero .tg > *:not(.sr-only){position:relative;z-index:1}
+
+  /* ===== text-left / table-right split =====
+     The table ran the full column width under its own prose, which is what left
+     the architecture column absorbing every spare pixel and the two error
+     columns pinned to the right edge. The copy reads on the left, the table sits
+     in the last third, and they start on the same line.
+     The stacking rule below names .t-split.thirds as well: that selector is
+     (0,2,0) and a media query adds no specificity, so a bare .t-split rule loses
+     to it and the split would keep two columns down to phone width. */
+  .t-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:1.6rem 2.4rem;align-items:start;margin-top:var(--sp-section)}
+  .t-split .h-sec{margin-top:0}
+  /* .h-sec .lead in styles.css is what colours and spaces a lead; the paragraphs
+     moved out of the h-sec when the heading took its own row, so the same
+     treatment is named here rather than lost. */
+  .t-body .lead{color:var(--ink-soft);max-width:46rem;margin-top:1rem}
+  .t-body .lead:first-child{margin-top:0}
+  .t-split .card{margin-top:0}
+  /* Drops the graphic to roughly the first line of the prose instead of the top of
+     the h2, so the two columns read as one block. On the class, not on
+     :nth-child(2): the performance table is the FIRST child of its split (left
+     half) while the driver bars are the second (right half), so position cannot
+     carry this. */
+  .t-split .t-off{margin-top:3.4rem}
+  @media(max-width:1020px){ .t-split .t-off{margin-top:1.4rem} }
+  /* .gfirst: the graphic reads AFTER the copy in the DOM and sits in the first
+     column on wide screens. Placement only applies where there are two tracks,
+     so the stacked layout keeps heading -> paragraph -> table. */
+  /* The heading sits on its own row across both columns, so the graphic starts at
+     the PARAGRAPH's line rather than the title's, whatever the h2 wraps to. A
+     fixed margin could not do this: at half width the h2 wraps differently than
+     it does stacked, so any measured offset is wrong at the other width. */
+  .t-split.gfirst > .t-head{grid-column:1/-1}
+  @media(min-width:1021px){
+    .t-split.gfirst > .t-off{grid-column:1;grid-row:2;margin-top:0}
+    .t-split.gfirst > .t-body{grid-column:2;grid-row:2}
+  }
+  @media(max-width:1020px){
+    .t-split,.t-split.thirds{grid-template-columns:minmax(0,1fr)}
+    /* Stacked, the table has to SHRINK TO FIT, not fill. width:100% with
+       table-layout:fixed hands every spare pixel to the unsized first column, so
+       capping the table only shrank the slack (measured 719px of label column
+       against 65px of text, then 403px against the same text). max-content sizes
+       the columns to their contents, which is what puts 13.57 and 9.97 next to
+       their model names. */
+    /* .t-split .perf, not a bare .perf: this media block sits ABOVE the
+       PERFORMANCE TABLE block in the sheet, and a media query adds no
+       specificity, so .perf{width:100%} down there wins the tie and the override
+       did nothing (measured: still 719px of label column). Two classes settle it. */
+    .t-split .perf{width:max-content;max-width:100%;table-layout:auto}
+  }
+
+  /* ===== PERFORMANCE TABLE =====
+     Four models on two error measures, on the page canvas rather than in a card.
+     ONE thing is coloured, the row that shipped; GRU's lower error is carried by
+     the figure and the word beside it, not by a second highlight. */
+  /* fixed layout with a measure on each numeric column: left to auto layout the
+     architecture column absorbed the spare width and pushed RMSE and MAE against
+     the right edge, which is what made the table read as full of holes. */
+  .perf{width:100%;border-collapse:collapse;margin-top:0;table-layout:fixed;
+    border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
+  .perf col.n{width:4.4rem}
+  .perf th,.perf td{padding:.7rem .4rem;border-bottom:1px solid rgba(255,255,255,.07);
+    text-align:right}
+  .perf th:first-child,.perf td:first-child{padding-left:0}
+  .perf th:last-child,.perf td:last-child{padding-right:0}
+  .perf thead th{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);font-weight:500}
+  .perf thead th:first-child,.perf tbody th{text-align:left}
+  .perf tbody th{font-family:var(--mono);font-size:var(--t-1);font-weight:500;color:var(--ink-soft)}
+  .perf tbody td{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .perf td.ps{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted)}
+  .perf tr.sel th,.perf tr.sel td{color:var(--ink);font-weight:600;
+    background:rgba(0,212,255,.07)}
+  .perf-tag.low{color:var(--muted);border-color:var(--border2)}
+  .perf tbody tr:last-child th,.perf tbody tr:last-child td{border-bottom:none}
+  .perf-tag{font-family:var(--mono);font-size:.52rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--cyan);border:1px solid rgba(0,212,255,.5);
+    border-radius:100px;padding:.1rem .4rem;margin-left:.4rem;font-weight:500}
+  .perf-note{font-size:var(--t-2);color:var(--ink-soft);margin-top:1rem;line-height:1.6}
+  .perf-note strong{color:var(--ink);font-weight:700}
+  @media(max-width:620px){
+    .perf{table-layout:auto}
+    .perf th,.perf td{padding:.6rem .25rem}
+    .perf-tag{display:block;margin:.25rem 0 0}
+  }
+
+  /* ===== SPEC LIST =====
+     Replaces the four stack boxes: a list of one-line facts wearing card chrome
+     reads as a dashboard at four across. Ruled rows on the canvas instead. */
+  .spec{margin-top:1.5rem;border-top:1px solid rgba(255,255,255,.14);
+    border-bottom:1px solid rgba(255,255,255,.09)}
+  .spec-r{display:grid;grid-template-columns:120px minmax(0,1fr);gap:1.4rem;
+    padding:.95rem 0;align-items:baseline}
+  .spec-r + .spec-r{border-top:1px solid rgba(255,255,255,.07)}
+  .spec-k{font-family:var(--mono);font-size:.74rem;letter-spacing:.03em;color:var(--cyan)}
+  .spec-d{font-size:var(--t-2);color:var(--ink-soft);line-height:1.55}
+  .spec-d b{display:block;color:var(--ink);font-weight:600;margin-bottom:.15rem}
+  @media(max-width:560px){ .spec-r{grid-template-columns:minmax(0,1fr);gap:.3rem} }
+
+  /* .sens-cap is gone with the caption; the bars sit in the right half of a split
+     beside their own description, so they are narrower and the rows shrink to
+     match. */
+  .t-split .sens{grid-template-columns:64px minmax(0,1fr) 42px;gap:.6rem;margin-bottom:.5rem}
+  .t-split .sens .st{height:13px}
+  .t-split .sens .sn{font-size:.7rem}
+
+  /* ===== HERO: interactive gauge + the model's real drivers =====
+     Replaces the looping cockpit: six illustrative sensor traces, a sliding
+     window and a pulsing attention bar pattern, none of which was measured and
+     all of which moved forever. This reads the model's own output for one engine
+     12 cycles from failure, with the eight attention weights that produced it
+     (final deck, slide 7), and the gauge is draggable so a reader can see where
+     the operator's act / watch / healthy thresholds fall. Motion is one pass on
+     arrival plus whatever the reader does themselves; nothing loops.
+     Bands, needle, readout and every bar ship in the markup at the default value,
+     so a blocked script leaves a static instrument rather than an empty frame. */
+  .ahero{padding:1rem 0 2rem}
+  .astage{position:relative;border-radius:20px;overflow:hidden;
+    padding:2rem 2.4rem 1.9rem;
+    background:linear-gradient(180deg,#0a1526,#060a14);
+    border:1px solid color-mix(in srgb,var(--cyan) 24%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(206,245,255,.07),
+               0 30px 62px -46px color-mix(in srgb,var(--cyan) 46%,#000)}
+  .astage::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 4% -14%,rgba(0,212,255,.10),transparent 58%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 1px,transparent 1px 34px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 34px)}
+  .ahead{position:relative;font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.5rem}
+  .ahead .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+  /* .acap is gone: the gauge's description is a paragraph above the frame, which
+     is the rule for every graphic on this site now. */
+
+  /* .split and .rows are gone with the hero's second panel: the gauge sits in a
+     .t-split beside the section's own copy, and the attribution bars live once,
+     in the explainability section. */
+
+  /* ===== PERFORMANCE TABLE =====
+     Four models on two error measures, on the page canvas rather than in a card.
+     ONE thing is coloured, the row that shipped; GRU's lower error is carried by
+     the figure and the word beside it, not by a second highlight. */
+  /* fixed layout with a measure on each numeric column: left to auto layout the
+     architecture column absorbed the spare width and pushed RMSE and MAE against
+     the right edge, which is what made the table read as full of holes. */
+  .perf{width:100%;border-collapse:collapse;margin-top:0;table-layout:fixed;
+    border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
+  .perf col.n{width:4.4rem}
+  .perf th,.perf td{padding:.7rem .4rem;border-bottom:1px solid rgba(255,255,255,.07);
+    text-align:right}
+  .perf th:first-child,.perf td:first-child{padding-left:0}
+  .perf th:last-child,.perf td:last-child{padding-right:0}
+  .perf thead th{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);font-weight:500}
+  .perf thead th:first-child,.perf tbody th{text-align:left}
+  .perf tbody th{font-family:var(--mono);font-size:var(--t-1);font-weight:500;color:var(--ink-soft)}
+  .perf tbody td{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .perf td.ps{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted)}
+  .perf tr.sel th,.perf tr.sel td{color:var(--ink);font-weight:600;
+    background:rgba(0,212,255,.07)}
+  .perf-tag.low{color:var(--muted);border-color:var(--border2)}
+  .perf tbody tr:last-child th,.perf tbody tr:last-child td{border-bottom:none}
+  .perf-tag{font-family:var(--mono);font-size:.52rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--cyan);border:1px solid rgba(0,212,255,.5);
+    border-radius:100px;padding:.1rem .4rem;margin-left:.4rem;font-weight:500}
+  .perf-note{font-size:var(--t-2);color:var(--ink-soft);margin-top:1rem;line-height:1.6}
+  .perf-note strong{color:var(--ink);font-weight:700}
+  @media(max-width:620px){
+    .perf{table-layout:auto}
+    .perf th,.perf td{padding:.6rem .25rem}
+    .perf-tag{display:block;margin:.25rem 0 0}
+  }
+
+  /* ===== SPEC LIST =====
+     Replaces the four stack boxes: a list of one-line facts wearing card chrome
+     reads as a dashboard at four across. Ruled rows on the canvas instead. */
+  .spec{margin-top:1.5rem;border-top:1px solid rgba(255,255,255,.14);
+    border-bottom:1px solid rgba(255,255,255,.09)}
+  .spec-r{display:grid;grid-template-columns:120px minmax(0,1fr);gap:1.4rem;
+    padding:.95rem 0;align-items:baseline}
+  .spec-r + .spec-r{border-top:1px solid rgba(255,255,255,.07)}
+  .spec-k{font-family:var(--mono);font-size:.74rem;letter-spacing:.03em;color:var(--cyan)}
+  .spec-d{font-size:var(--t-2);color:var(--ink-soft);line-height:1.55}
+  .spec-d b{display:block;color:var(--ink);font-weight:600;margin-bottom:.15rem}
+  @media(max-width:560px){ .spec-r{grid-template-columns:minmax(0,1fr);gap:.3rem} }
+
+  /* .sens-cap is gone with the caption; the bars sit in the right half of a split
+     beside their own description, so they are narrower and the rows shrink to
+     match. */
+  .t-split .sens{grid-template-columns:64px minmax(0,1fr) 42px;gap:.6rem;margin-bottom:.5rem}
+  .t-split .sens .st{height:13px}
+  .t-split .sens .sn{font-size:.7rem}
+
+  /* ===== HERO: interactive gauge + the model's real drivers =====
+     Replaces the looping cockpit: six illustrative sensor traces, a sliding
+     window and a pulsing attention bar pattern, none of which was measured and
+     all of which moved forever. This reads the model's own output for one engine
+     12 cycles from failure, with the eight attention weights that produced it
+     (final deck, slide 7), and the gauge is draggable so a reader can see where
+     the operator's act / watch / healthy thresholds fall. Motion is one pass on
+     arrival plus whatever the reader does themselves; nothing loops.
+     Bands, needle, readout and every bar ship in the markup at the default value,
+     so a blocked script leaves a static instrument rather than an empty frame. */
+  .ahero{padding:1rem 0 2rem}
+  .astage{position:relative;border-radius:20px;overflow:hidden;
+    padding:2rem 2.4rem 1.9rem;
+    background:linear-gradient(180deg,#0a1526,#060a14);
+    border:1px solid color-mix(in srgb,var(--cyan) 24%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(206,245,255,.07),
+               0 30px 62px -46px color-mix(in srgb,var(--cyan) 46%,#000)}
+  .astage::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 4% -14%,rgba(0,212,255,.10),transparent 58%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 1px,transparent 1px 34px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 34px)}
+  .ahead{position:relative;font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.5rem}
+  .ahead .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+  /* .acap is gone: the gauge's description is a paragraph above the frame, which
+     is the rule for every graphic on this site now. */
+
+  .split{position:relative;display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1fr);
+    gap:2.4rem;align-items:center;margin-top:1.2rem}
+  @media(max-width:860px){.split{grid-template-columns:minmax(0,1fr);gap:1.6rem}}
+
+  /* ===== the gauge =====
+     Bands, needle and readout all ship in the markup at the default value, so with
+     the script blocked this is a static gauge reading 12 cycles rather than an
+     empty box. The script only adds the dragging. */
+  .gauge{position:relative;width:100%;max-width:268px;margin:0 auto}
+  /* CHILD selector: a descendant .gauge svg also matched the status pill's 13px
+     icon and beat its width/height attributes, stretching it to 100% of the pill
+     and turning a border-radius:100px badge into a 112px circle. */
+  .gauge > svg{display:block;width:100%;height:auto;overflow:visible}
+  .g-verdict svg{width:13px;height:13px;flex:0 0 auto}
+  /* A 250-degree tick dial in the live app's own language: a ramp of ticks from
+     red through amber to green, the act stretch drawn solid over them, labels
+     inside the ring, a ringed hub, and the reading in the band's colour inside the
+     dial. The sweep is 250 rather than 270 on purpose: at 270 the needle's lower
+     travel crosses the digits, measured, and this keeps the two apart at every
+     value in the run. */
+  .g-tick{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+  .g-val{font-size:44px;font-weight:800;letter-spacing:-.03em;fill:var(--red);
+    font-variant-numeric:tabular-nums}
+  .g-val.watch{fill:var(--amber)} .g-val.healthy{fill:var(--green)}
+  .g-unit{font-family:var(--mono);font-size:10px;letter-spacing:.22em;fill:var(--muted)}
+  .g-hubring{fill:#0a1526;stroke:#fff;stroke-width:3}
+  .g-hubdot{fill:var(--red)}
+  .g-needle{stroke:#fff;stroke-width:2.2;stroke-linecap:round;
+    transition:transform .16s cubic-bezier(.23,1,.32,1)}
+  .g-hub{fill:#fff}
+  /* the run-down is driven frame by frame, so the needle must not also tween */
+  .gauge.running .g-needle{transition:none}
+  @media(prefers-reduced-motion:reduce){.g-needle{transition:none}}
+
+  /* The readout used to be absolutely positioned INSIDE the dial (bottom:4px), which
+     put the "cycles remaining" line at page y 292-306 while the hub sits at 330 and
+     the needle is 88 units long: at any reading under about 40 cycles the needle is
+     nearly horizontal and runs straight through that text. Measured at the resting
+     value of 12: needle band y 315-330 against a label box ending at 306, a visible
+     strike-through. It sits in normal flow under the dial now, outside the swept
+     radius entirely, so no reading can collide with it. */
+  .g-read{text-align:center;margin-top:-.4rem}
+  .g-verdict svg{flex:0 0 auto}
+  /* the line the live app carries under its status pill: the reading in words */
+  .g-sub{display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;
+    color:var(--muted);margin-top:.7rem}
+  .g-read b{display:block;font-size:2.9rem;font-weight:800;letter-spacing:-.04em;line-height:1;
+    color:#fff;font-variant-numeric:tabular-nums}
+  /* :not(.g-verdict) is load-bearing. This rule is (0,1,1) and the badge's own
+     display:inline-flex is (0,1,0), so a bare "span" selector won the tie and the
+     pill computed display:block: harmless while .g-read was absolutely positioned
+     and shrink-wrapped, but in normal flow it inherited the readout's full 320px
+     and rendered as a wide outlined bar. */
+  /* CHILD selector again: as a descendant rule this also hit the pill's nested
+     label, making it a block flex item that laid out beside the badge instead of
+     inside it. */
+  .g-read > span:not(.g-verdict){display:block;font-family:var(--mono);font-size:.58rem;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:.35rem}
+  .g-verdict{display:inline-flex;align-items:center;gap:.45rem;margin-top:.7rem;
+    font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+    padding:.32rem .66rem;border-radius:100px;border:1px solid;white-space:nowrap}
+  .g-verdict.act{color:#ff9b9b;border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.12)}
+  .g-verdict.watch{color:#f8c572;border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.12)}
+  .g-verdict.healthy{color:#86efac;border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.12)}
+
+  /* the real attributions, drawn once in rank order */
+  .rows{display:flex;flex-direction:column;gap:.46rem}
+  .rows h3{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;margin-bottom:.5rem}
+  .row{display:grid;grid-template-columns:70px minmax(0,1fr) 44px;gap:.7rem;align-items:center}
+  .row .k{font-family:var(--mono);font-size:.66rem;color:var(--ink-soft);text-align:right}
+  .row .t{height:13px;border-radius:4px;background:rgba(255,255,255,.05);overflow:hidden}
+  .row .t i{display:block;height:100%;border-radius:4px;
+    background:linear-gradient(90deg,#7ff0ff,#00d4ff 55%,#1668a8);
+    transform:scaleX(0);transform-origin:left center;
+    animation:draw .55s cubic-bezier(.23,1,.32,1) both}
+  .row .v{font-family:var(--mono);font-size:.64rem;color:var(--muted);animation:fade .4s ease-out both}
+  .row:nth-child(2) .t i,.row:nth-child(2) .v{animation-delay:.18s}
+  .row:nth-child(3) .t i,.row:nth-child(3) .v{animation-delay:.24s}
+  .row:nth-child(4) .t i,.row:nth-child(4) .v{animation-delay:.30s}
+  .row:nth-child(5) .t i,.row:nth-child(5) .v{animation-delay:.36s}
+  .row:nth-child(6) .t i,.row:nth-child(6) .v{animation-delay:.42s}
+  .row:nth-child(7) .t i,.row:nth-child(7) .v{animation-delay:.48s}
+  .row:nth-child(8) .t i,.row:nth-child(8) .v{animation-delay:.54s}
+  .row:nth-child(9) .t i,.row:nth-child(9) .v{animation-delay:.60s}
+  @keyframes draw{to{transform:scaleX(1)}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @media(prefers-reduced-motion:reduce){
+    .row .t i{animation:none;transform:scaleX(1)}
+    .row .v{animation:none;opacity:1}
+  }
+
+  /* ===== sections ===== */
+
+  /* .econ and .ebar are gone with the cost-comparison card: two bars for two
+     numbers that were printed next to them, so the comparison is prose now. */
+
+  /* ===== SENSOR DRIFT PANEL =====
+     Six channels, each its own card: name in the channel's colour, the delta with a
+     direction mark, a gradient sparkline, and low / current / high underneath. */
+  .drift{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1.4rem}
+  @media(max-width:860px){.drift{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:560px){.drift{grid-template-columns:minmax(0,1fr)}}
+  .dr-c{border:1px solid var(--border);border-radius:12px;padding:.85rem .95rem;
+    background:rgba(255,255,255,.022)}
+  .dr-h{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}
+  .dr-n{font-family:var(--mono);font-size:.78rem;font-weight:600}
+  .dr-d{font-family:var(--mono);font-size:.64rem;color:var(--muted);white-space:nowrap}
+  .dr-s{display:block;width:100%;height:44px;margin:.6rem 0 .5rem}
+  .dr-f{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;
+    font-family:var(--mono);font-size:.62rem;color:var(--muted)}
+  .dr-f b{font-size:.95rem;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+
+  /* ===== ARCHITECTURE CARDS =====
+     Was five full-width rows, each a name on the left and one short detail on the
+     right with a long empty middle. Five cards across instead, the layer name
+     visible and its detail opening inside the card on hover or on keyboard
+     focus, the same max-height panel the other case studies use. align-items:start
+     so an open card grows on its own. Nothing is drawn by a script, so where
+     there is no hover, and at one column, every detail is simply printed. */
+  .arch{margin-top:1.3rem;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:.7rem;align-items:start}
+  @media(max-width:980px){.arch{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:640px){.arch{grid-template-columns:minmax(0,1fr)}}
+  .layer{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    padding:1rem 1.1rem;display:block;cursor:help;
+    transition:opacity .4s var(--ease),transform .4s var(--ease),
+               border-color .18s var(--ease)}
+  .layer:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  /* display:block is load-bearing, not tidiness: .lp is a <span>, and max-height
+     and overflow do not apply to a non-replaced INLINE element, so the panel kept
+     its natural height at opacity 0 (measured 30, 48 and 66px in the five cards)
+     and every card sat at a different height with dead space inside it. */
+  .layer .lp{display:block;overflow:hidden;max-height:0;opacity:0;
+    transition:max-height .24s var(--ease),opacity .2s var(--ease)}
+  .layer .lp .ld{margin-top:.7rem;padding-top:.7rem;
+    border-top:1px solid rgba(255,255,255,.09)}
+  @media(hover:hover) and (pointer:fine){
+    .layer:hover,.layer:focus{border-color:color-mix(in srgb,var(--cyan) 45%,var(--border))}
+    .layer:hover .lp,.layer:focus .lp{max-height:12rem;opacity:1}
+  }
+  @media(hover:none),(pointer:coarse){ .layer .lp{max-height:none;opacity:1} }
+  @media(max-width:640px){ .layer .lp{max-height:none;opacity:1} }
+  @media(prefers-reduced-motion:reduce){ .layer .lp{transition:opacity .2s linear} }
+  /* visible by default; only the JS path (never armed under reduced motion,
+     see main.js html.js-anim) hides it pre-reveal */
+  html.js-anim .layer{opacity:0;transform:translateY(10px)}
+  html.js-anim .layer.in{opacity:1;transform:none}
+  .layer .ln{display:block;font-family:var(--mono);font-size:var(--t-2);font-weight:600;
+    line-height:1.35}
+  .layer .ld{display:block;font-size:var(--t-1);color:var(--muted)}
+  .layer.attn{border-color:rgba(0,212,255,.45);background:linear-gradient(160deg,#0d2233,#0b1626)}
+  .layer.attn .ln{color:var(--cyan)}
+
+  .card h3{font-weight:600;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+  .card code{font-family:var(--mono);font-size:var(--t-1);color:var(--cyan)}
+
+  /* ===== TWO-COLUMN RULED TABLE =====
+     Was two cards side by side, each holding a paragraph. One ruled table with a
+     column each, bullets rather than prose, and the only coloured things are the
+     two headings: cyan for how it is trained, amber for how it is scored. The
+     body copy stays neutral, so the colour means "which column", nothing more.
+     Copied from titan.html's .rtab. (.mlist went with the card it lived in.) */
+  .rtab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:1.6rem;
+    border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
+  .rtab > div{padding:0 1.5rem 1.4rem}
+  .rtab > div + div{border-left:1px solid rgba(255,255,255,.09)}
+  .rtab > div:first-child{padding-left:0}
+  .rtab h3{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--c);padding:.95rem 0 1rem;margin-bottom:1.1rem;
+    border-bottom:1px solid color-mix(in srgb,var(--c) 34%,transparent)}
+  .rtab ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
+  .rtab li{position:relative;padding-left:1.1rem;font-size:var(--t-2);
+    color:var(--ink-soft);line-height:1.55}
+  /* marker is a muted hairline dash, not the column's colour */
+  .rtab li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:1px;
+    background:var(--muted)}
+  .rtab li b{color:var(--ink);font-weight:600}
+  @media(max-width:820px){
+    .rtab{grid-template-columns:minmax(0,1fr)}
+    .rtab > div,.rtab > div:first-child{padding:0 0 1.2rem}
+    .rtab > div + div{border-left:0}
+  }
+
+  /* sensor drivers */
+  .sens{display:grid;grid-template-columns:70px 1fr 46px;gap:.7rem;align-items:center;margin-bottom:.6rem}
+  .sens .sn{font-family:var(--mono);font-size:var(--t-1);color:var(--ink-soft);text-align:right}
+  .sens .st{height:16px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
+  .sens .st span{display:block;height:100%;width:var(--w,0);border-radius:5px;background:linear-gradient(90deg,#00d4ff,#1e3a8a)}
+  .sens .sv{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+
+  /* .stack and .sc are gone with the four boxes they styled: that list is the
+     ruled .spec above. */
+</style>
+</head>
+<body class="theme-aero">
+<!-- Shared pixel-snow background (snow-bg.js): fixed, z-index -1, sits behind
+     everything. The hero stays clear on its own, since .vhero paints an opaque
+     #0c0e11 with a video over it in styles.css, not because of anything here.
+     Cyan, because it is already this page's one accent, not a second hue. -->
+<canvas id="snowBg" data-color="#00d4ff" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+  <section class="vhero aero-hero">
+    <div class="vhero-bg" aria-hidden="true">
+      <video autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-aerospace-poster.webp">
+        <source src="assets/hero-aerospace.mp4" type="video/mp4" />
+      </video>
+      <img class="vhero-still" src="assets/hero-aerospace-poster.webp" alt=""
+           width="1280" height="712" />
+      <div class="vhero-veil"></div>
+    </div>
+    <div class="vhero-in">
+      <div class="lg aero-panel">
+        <div class="lg-fx" aria-hidden="true">
+          <span class="lg-face"></span>
+          <span class="lg-edge t"></span><span class="lg-edge b"></span>
+          <span class="lg-edge l"></span><span class="lg-edge r"></span>
+        </div>
+        <div class="pd-top">
+          <a href="index.html#projects" class="pd-back">← All projects</a>
+          <div class="ae-badge"><span class="dot"></span>Deployable MVP</div>
+        </div>
+        <div class="pd-cat">Deep Learning · Time Series · Aviation</div>
+        <h1 class="pd-title" style="view-transition-name:vt-aerospace">Aerospace Predictive Maintenance</h1>
+        <p class="pd-sub">A platform that predicts how much life is left in an aircraft engine from its sensor data. A stacked LSTM with attention reads the telemetry and estimates the flight cycles remaining, so maintenance can be scheduled on real wear instead of a fixed calendar.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="pd-belt">
+    <div class="pd-facts">
+      <div class="pd-fact"><div class="k">Role</div><div class="v">ML / DL (team of 7)</div></div>
+      <div class="pd-fact"><div class="k">Course</div><div class="v">Deep Learning · IE</div></div>
+      <div class="pd-fact"><div class="k">Year</div><div class="v">2026</div></div>
+      <div class="pd-fact"><div class="k">Stack</div><div class="v">Keras · FastAPI · React</div></div>
+    </div>
+    <div class="pd-links">
+      <a href="https://frontend-mariangarabana-project.vercel.app/" target="_blank" rel="noopener">Live app <span>↗</span></a>
+      <a class="ghost" href="https://github.com/MarianGarabana/DeepLearning_PredictiveMaintenance" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+    </div>
+  </div>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked.
+       Five panels became four sections: explainability is a subsection of the
+       model, since the reason attention was deployed at all is that it explains
+       itself. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-telemetry">Live telemetry</a>
+    <a href="#s-business">The business case</a>
+    <a href="#s-model">The model</a>
+    <a href="#s-build">The build</a>
+  </nav>
+
+  <section id="s-telemetry" class="case-sec" data-screen-label="Telemetry">
+  <!-- ===== OVERVIEW: the gauge, beside its own description ===== -->
+  <div class="t-split">
+  <div class="h-sec" style="margin-top:.9rem">
+    <span class="eyebrow">Live telemetry</span>
+    <h2>Read the wear, not the <em>calendar</em>.</h2>
+    <p class="lead">A stacked LSTM with attention reads a rolling 30-cycle window of engine sensor data and estimates how many flight cycles are left. Because it weights what it reads, every estimate arrives with the sensors that drove it.</p>
+    <p class="lead">The gauge runs down through an engine's life to the model's own output for a unit <strong>12 cycles</strong> from failure. The bands are the operator's thresholds: above 200 cycles is healthy, 100 to 200 is watch, under 100 is act. The eight sensors that drove this particular call are further down, under explainability.</p>
+  </div>
+  <!-- The gauge sits beside the copy, and the eight attribution rows that used to
+       share this frame are gone: they are the explainability section's own graphic,
+       so the hero was drawing the same eight numbers twice. -->
+  <div class="astage t-off" id="astage">
+      <div class="ahead"><span class="dot" style="background:var(--red)"></span>Engine · 12 cycles remaining · RUL gauge</div>
+          <div class="gauge" id="gauge">
+            <svg viewBox="0 0 280 244" role="presentation">
+      <line x1="66.3" y1="183.6" x2="54.8" y2="191.7" stroke="rgb(239,68,68)" stroke-width="3" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="58.6" y1="179.0" x2="49.9" y2="184.0" stroke="rgb(239,72,66)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="54.8" y1="171.7" x2="45.7" y2="176.0" stroke="rgb(239,75,63)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="51.7" y1="164.1" x2="42.3" y2="167.6" stroke="rgb(240,79,61)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="49.2" y1="156.3" x2="39.5" y2="158.9" stroke="rgb(240,82,59)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="47.4" y1="148.3" x2="37.6" y2="150.1" stroke="rgb(240,86,57)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="46.4" y1="140.2" x2="36.4" y2="141.1" stroke="rgb(240,90,54)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="46.0" y1="132.0" x2="36.0" y2="132.0" stroke="rgb(241,93,52)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="46.4" y1="123.8" x2="36.4" y2="122.9" stroke="rgb(241,97,50)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="47.4" y1="115.7" x2="37.6" y2="113.9" stroke="rgb(241,100,47)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="49.2" y1="107.7" x2="39.5" y2="105.1" stroke="rgb(241,104,45)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="51.7" y1="99.9" x2="42.3" y2="96.4" stroke="rgb(242,108,43)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="54.8" y1="92.3" x2="45.7" y2="88.0" stroke="rgb(242,111,41)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="58.6" y1="85.0" x2="49.9" y2="80.0" stroke="rgb(242,115,38)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="63.0" y1="78.1" x2="54.8" y2="72.3" stroke="rgb(242,118,36)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="68.0" y1="71.6" x2="60.3" y2="65.2" stroke="rgb(243,122,34)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="73.5" y1="65.5" x2="66.5" y2="58.5" stroke="rgb(243,126,32)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="79.6" y1="60.0" x2="73.2" y2="52.3" stroke="rgb(243,129,29)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="86.1" y1="55.0" x2="80.3" y2="46.8" stroke="rgb(243,133,27)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="93.0" y1="50.6" x2="88.0" y2="41.9" stroke="rgb(244,136,25)" stroke-width="2.4" stroke-opacity="1" stroke-linecap="round" />
+      <line x1="100.3" y1="46.8" x2="96.0" y2="37.7" stroke="rgb(244,140,22)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="107.9" y1="43.7" x2="104.4" y2="34.3" stroke="rgb(244,144,20)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="115.7" y1="41.2" x2="113.1" y2="31.5" stroke="rgb(244,147,18)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="123.7" y1="39.4" x2="121.9" y2="29.6" stroke="rgb(245,151,16)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="131.8" y1="38.4" x2="130.9" y2="28.4" stroke="rgb(245,154,13)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="140.0" y1="42.0" x2="140.0" y2="28.0" stroke="rgb(245,158,11)" stroke-width="3" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="148.2" y1="38.4" x2="149.1" y2="28.4" stroke="rgb(237,160,14)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="156.3" y1="39.4" x2="158.1" y2="29.6" stroke="rgb(228,161,18)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="164.3" y1="41.2" x2="166.9" y2="31.5" stroke="rgb(220,163,21)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="172.1" y1="43.7" x2="175.6" y2="34.3" stroke="rgb(211,164,24)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="179.7" y1="46.8" x2="184.0" y2="37.7" stroke="rgb(203,166,28)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="187.0" y1="50.6" x2="192.0" y2="41.9" stroke="rgb(194,167,31)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="193.9" y1="55.0" x2="199.7" y2="46.8" stroke="rgb(186,169,34)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="200.4" y1="60.0" x2="206.8" y2="52.3" stroke="rgb(177,170,38)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="206.5" y1="65.5" x2="213.5" y2="58.5" stroke="rgb(169,172,41)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="212.0" y1="71.6" x2="219.7" y2="65.2" stroke="rgb(161,174,44)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="217.0" y1="78.1" x2="225.2" y2="72.3" stroke="rgb(152,175,48)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="221.4" y1="85.0" x2="230.1" y2="80.0" stroke="rgb(144,177,51)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="225.2" y1="92.3" x2="234.3" y2="88.0" stroke="rgb(135,178,54)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="228.3" y1="99.9" x2="237.7" y2="96.4" stroke="rgb(127,180,57)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="230.8" y1="107.7" x2="240.5" y2="105.1" stroke="rgb(118,181,61)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="232.6" y1="115.7" x2="242.4" y2="113.9" stroke="rgb(110,183,64)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="233.6" y1="123.8" x2="243.6" y2="122.9" stroke="rgb(102,185,67)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="234.0" y1="132.0" x2="244.0" y2="132.0" stroke="rgb(93,186,71)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="233.6" y1="140.2" x2="243.6" y2="141.1" stroke="rgb(85,188,74)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="232.6" y1="148.3" x2="242.4" y2="150.1" stroke="rgb(76,189,77)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="230.8" y1="156.3" x2="240.5" y2="158.9" stroke="rgb(68,191,81)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="228.3" y1="164.1" x2="237.7" y2="167.6" stroke="rgb(59,192,84)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="225.2" y1="171.7" x2="234.3" y2="176.0" stroke="rgb(51,194,87)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="221.4" y1="179.0" x2="230.1" y2="184.0" stroke="rgb(42,195,91)" stroke-width="2.4" stroke-opacity="0.5" stroke-linecap="round" />
+      <line x1="213.7" y1="183.6" x2="225.2" y2="191.7" stroke="rgb(34,197,94)" stroke-width="3" stroke-opacity="0.5" stroke-linecap="round" />
+      <path d="M58.9,188.8 A99,99 0 0 1 92.2,45.3" fill="none" stroke="#ef4444" stroke-width="9" stroke-linecap="round" />
+      <text class="g-tick" x="79.4" y="177.4" text-anchor="middle">0</text>
+      <text class="g-tick" x="74.4" y="100.8" text-anchor="middle">65</text>
+      <text class="g-tick" x="140.0" y="61.0" text-anchor="middle">130</text>
+      <text class="g-tick" x="205.6" y="100.8" text-anchor="middle">195</text>
+      <text class="g-tick" x="200.6" y="177.4" text-anchor="middle">260</text>
+              <g id="gNeedleWrap">
+                <line class="g-needle" id="gNeedle" x1="140" y1="132" x2="140" y2="48"
+                      transform="rotate(-113.46 140 132)" />
+                <circle class="g-hubring" cx="140" cy="132" r="11" />
+                <circle class="g-hubdot" cx="140" cy="132" r="3.4" />
+              </g>
+              <text class="g-val" id="gVal" x="140" y="204" text-anchor="middle">12</text>
+              <text class="g-unit" x="140" y="228" text-anchor="middle">CYCLES RUL</text>
+            </svg>
+            <div class="g-read">
+              <span class="g-verdict act" id="gVerdict"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.6v.4"/></svg><span id="gVerdictT">Act · &lt;100</span></span>
+              <span class="g-sub" id="gSub">12 cycles until this engine is out of life</span>
+            </div>
+          </div>
+  </div>
+  </div>
+  </section>
+
+  <section id="s-business" class="case-sec" data-screen-label="Business">
+  <!-- ===== WHY IT MATTERS ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The business case</span>
+    <h2>The most expensive event in <em>aviation</em>.</h2>
+    <p class="lead">Engine failure is the maintenance event airlines fear most. Time-based schedules ignore how worn an engine actually is, so operators either replace parts too early or find out too late.</p>
+    <!-- Was a two-bar comparison card underneath. The bars encoded two numbers
+         that were printed beside them, so the comparison is the sentence. -->
+    <p class="lead">An unplanned failure runs about <strong>$500,000</strong>. The same intervention, scheduled ahead of time, is about <strong>$35,000</strong>, so every failure caught early saves roughly <strong>$465,000</strong>, about 13 times the cost of the planned work. On a fleet of 50 engines avoiding two failures a month, that is <strong>$11.2M</strong> a year.</p>
+  </div>
+  <div class="k4" id="kpis">
+    <div class="kc"><div class="k">AOG cost</div><div class="v">$10–150K</div><div class="s">Per hour on the ground</div></div>
+    <div class="kc"><div class="k">Overhaul</div><div class="v">$1–3M</div><div class="s">Widebody turbofan</div></div>
+    <div class="kc"><div class="k">Return</div><div class="v">13x</div><div class="s">Per failure avoided</div></div>
+    <div class="kc"><div class="k">Fleet of 50</div><div class="v">$11.2M</div><div class="s">Modelled annual saving</div></div>
+  </div>
+  </section>
+
+  <section id="s-model" class="case-sec" data-screen-label="Model">
+  <!-- ===== THE MODEL ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The model</span>
+    <h2>A stacked LSTM with <em>attention</em>.</h2>
+    <p class="lead">The network reads a rolling 30-cycle window of 17 sensor features and learns which moments in that window actually matter. Attention is what lets it weight the timesteps where degradation shows up, instead of treating the whole window equally.</p>
+    <p class="lead">Below, the per-channel drift panel from the live app: six of the seventeen channels, each on its own scale. The readings, the ranges and the deltas are the app's own; only the traces move here, as a simulation inside each channel's real range, the same way the app animates them.</p>
+  </div>
+  <!-- ===== SENSOR DRIFT =====
+       A recreation of the live app's per-channel drift panel. The six sensors, their
+       ranges and their deltas are the app's own readings; the traces themselves are a
+       SIMULATION inside each sensor's real range, which is what the app's own panel
+       animates and what the caption above says. Each polyline ships in the markup
+       from a seeded walk, so a blocked script leaves six drawn sparklines rather than
+       six empty strips. -->
+  <div class="drift" id="drift">
+    <div class="dr-c" data-lo="1586" data-hi="1601" data-dec="0" data-seed="97">
+      <div class="dr-h">
+        <span class="dr-n" style="color:#f59e0b">T50</span>
+        <span class="dr-d up">▲ +0.06%</span>
+      </div>
+      <svg class="dr-s" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="drg0" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f59e0b" stop-opacity=".34"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon class="dr-fill" fill="url(#drg0)" points="0,38 0.0,10.3 5.7,29.7 11.4,28.6 17.1,14.7 22.9,16.1 28.6,28.6 34.3,30.6 40.0,14.1 45.7,8.5 51.4,31.4 57.1,19.6 62.9,6.1 68.6,11.5 74.3,20.6 80.0,7.9 85.7,22.9 91.4,6.7 97.1,12.9 102.9,17.3 108.6,20.3 114.3,17.1 120.0,29.7 120,38" />
+        <polyline class="dr-line" fill="none" stroke="#f59e0b" stroke-width="1.6" stroke-linejoin="round" points="0.0,10.3 5.7,29.7 11.4,28.6 17.1,14.7 22.9,16.1 28.6,28.6 34.3,30.6 40.0,14.1 45.7,8.5 51.4,31.4 57.1,19.6 62.9,6.1 68.6,11.5 74.3,20.6 80.0,7.9 85.7,22.9 91.4,6.7 97.1,12.9 102.9,17.3 108.6,20.3 114.3,17.1 120.0,29.7" />
+      </svg>
+      <div class="dr-f"><span>1586</span><b class="dr-v">1590</b><span>1601</span></div>
+    </div>
+    <div class="dr-c" data-lo="1408" data-hi="1423" data-dec="0" data-seed="128">
+      <div class="dr-h">
+        <span class="dr-n" style="color:#38bdf8">P24</span>
+        <span class="dr-d up">▲ +0.25%</span>
+      </div>
+      <svg class="dr-s" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="drg1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#38bdf8" stop-opacity=".34"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon class="dr-fill" fill="url(#drg1)" points="0,38 0.0,12.3 5.7,25.9 11.4,10.9 17.1,21.4 22.9,12.1 28.6,8.4 34.3,28.4 40.0,15.2 45.7,28.2 51.4,20.6 57.1,29.8 62.9,14.1 68.6,9.9 74.3,18.6 80.0,21.9 85.7,25.4 91.4,20.8 97.1,8.5 102.9,28.2 108.6,29.3 114.3,29.2 120.0,21.6 120,38" />
+        <polyline class="dr-line" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linejoin="round" points="0.0,12.3 5.7,25.9 11.4,10.9 17.1,21.4 22.9,12.1 28.6,8.4 34.3,28.4 40.0,15.2 45.7,28.2 51.4,20.6 57.1,29.8 62.9,14.1 68.6,9.9 74.3,18.6 80.0,21.9 85.7,25.4 91.4,20.8 97.1,8.5 102.9,28.2 108.6,29.3 114.3,29.2 120.0,21.6" />
+      </svg>
+      <div class="dr-f"><span>1408</span><b class="dr-v">1418</b><span>1423</span></div>
+    </div>
+    <div class="dr-c" data-lo="47.6" data-hi="47.9" data-dec="1" data-seed="159">
+      <div class="dr-h">
+        <span class="dr-n" style="color:#60a5fa">Nf</span>
+        <span class="dr-d up">▲ +0.29%</span>
+      </div>
+      <svg class="dr-s" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="drg2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#60a5fa" stop-opacity=".34"/><stop offset="1" stop-color="#60a5fa" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon class="dr-fill" fill="url(#drg2)" points="0,38 0.0,14.3 5.7,22.0 11.4,8.6 17.1,10.7 22.9,29.9 28.6,8.2 34.3,11.6 40.0,18.6 45.7,27.9 51.4,18.9 57.1,28.9 62.9,14.6 68.6,31.4 74.3,13.9 80.0,30.8 85.7,27.4 91.4,33.7 97.1,13.1 102.9,30.9 108.6,26.1 114.3,21.7 120.0,19.4 120,38" />
+        <polyline class="dr-line" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linejoin="round" points="0.0,14.3 5.7,22.0 11.4,8.6 17.1,10.7 22.9,29.9 28.6,8.2 34.3,11.6 40.0,18.6 45.7,27.9 51.4,18.9 57.1,28.9 62.9,14.6 68.6,31.4 74.3,13.9 80.0,30.8 85.7,27.4 91.4,33.7 97.1,13.1 102.9,30.9 108.6,26.1 114.3,21.7 120.0,19.4" />
+      </svg>
+      <div class="dr-f"><span>47.6</span><b class="dr-v">47.9</b><span>47.9</span></div>
+    </div>
+    <div class="dr-c" data-lo="8.43" data-hi="8.51" data-dec="2" data-seed="190">
+      <div class="dr-h">
+        <span class="dr-n" style="color:#e0b877">farB</span>
+        <span class="dr-d up">▲ +0.39%</span>
+      </div>
+      <svg class="dr-s" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="drg3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e0b877" stop-opacity=".34"/><stop offset="1" stop-color="#e0b877" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon class="dr-fill" fill="url(#drg3)" points="0,38 0.0,16.2 5.7,18.1 11.4,19.0 17.1,20.6 22.9,20.2 28.6,6.5 34.3,9.2 40.0,25.9 45.7,15.0 51.4,27.5 57.1,17.0 62.9,9.2 68.6,31.7 74.3,20.7 80.0,26.7 85.7,10.6 91.4,11.0 97.1,12.9 102.9,7.2 108.6,15.2 114.3,7.6 120.0,12.6 120,38" />
+        <polyline class="dr-line" fill="none" stroke="#e0b877" stroke-width="1.6" stroke-linejoin="round" points="0.0,16.2 5.7,18.1 11.4,19.0 17.1,20.6 22.9,20.2 28.6,6.5 34.3,9.2 40.0,25.9 45.7,15.0 51.4,27.5 57.1,17.0 62.9,9.2 68.6,31.7 74.3,20.7 80.0,26.7 85.7,10.6 91.4,11.0 97.1,12.9 102.9,7.2 108.6,15.2 114.3,7.6 120.0,12.6" />
+      </svg>
+      <div class="dr-f"><span>8.43</span><b class="dr-v">8.48</b><span>8.51</span></div>
+    </div>
+    <div class="dr-c" data-lo="38.5" data-hi="38.8" data-dec="1" data-seed="221">
+      <div class="dr-h">
+        <span class="dr-n" style="color:#34d399">W32</span>
+        <span class="dr-d dn">▼ −0.52%</span>
+      </div>
+      <svg class="dr-s" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="drg4" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#34d399" stop-opacity=".34"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon class="dr-fill" fill="url(#drg4)" points="0,38 0.0,18.2 5.7,14.3 11.4,29.3 17.1,30.4 22.9,13.7 28.6,27.1 34.3,15.9 40.0,31.7 45.7,22.8 51.4,25.7 57.1,32.5 62.9,21.2 68.6,32.1 74.3,11.3 80.0,14.3 85.7,30.3 91.4,14.1 97.1,12.0 102.9,24.3 108.6,21.1 114.3,30.9 120.0,9.0 120,38" />
+        <polyline class="dr-line" fill="none" stroke="#34d399" stroke-width="1.6" stroke-linejoin="round" points="0.0,18.2 5.7,14.3 11.4,29.3 17.1,30.4 22.9,13.7 28.6,27.1 34.3,15.9 40.0,31.7 45.7,22.8 51.4,25.7 57.1,32.5 62.9,21.2 68.6,32.1 74.3,11.3 80.0,14.3 85.7,30.3 91.4,14.1 97.1,12.0 102.9,24.3 108.6,21.1 114.3,30.9 120.0,9.0" />
+      </svg>
+      <div class="dr-f"><span>38.5</span><b class="dr-v">38.6</b><span>38.8</span></div>
+    </div>
+    <div class="dr-c" data-lo="23.1" data-hi="23.3" data-dec="1" data-seed="252">
+      <div class="dr-h">
+        <span class="dr-n" style="color:#c4b5fd">DSM</span>
+        <span class="dr-d up">▲ +0.07%</span>
+      </div>
+      <svg class="dr-s" viewBox="0 0 120 38" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="drg5" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#c4b5fd" stop-opacity=".34"/><stop offset="1" stop-color="#c4b5fd" stop-opacity="0"/>
+        </linearGradient></defs>
+        <polygon class="dr-fill" fill="url(#drg5)" points="0,38 0.0,20.2 5.7,10.4 11.4,11.6 17.1,12.2 22.9,28.8 28.6,31.2 34.3,13.9 40.0,10.6 45.7,11.9 51.4,32.8 57.1,29.8 62.9,23.8 68.6,30.6 74.3,27.9 80.0,28.0 85.7,18.9 91.4,12.1 97.1,20.2 102.9,31.2 108.6,12.2 114.3,18.4 120.0,27.1 120,38" />
+        <polyline class="dr-line" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linejoin="round" points="0.0,20.2 5.7,10.4 11.4,11.6 17.1,12.2 22.9,28.8 28.6,31.2 34.3,13.9 40.0,10.6 45.7,11.9 51.4,32.8 57.1,29.8 62.9,23.8 68.6,30.6 74.3,27.9 80.0,28.0 85.7,18.9 91.4,12.1 97.1,20.2 102.9,31.2 108.6,12.2 114.3,18.4 120.0,27.1" />
+      </svg>
+      <div class="dr-f"><span>23.1</span><b class="dr-v">23.2</b><span>23.3</span></div>
+    </div>
+  </div>
+
+  <div class="arch" id="arch">
+    <!-- 17, not 24. CMAPSS ships 21 sensors and 3 operating settings, but the
+         constant-value sensors are dropped in preprocessing, so 17 is what the
+         input tensor actually carries. The deck (slide 12) and the repo README
+         both say 17; the page was describing the file rather than the tensor. -->
+    <div class="layer" tabindex="0"><span class="ln">Input</span><span class="lp"><span class="ld">30 cycles × 17 features, the constant-value sensors dropped in preprocessing.</span></span></div>
+    <div class="layer" tabindex="0"><span class="ln">LSTM 128</span><span class="lp"><span class="ld">Returns sequences, dropout 0.2.</span></span></div>
+    <div class="layer" tabindex="0"><span class="ln">LSTM 64</span><span class="lp"><span class="ld">Returns sequences, dropout 0.2.</span></span></div>
+    <div class="layer attn" tabindex="0"><span class="ln">Attention</span><span class="lp"><span class="ld">Dot product over the 30 timesteps: learns which moments in the window carry the degradation.</span></span></div>
+    <div class="layer" tabindex="0"><span class="ln">Dense → RUL</span><span class="lp"><span class="ld">One output: flight cycles remaining.</span></span></div>
+  </div>
+  <!-- ===== PERFORMANCE =====
+       The page named RMSE, MAE and the NASA score and gave a value for none of
+       them. Every figure below is from the repo README, and slide 8 of the deck
+       plots the same four models. -->
+  <!-- Reading order is copy then table, and the table is moved into the left
+       column by GRID PLACEMENT, not by DOM order. Ordering the DOM instead put
+       the table above its own heading in the stacked layout, where source order
+       is reading order: measured 289px above the h2 that titles it at 924px. -->
+  <div class="t-split gfirst">
+  <div class="t-head h-sec" style="margin-top:0">
+    <span class="eyebrow">Performance</span>
+    <h2>Four architectures, and the one we <em>shipped</em>.</h2>
+  </div>
+  <div class="t-body">
+    <p class="lead">All four were trained and compared on FD001, 100 engines and 17,731 sequences. <strong>GRU reached the lowest error.</strong> We deployed the LSTM with attention anyway, because it can show which timesteps and which sensors drove each prediction, and an estimate a maintenance engineer can interrogate is worth more than one cycle of RMSE. Published work on this dataset sits between 12 and 18 cycles RMSE.</p>
+    <p class="perf-note">Errors are in flight cycles, so the deployed model is on average about ten cycles out. <strong>59%</strong> of its predictions land within ±10 cycles and <strong>92%</strong> within ±25.</p>
+  </div>
+  <table class="perf t-off">
+    <caption class="sr-only">Four architectures compared on FD001 by RMSE and MAE in flight cycles. SimpleRNN, the baseline, 15.90 and 11.22. LSTM, 13.71 and 10.26. GRU, 13.57 and 9.97, the lowest error of the four. LSTM with attention, 14.52 and 10.33, the architecture deployed.</caption>
+    <colgroup><col /><col class="n" /><col class="n" /></colgroup>
+    <thead>
+      <tr><th scope="col">Architecture</th><th scope="col">RMSE</th><th scope="col">MAE</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">SimpleRNN</th><td>15.90</td><td>11.22</td></tr>
+      <tr><th scope="row">LSTM</th><td>13.71</td><td>10.26</td></tr>
+      <tr><th scope="row">GRU <span class="perf-tag low">lowest error</span></th><td>13.57</td><td>9.97</td></tr>
+      <tr class="sel"><th scope="row">LSTM + attention <span class="perf-tag">deployed</span></th><td>14.52</td><td>10.33</td></tr>
+    </tbody>
+  </table>
+
+  </div>
+
+  <!-- Was two cards side by side, each holding a paragraph. One ruled table with a
+       column each, bullets rather than prose, and the only coloured things are the
+       two headings. -->
+  <div class="rtab">
+    <div style="--c:var(--cyan)">
+      <h3>How it is trained</h3>
+      <ul>
+        <li>Sliding windows of 30 cycles per engine.</li>
+        <li>MinMax scaling across the 17 features.</li>
+        <li>RUL capped at <b>125</b>, so the model does not chase noise on healthy engines.</li>
+        <li>Up to 100 epochs, early stopping, dropout after each LSTM layer.</li>
+      </ul>
+    </div>
+    <div style="--c:var(--amber)">
+      <h3>How it is scored</h3>
+      <ul>
+        <li><b>RMSE</b>, the standard error, in flight cycles.</li>
+        <li><b>MAE</b>, the average miss.</li>
+        <li><b>NASA score</b>, asymmetric on purpose.</li>
+        <li>It punishes late predictions far harder than early ones, because being optimistic about a failing engine is the dangerous mistake.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== SENSORS: a subsection of the model, not a tab of its own. The reason
+       this architecture was deployed over the more accurate one is that it can
+       show its working, so the two belong together. ===== -->
+  <div class="t-split">
+  <div>
+  <div class="h-sec" style="margin-top:0">
+    <span class="eyebrow">Explainability</span>
+    <h2>Which sensors drive the call.</h2>
+    <p class="lead">The dashboard surfaces the sensors contributing most to each prediction, so an engineer can see the physical story behind the number rather than a bare countdown.</p>
+    <p class="lead">Beside this: the model's top drivers for a single prediction on an engine 12 cycles from failure, as presented in the final deck. They are attributions across all 17 features, so they sum toward 1 rather than running on a 0 to 1 scale, and bar length is each one relative to the largest. Core speed leads; the operational settings contribute little in this example.</p>
+  </div>
+  </div>
+  <!-- These eight rows are the model's real attributions for one prediction,
+       from slide 7 of the final deck. They replace an unattributed six-row list
+       (T50 0.92 down to phi 0.33) that named different sensors on a different
+       scale: a reader who opened the embedded deck saw one set of drivers here
+       and another set two clicks later. -->
+  <div class="card tg t-off" id="sensors">
+    <h3>Attention weights · 12 cycles remaining</h3>
+    <div class="sens"><div class="sn">Nc (S9)</div><div class="st"><span style="--w:100%"></span></div><div class="sv">0.148</div></div>
+    <div class="sens"><div class="sn">S14</div><div class="st"><span style="--w:72%"></span></div><div class="sv">0.107</div></div>
+    <div class="sens"><div class="sn">S13</div><div class="st"><span style="--w:65%"></span></div><div class="sv">0.096</div></div>
+    <div class="sens"><div class="sn">S8</div><div class="st"><span style="--w:64%"></span></div><div class="sv">0.094</div></div>
+    <div class="sens"><div class="sn">S11</div><div class="st"><span style="--w:57%"></span></div><div class="sv">0.085</div></div>
+    <div class="sens"><div class="sn">S12</div><div class="st"><span style="--w:55%"></span></div><div class="sv">0.081</div></div>
+    <div class="sens"><div class="sn">S7</div><div class="st"><span style="--w:45%"></span></div><div class="sv">0.067</div></div>
+    <div class="sens"><div class="sn">S20</div><div class="st"><span style="--w:43%"></span></div><div class="sv">0.064</div></div>
+  </div>
+  </div>
+  </section>
+
+  <section id="s-build" class="case-sec" data-screen-label="Build">
+  <!-- ===== DATA + STACK ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The build</span>
+    <h2>A product, not a notebook.</h2>
+    <p class="lead">The dataset is NASA CMAPSS, which simulates turbofan engines run to failure, so the data is literally the business case. We started on FD001 for the cleanest signal and extended to FD003, which adds fan degradation alongside the same compressor wear, then shipped the whole thing as a deployable MVP.</p>
+  </div>
+  <!-- Was four equal boxes, each a label over one line. One ruled list on the
+       page canvas instead: the layer, what it is, and what it does. -->
+  <div class="spec">
+    <div class="spec-r"><div class="spec-k">Data</div><div class="spec-d"><b>NASA CMAPSS</b>FD001 → FD003, run-to-failure turbofans.</div></div>
+    <div class="spec-r"><div class="spec-k">Model</div><div class="spec-d"><b>Keras LSTM</b>Stacked, with attention over the 30-cycle window.</div></div>
+    <div class="spec-r"><div class="spec-k">Serving</div><div class="spec-d"><b>FastAPI</b>Cycle-by-cycle <code>/predict</code> endpoint.</div></div>
+    <div class="spec-r"><div class="spec-k">Interface</div><div class="spec-d"><b>React dashboard</b>Live gauge, drivers and what-if scheduling, deployed at <a href="https://frontend-mariangarabana-project.vercel.app/" target="_blank" rel="noopener">frontend-mariangarabana-project.vercel.app</a>.</div></div>
+  </div>
+
+  <!-- ===== DELIVERABLE ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The deliverable</span>
+    <h2>The final deck.</h2>
+    <p class="lead">The presentation we delivered for the Deep Learning course, from the business case and the CMAPSS data through the LSTM architecture to the deployed product. Scroll it in place or open it full screen.</p>
+  </div>
+  <div class="pd-block">
+    <div class="pd-embed">
+      <a class="pdf-fac" href="assets/aerospace-deck.pdf" target="_blank" rel="noopener" data-frame-title="Aerospace predictive maintenance final presentation, 14 slides">
+        <img src="assets/posters/aerospace-deck.webp" alt="" width="1600" height="901" loading="lazy" decoding="async">
+        <span class="pdf-fac-cta">Load the deck <span class="sz">3.3 MB</span><span class="sr-only pdf-fac-note">, opens in a new tab</span></span>
+      </a>
+      <div class="pd-embed-bar">
+        <span class="lbl">Predictive maintenance · final presentation (14 slides)</span>
+        <a href="assets/aerospace-deck.pdf" target="_blank" rel="noopener">Open full screen <span>↗</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="h-sec">
+    <span class="eyebrow">My part</span>
+    <h2>What I worked on.</h2>
+    <p class="lead">Built with a team of seven for the Deep Learning course. The interesting problem was not just fitting the network, it was framing the target properly, capping RUL so the model learns real degradation, and scoring it in a way that treats a late prediction as the serious failure it is.</p>
+    <div class="pd-links" style="margin-top:2rem">
+      <a href="https://frontend-mariangarabana-project.vercel.app/" target="_blank" rel="noopener">Open the live app <span>↗</span></a>
+      <a class="ghost" href="https://github.com/MarianGarabana/DeepLearning_PredictiveMaintenance" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+    </div>
+  </div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="datathon.html">Sustainable Aviation Datathon <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script>
+/* ===== onView: fires when an element is IN VIEW **or HAS BEEN SCROLLED PAST** =====
+   Not IntersectionObserver, for the reason madrid.html documents at length: IO
+   only fires on a state CHANGE, and the section rail makes one-step jumps
+   ordinary, so an element that goes from below the fold to above the viewport in
+   a single jump never intersects and never gets a callback. Position is tested
+   on scroll instead. */
+var WATCH=[], vraf=0;
+function vReached(e){
+  var r=e.el.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return false;
+  return r.bottom<=0 || r.top<innerHeight-40;
+}
+function vSweep(){
+  vraf=0;
+  for(var i=WATCH.length-1;i>=0;i--){ if(vReached(WATCH[i])){ WATCH.splice(i,1)[0].cb(); } }
+}
+function vKick(){ if(!vraf) vraf=requestAnimationFrame(vSweep); }
+function onView(el,cb){
+  if(!el) return;
+  var e={el:el,cb:cb};
+  if(vReached(e)){ cb(); return; }
+  WATCH.push(e); vKick();
+}
+addEventListener('scroll',vKick,{passive:true});
+addEventListener('resize',vKick);
+addEventListener('load',vKick);
+
+/* ---- hero gauge: one run-down through the engine's life ----
+   Not interactive any more, at Marian's request: the needle sweeps from a healthy
+   engine down to the model's own reading for a unit 12 cycles from failure, the
+   number counts with it, and the verdict pill changes band as it crosses 200 and
+   100. ONE pass, on arrival, then it stops: nothing on this page loops.
+   The markup already holds the final state (12 cycles, act band), so a blocked
+   script leaves a correct static instrument, and reduced motion simply never
+   starts the run. */
+(function(){
+  var wrap=document.getElementById('gauge'); if(!wrap) return;
+  var needle=document.getElementById('gNeedle'), sub=document.getElementById('gSub'),
+      out=document.getElementById('gVal'), verdict=document.getElementById('gVerdict');
+  /* 20 seconds, at Marian's request: the run reads as an engine wearing through its
+     service life rather than a needle moving. It is still ONE pass, ends on the
+     model's reading and stops, and never starts under reduced motion. */
+  var CX=140, CY=132, MAX=260, A0=215, SWEEP=250, FROM=232, TO=12, DUR=20000;
+
+  function bandFor(v){
+    if(v<100) return ['act','Act · &lt;100'];
+    if(v<200) return ['watch','Watch · 100–200'];
+    return ['healthy','Healthy · &gt;200'];
+  }
+  function paint(v){
+    /* the needle is authored pointing up, so the rotation is 90 minus the dial
+       angle for this value */
+    var t='rotate('+(90-(A0-(v/MAX)*SWEEP)).toFixed(2)+' '+CX+' '+CY+')';
+    needle.setAttribute('transform',t);
+    out.textContent=Math.round(v);
+    if(sub.dataset.n!==String(Math.round(v))){ sub.dataset.n=String(Math.round(v)); }
+    var b=bandFor(v);
+    if(verdict.dataset.band!==b[0]){
+      verdict.dataset.band=b[0];
+      verdict.className='g-verdict '+b[0];
+      document.getElementById('gVerdictT').innerHTML=b[1];
+      out.setAttribute('class','g-val '+(b[0]==='act'?'':b[0]));
+      sub.textContent=b[0]==='act'
+        ? 'inside the act band · schedule the intervention now'
+        : (b[0]==='watch' ? 'inside the watch band · plan the intervention' : 'healthy · no action from this reading');
+      document.querySelector('.g-hubdot').style.fill=
+        b[0]==='act'?'var(--red)':(b[0]==='watch'?'var(--amber)':'var(--green)');
+    }
+  }
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var ran=false;
+  function run(){
+    if(ran) return; ran=true;
+    wrap.classList.add('running');
+    var t0=null;
+    /* ease-out: the wear reads fast at first and settles onto the reading, rather
+       than crawling in at a constant rate */
+    function ease(p){ return 1-Math.pow(1-p,3); }
+    function frame(ts){
+      if(t0===null) t0=ts;
+      var p=Math.min(1,(ts-t0)/DUR);
+      paint(FROM+(TO-FROM)*ease(p));
+      if(p<1) requestAnimationFrame(frame);
+      else { wrap.classList.remove('running'); paint(TO); }
+    }
+    paint(FROM);
+    requestAnimationFrame(frame);
+  }
+  onView(wrap, run);
+})();
+
+/* The chartkit RUL scale went with the cockpit panel that held it: the gauge
+   above is the reading now, and it needs no chart library. chartkit.js is no
+   longer loaded by this page. */
+
+/* ---- sensor drift: the simulated walk the live app's panel animates ----
+   One sample shifts in every 900ms, each channel walking inside its OWN real range,
+   so the shape moves the way the app's does without pretending to be a recorded
+   series (the caption above says it is a simulation). Pauses when the tab is hidden
+   and never starts under reduced motion, where the seeded shape shipped in the
+   markup is what stays on screen. */
+(function(){
+  var host=document.getElementById('drift'); if(!host) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var W=120, H=38, N=22;
+  var cards=[].map.call(host.querySelectorAll('.dr-c'), function(c){
+    var pl=c.querySelector('.dr-line'), pg=c.querySelector('.dr-fill');
+    var ys=pl.getAttribute('points').split(' ').map(function(p){ return parseFloat(p.split(',')[1]); });
+    return {el:c, line:pl, fill:pg, ys:ys,
+      lo:parseFloat(c.dataset.lo), hi:parseFloat(c.dataset.hi),
+      dec:parseInt(c.dataset.dec,10), val:c.querySelector('.dr-v')};
+  });
+  function draw(c){
+    var pts=c.ys.map(function(y,i){ return ((i/(N-1))*W).toFixed(1)+','+y.toFixed(1); }).join(' ');
+    c.line.setAttribute('points',pts);
+    c.fill.setAttribute('points','0,'+H+' '+pts+' '+W+','+H);
+    /* The printed reading is the LIVE APP's value and is never recomputed here.
+       It used to follow the simulated last sample, which meant the bold number a
+       reader takes for the app's reading was generated on this page: the caption
+       says the ranges and deltas are the app's, so the reading has to be too.
+       Only the trace walks. */
+  }
+  var timer=null;
+  function tick(){
+    cards.forEach(function(c){
+      var last=c.ys[c.ys.length-1];
+      var next=last+(Math.random()-0.5)*9;
+      next=Math.max(4,Math.min(H-6,next));
+      c.ys.shift(); c.ys.push(next);
+      draw(c);
+    });
+  }
+  function start(){ if(!timer) timer=setInterval(tick,900); }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+  document.addEventListener('visibilitychange',function(){ document.hidden?stop():start(); });
+  onView(host, start);
+})();
+
+/* ---- arch layers reveal ---- */
+(function(){ var a=document.getElementById('arch'); if(a) onView(a,function(){ a.querySelectorAll('.layer').forEach(function(l,i){ setTimeout(function(){l.classList.add('in');},i*140); }); },0.2); })();
+</script>
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The anchors work without this. It adds which pill is lit, an offset jump that
+   clears the sticky rail, and keeping the lit pill inside the rail's own
+   horizontal scroll on a phone. aria-current, not aria-selected: links, not tabs. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    var a=links[i];
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* Reading position, not intersection ratio: these sections are wildly different
+     heights, so the tallest would hold the marker while a short one owns the
+     screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  /* park() is symmetric: it corrects a section that landed under the rail AND one
+     that landed too far below it. Measured on dicorsa.html, where lazy charts
+     grew the document mid-travel and a one-way guard left the jump 200 to 620px
+     short with the wrong pill lit. Re-asserted on a short ladder because the
+     nav's own 300ms show/hide moves the rail after park() scrolls upward. */
+  function park(i){
+    var delta=secs[i].getBoundingClientRect().top-(rail.getBoundingClientRect().bottom+12);
+    if(Math.abs(delta)<=2) return;
+    var to=Math.max(0,scrollY+delta);
+    if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+    else window.scrollTo(0,to);
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      [0,140,340,600,900,1200].forEach(function(ms){
+        setTimeout(function(){ park(i); if(ms===1200) light(i); },ms);
+      });
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+<!-- Opts this page into the shared shader; the #snowBg rules already live in
+     styles.css, which this page loads like every other. -->
+<script src="snow-bg.js" defer></script>
+</body>
+</html>

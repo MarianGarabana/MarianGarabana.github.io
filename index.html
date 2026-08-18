@@ -1,2459 +1,1493 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Marian Garabana | Business Analytics & Data Science</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #080c10;
-      --surface: #0d1219;
-      --surface2: #111820;
-      --border: rgba(0, 163, 255, 0.12);
-      --border2: rgba(0, 163, 255, 0.28);
-      --neon: #00a3ff;
-      --neon-dim: rgba(0, 163, 255, 0.10);
-      --neon-glow: rgba(0, 163, 255, 0.35);
-      --text: #dde4eb;
-      --muted: #4a5a6a;
-      --muted2: #7a8a9a;
-      --white: #ffffff;
-      --mono: 'JetBrains Mono', monospace;
-      --display: 'Syne', sans-serif;
-      --body: 'Inter', sans-serif;
-      --radius: 3px;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--body);
-      font-weight: 300;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    body.modal-open {
-      overflow: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(0, 163, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 163, 255, 0.025) 1px, transparent 1px);
-      background-size: 64px 64px;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      z-index: 0;
-      pointer-events: none;
-      width: 800px;
-      height: 800px;
-      top: -280px;
-      right: -280px;
-      background: radial-gradient(circle, rgba(0, 163, 255, 0.06) 0%, transparent 65%);
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.1rem 3rem;
-      background: rgba(8, 12, 16, 0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      transition: border-color .3s;
-    }
-
-    nav.scrolled {
-      border-bottom-color: var(--border2);
-    }
-
-    .nav-logo {
-      font-family: var(--display);
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--white);
-      text-decoration: none;
-    }
-
-    .nav-logo span {
-      color: var(--neon);
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      gap: 2.5rem;
-    }
-
-    .nav-links a {
-      font-family: var(--mono);
-      font-size: .68rem;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--muted2);
-      text-decoration: none;
-      transition: color .2s;
-      position: relative;
-    }
-
-    .nav-links a::before {
-      content: '//';
-      font-size: .58rem;
-      color: var(--neon);
-      opacity: 0;
-      margin-right: .3rem;
-      transition: opacity .2s;
-    }
-
-    .nav-links a:hover {
-      color: var(--white);
-    }
-
-    .nav-links a:hover::before {
-      opacity: 1;
-    }
-
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-    }
-
-    .hamburger span {
-      display: block;
-      width: 22px;
-      height: 1.5px;
-      background: var(--text);
-    }
-
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 62px;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid var(--border);
-      z-index: 190;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .mobile-menu.open {
-      display: flex;
-    }
-
-    .mobile-menu a {
-      font-family: var(--mono);
-      font-size: .78rem;
-      color: var(--muted2);
-      text-decoration: none;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-
-    /* ── HERO ── */
-    #hero {
-      min-height: 100vh;
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      padding: 8rem 3rem 5rem;
-      gap: 5rem;
-    }
-
-    .hero-text {
-      animation: fadeUp .8s ease both;
-    }
-
-    .hero-eyebrow {
-      font-family: var(--mono);
-      font-size: .7rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: var(--neon);
-      margin-bottom: 1rem;
-    }
-
-    .hero-name {
-      font-family: var(--display);
-      font-size: clamp(2.8rem, 5vw, 4.8rem);
-      font-weight: 800;
-      line-height: 1.05;
-      color: var(--white);
-      margin-bottom: 1.25rem;
-      letter-spacing: -.01em;
-    }
-
-    .hero-name .accent {
-      color: var(--neon);
-    }
-
-    .hero-title {
-      font-family: var(--mono);
-      font-size: .78rem;
-      color: var(--muted2);
-      margin-bottom: 2rem;
-      padding: .65rem 1rem;
-      border-left: 2px solid var(--neon);
-      background: var(--neon-dim);
-      letter-spacing: .05em;
-    }
-
-    .hero-summary {
-      font-size: .94rem;
-      color: var(--muted2);
-      max-width: 460px;
-      margin-bottom: 2.75rem;
-      line-height: 1.78;
-    }
-
-    .hero-btns {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: .7rem 1.75rem;
-      font-family: var(--mono);
-      font-size: .7rem;
-      font-weight: 500;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all .22s;
-      border-radius: var(--radius);
-    }
-
-    .btn-primary {
-      background: var(--neon);
-      color: var(--bg);
-    }
-
-    .btn-primary:hover {
-      background: #33b5ff;
-      box-shadow: 0 0 28px var(--neon-glow);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border2);
-    }
-
-    .btn-outline:hover {
-      border-color: var(--neon);
-      color: var(--neon);
-      box-shadow: inset 0 0 16px var(--neon-dim);
-    }
-
-    .hero-visual {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeUp .8s .15s ease both;
-      position: relative;
-      z-index: 1;
-    }
-
-    .avatar-wrap {
-      position: relative;
-      width: 320px;
-      height: 360px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .avatar-ring {
-      position: absolute;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      border: 1px dashed rgba(0, 163, 255, 0.22);
-      animation: spin 22s linear infinite;
-    }
-
-    .avatar-ring::before {
-      content: '';
-      position: absolute;
-      top: -4px;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--neon);
-      box-shadow: 0 0 14px var(--neon), 0 0 28px var(--neon-glow);
-      transform: translateX(-50%);
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .avatar-circle {
-      width: 210px;
-      height: 210px;
-      border-radius: 50%;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--display);
-      font-size: 3.4rem;
-      font-weight: 800;
-      color: var(--neon);
-      letter-spacing: .04em;
-      box-shadow: 0 0 60px rgba(0, 163, 255, 0.1), inset 0 0 40px rgba(0, 163, 255, 0.04);
-      position: relative;
-      z-index: 1;
-    }
-
-    .avatar-badges {
-      position: absolute;
-      bottom: 10px;
-      left: 0;
-      right: 0;
-      display: flex;
-      gap: .4rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .badge {
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      padding: .25rem .7rem;
-      font-family: var(--mono);
-      font-size: .6rem;
-      color: var(--neon);
-      letter-spacing: .1em;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 2.5rem;
-      margin-top: 2.75rem;
-      flex-wrap: wrap;
-    }
-
-    .stat-num {
-      font-family: var(--display);
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--neon);
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-family: var(--mono);
-      font-size: .62rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-top: .25rem;
-    }
-
-    /* ── SECTION SHELL ── */
-    section {
-      padding: 6rem 3rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    section:nth-child(even) {
-      background: var(--surface);
-    }
-
-    .section-eyebrow {
-      font-family: var(--mono);
-      font-size: .68rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--neon);
-      margin-bottom: .5rem;
-    }
-
-    .section-title {
-      font-family: var(--display);
-      font-size: clamp(1.9rem, 3vw, 2.6rem);
-      font-weight: 800;
-      color: var(--white);
-      line-height: 1.1;
-      letter-spacing: -.01em;
-      margin-bottom: 1rem;
-    }
-
-    .section-line {
-      width: 40px;
-      height: 2px;
-      margin-bottom: 3rem;
-      background: linear-gradient(90deg, var(--neon), transparent);
-    }
-
-    /* ── ABOUT (expand in-place) ── */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-
-    .about-text p {
-      color: var(--muted2);
-      margin-bottom: 1.25rem;
-      font-size: .92rem;
-    }
-
-    .about-highlights {
-      display: flex;
-      flex-direction: column;
-      gap: .8rem;
-    }
-
-    .exp-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-left: 2px solid var(--neon);
-      cursor: pointer;
-      overflow: hidden;
-      transition: border-color .25s, box-shadow .25s;
-      user-select: none;
-    }
-
-    .exp-card:hover {
-      border-color: var(--border2);
-      box-shadow: 0 0 24px var(--neon-dim);
-    }
-
-    .exp-card.open {
-      border-color: var(--border2);
-    }
-
-    .exp-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.2rem 1.4rem;
-      gap: 1rem;
-    }
-
-    .exp-card-header-text h4 {
-      font-family: var(--display);
-      font-size: .9rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: .15rem;
-    }
-
-    .exp-card-header-text p {
-      font-size: .78rem;
-      color: var(--muted2);
-      margin: 0;
-    }
-
-    .exp-chevron {
-      width: 22px;
-      height: 22px;
-      flex-shrink: 0;
-      border: 1px solid var(--border2);
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .25s;
-    }
-
-    .exp-chevron svg {
-      width: 10px;
-      height: 10px;
-      stroke: var(--neon);
-      fill: none;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transition: transform .35s;
-    }
-
-    .exp-card.open .exp-chevron {
-      background: var(--neon-dim);
-    }
-
-    .exp-card.open .exp-chevron svg {
-      transform: rotate(180deg);
-    }
-
-    .exp-card-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .45s cubic-bezier(.4, 0, .2, 1), padding .35s;
-      padding: 0 1.4rem;
-    }
-
-    .exp-card.open .exp-card-body {
-      max-height: 400px;
-      padding: 0 1.4rem 1.4rem;
-    }
-
-    .exp-card-body-inner {
-      border-top: 1px solid var(--border);
-      padding-top: 1.1rem;
-    }
-
-    .exp-card-body p {
-      font-size: .84rem;
-      color: var(--muted2);
-      line-height: 1.7;
-      margin-bottom: .75rem;
-    }
-
-    .exp-card-body p:last-child {
-      margin-bottom: 0;
-    }
-
-    .exp-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .4rem;
-      margin-top: .75rem;
-    }
-
-    .exp-tag {
-      font-family: var(--mono);
-      font-size: .62rem;
-      padding: .2rem .65rem;
-      background: rgba(0, 163, 255, 0.07);
-      border: 1px solid rgba(0, 163, 255, 0.18);
-      color: var(--neon);
-      letter-spacing: .06em;
-    }
-
-    /* ── SKILLS GRID ── */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 1.2rem;
-    }
-
-    .skill-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 1.6rem;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: border-color .25s, box-shadow .25s, transform .25s;
-      user-select: none;
-    }
-
-    .skill-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--neon), transparent);
-      opacity: 0;
-      transition: opacity .3s;
-    }
-
-    .skill-card:hover {
-      border-color: var(--border2);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 28px var(--neon-dim);
-    }
-
-    .skill-card:hover::before {
-      opacity: 1;
-    }
-
-    .skill-card-label {
-      font-family: var(--mono);
-      font-size: .62rem;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: var(--neon);
-      margin-bottom: .65rem;
-    }
-
-    .skill-card h3 {
-      font-family: var(--display);
-      font-size: .95rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: .4rem;
-    }
-
-    .skill-card p {
-      font-size: .82rem;
-      color: var(--muted2);
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-
-    .skill-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .35rem;
-    }
-
-    .skill-tag {
-      font-family: var(--mono);
-      font-size: .62rem;
-      padding: .2rem .65rem;
-      background: rgba(0, 163, 255, 0.07);
-      border: 1px solid rgba(0, 163, 255, 0.18);
-      color: var(--neon);
-      letter-spacing: .06em;
-    }
-
-    .card-open-hint {
-      display: flex;
-      align-items: center;
-      gap: .45rem;
-      margin-top: 1.1rem;
-      padding-top: .9rem;
-      border-top: 1px solid var(--border);
-      font-family: var(--mono);
-      font-size: .62rem;
-      color: var(--muted);
-      letter-spacing: .1em;
-      transition: color .2s;
-    }
-
-    .card-open-hint svg {
-      width: 10px;
-      height: 10px;
-      stroke: var(--neon);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .skill-card:hover .card-open-hint {
-      color: var(--neon);
-    }
-
-    /* ── PROJECTS GRID ── */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.4rem;
-    }
-
-    .project-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      user-select: none;
-      align-self: start;
-      transition: border-color .25s, box-shadow .25s, transform .25s;
-    }
-
-    .project-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, transparent 65%, rgba(0, 163, 255, 0.05));
-      opacity: 0;
-      transition: opacity .3s;
-      pointer-events: none;
-    }
-
-    .project-card:hover {
-      border-color: var(--border2);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0, 163, 255, 0.1);
-    }
-
-    .project-card:hover::after {
-      opacity: 1;
-    }
-
-    .project-card-header {
-      height: 200px;
-      min-height: 200px;
-      max-height: 200px;
-      position: relative;
-      overflow: hidden;
-      background: #050d18;
-    }
-
-    .project-card-header img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      opacity: 0.85;
-      transition: opacity .3s;
-    }
-
-    .project-card:hover .project-card-header img {
-      opacity: 1;
-    }
-
-    .project-card-title-bg {
-      font-family: var(--display);
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: rgba(0, 163, 255, 0.12);
-    }
-
-    .project-card-num {
-      position: absolute;
-      bottom: 10px;
-      right: 14px;
-      font-family: var(--mono);
-      font-size: .62rem;
-      color: rgba(0, 163, 255, 0.3);
-      letter-spacing: .1em;
-    }
-
-    .project-card-body {
-      padding: 1.4rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-top: 1px solid var(--border);
-    }
-
-    .project-card-label {
-      font-family: var(--mono);
-      font-size: .62rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: var(--muted);
-      margin-bottom: .35rem;
-    }
-
-    .project-card-body h3 {
-      font-family: var(--display);
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: .5rem;
-    }
-
-    .project-card-body p {
-      font-size: .82rem;
-      color: var(--muted2);
-      line-height: 1.6;
-      flex: 1;
-    }
-
-    .project-card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 1.1rem;
-      padding-top: .9rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .project-award-pill {
-      font-family: var(--mono);
-      font-size: .6rem;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--neon);
-      background: rgba(0, 163, 255, 0.07);
-      border: 1px solid rgba(0, 163, 255, 0.2);
-      padding: .22rem .6rem;
-    }
-
-    .project-card:hover .card-open-hint {
-      color: var(--neon);
-    }
-
-    /* ════════════════════════════════════════
-       FULL-SCREEN MODAL TAKEOVER
-    ════════════════════════════════════════ */
-    .fs-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 500;
-      background: var(--bg);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .4s ease;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .fs-modal.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    /* top scanline animation on open */
-    .fs-modal::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 40%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon), transparent);
-      z-index: 1;
-    }
-
-    .fs-modal.active::before {
-      animation: scanline .6s .1s ease forwards;
-    }
-
-    @keyframes scanline {
-      from {
-        left: -40%;
-      }
-
-      to {
-        left: 110%;
-      }
-    }
-
-    /* modal grid lines bg */
-    .fs-modal::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(0, 163, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 163, 255, 0.025) 1px, transparent 1px);
-      background-size: 64px 64px;
-    }
-
-    /* ── MODAL TOPBAR ── */
-    .fs-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.1rem 3rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(8, 12, 16, 0.9);
-      backdrop-filter: blur(12px);
-      position: relative;
-      z-index: 2;
-      flex-shrink: 0;
-    }
-
-    .fs-breadcrumb {
-      font-family: var(--mono);
-      font-size: .65rem;
-      color: var(--muted);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-
-    .fs-breadcrumb .sep {
-      color: var(--border2);
-    }
-
-    .fs-breadcrumb .current {
-      color: var(--neon);
-    }
-
-    /* close button */
-    .fs-close {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      background: transparent;
-      border: 1px solid var(--border2);
-      padding: .5rem 1.1rem;
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: .65rem;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--muted2);
-      transition: border-color .2s, color .2s, background .2s;
-    }
-
-    .fs-close:hover {
-      border-color: var(--neon);
-      color: var(--neon);
-      background: var(--neon-dim);
-    }
-
-    .fs-close svg {
-      width: 11px;
-      height: 11px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-    }
-
-    /* ── MODAL BODY ── */
-    .fs-body {
-      flex: 1;
-      overflow-y: auto;
-      position: relative;
-      z-index: 2;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border2) transparent;
-    }
-
-    .fs-body::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .fs-body::-webkit-scrollbar-thumb {
-      background: var(--border2);
-    }
-
-    .fs-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 4rem 3rem 6rem;
-      animation: fsContentIn .45s .15s ease both;
-    }
-
-    @keyframes fsContentIn {
-      from {
-        opacity: 0;
-        transform: translateY(18px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    /* two-col layout inside modal */
-    .fs-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 4rem;
-      align-items: start;
-    }
-
-    /* left col */
-    .fs-left {}
-
-    .fs-category {
-      font-family: var(--mono);
-      font-size: .68rem;
-      text-transform: uppercase;
-      letter-spacing: .2em;
-      color: var(--neon);
-      margin-bottom: .6rem;
-    }
-
-    .fs-title {
-      font-family: var(--display);
-      font-size: clamp(2rem, 4vw, 3.2rem);
-      font-weight: 800;
-      color: var(--white);
-      line-height: 1.05;
-      letter-spacing: -.01em;
-      margin-bottom: 1.5rem;
-    }
-
-    .fs-award {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: .65rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--neon);
-      background: rgba(0, 163, 255, 0.07);
-      border: 1px solid rgba(0, 163, 255, 0.25);
-      padding: .35rem 1rem;
-      margin-bottom: 1.75rem;
-    }
-
-    .fs-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .45rem;
-      margin-bottom: 2rem;
-    }
-
-    .fs-tag {
-      font-family: var(--mono);
-      font-size: .65rem;
-      padding: .25rem .8rem;
-      background: rgba(0, 163, 255, 0.07);
-      border: 1px solid rgba(0, 163, 255, 0.2);
-      color: var(--neon);
-      letter-spacing: .06em;
-    }
-
-    .fs-section-label {
-      font-family: var(--mono);
-      font-size: .62rem;
-      text-transform: uppercase;
-      letter-spacing: .16em;
-      color: var(--muted);
-      margin-bottom: .9rem;
-    }
-
-    .fs-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 2rem 0;
-    }
-
-    .fs-paragraphs p {
-      font-size: .95rem;
-      color: var(--muted2);
-      line-height: 1.82;
-      margin-bottom: 1.1rem;
-    }
-
-    .fs-paragraphs p:last-child {
-      margin-bottom: 0;
-    }
-
-    /* right col — sticky sidebar */
-    .fs-right {
-      position: sticky;
-      top: 2rem;
-    }
-
-    .fs-meta-box {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-top: 2px solid var(--neon);
-      padding: 1.5rem;
-    }
-
-    .fs-meta-box-title {
-      font-family: var(--mono);
-      font-size: .62rem;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      color: var(--muted);
-      margin-bottom: 1.25rem;
-    }
-
-    .fs-meta-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .fs-meta-row {
-      display: flex;
-      flex-direction: column;
-      gap: .18rem;
-    }
-
-    .fs-meta-key {
-      font-family: var(--mono);
-      font-size: .6rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: var(--muted);
-    }
-
-    .fs-meta-val {
-      font-family: var(--mono);
-      font-size: .8rem;
-      color: var(--neon);
-    }
-
-    /* nav arrows at bottom */
-    .fs-nav-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .fs-nav-btn {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      font-family: var(--mono);
-      font-size: .68rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--muted2);
-      background: transparent;
-      border: 1px solid var(--border);
-      padding: .6rem 1.2rem;
-      cursor: pointer;
-      transition: all .2s;
-    }
-
-    .fs-nav-btn:hover {
-      border-color: var(--neon);
-      color: var(--neon);
-      background: var(--neon-dim);
-    }
-
-    .fs-nav-btn:disabled {
-      opacity: .25;
-      pointer-events: none;
-    }
-
-    .fs-nav-btn svg {
-      width: 12px;
-      height: 12px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .fs-nav-counter {
-      font-family: var(--mono);
-      font-size: .65rem;
-      color: var(--muted);
-      letter-spacing: .1em;
-    }
-
-    .fs-nav-counter span {
-      color: var(--neon);
-    }
-
-    /* ── TIMELINE ── */
-    .timeline {
-      position: relative;
-      max-width: 820px;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 15px;
-      top: 8px;
-      bottom: 8px;
-      width: 1px;
-      background: linear-gradient(to bottom, var(--neon), rgba(0, 163, 255, 0.08));
-    }
-
-    .tl-item {
-      padding-left: 54px;
-      margin-bottom: 2.75rem;
-      position: relative;
-    }
-
-    .tl-dot {
-      position: absolute;
-      left: 0;
-      top: 4px;
-      width: 32px;
-      height: 32px;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--mono);
-      font-size: .66rem;
-      color: var(--neon);
-    }
-
-    .tl-date {
-      font-family: var(--mono);
-      font-size: .66rem;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: .35rem;
-    }
-
-    .tl-company {
-      font-family: var(--display);
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--white);
-    }
-
-    .tl-role {
-      font-family: var(--mono);
-      font-size: .72rem;
-      color: var(--neon);
-      margin-bottom: .9rem;
-      letter-spacing: .04em;
-    }
-
-    .tl-bullets {
-      list-style: none;
-    }
-
-    .tl-bullets li {
-      font-size: .87rem;
-      color: var(--muted2);
-      padding: .28rem 0 .28rem 1.3rem;
-      position: relative;
-    }
-
-    .tl-bullets li::before {
-      content: '>';
-      position: absolute;
-      left: 0;
-      color: var(--neon);
-      font-family: var(--mono);
-      font-size: .72rem;
-    }
-
-    .tl-bullets strong {
-      color: var(--white);
-      font-weight: 500;
-    }
-
-    /* ── EDUCATION ── */
-    .edu-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.4rem;
-    }
-
-    .edu-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-top: 2px solid var(--neon);
-      transition: box-shadow .25s;
-      overflow: hidden;
-    }
-
-    .edu-card-img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-    }
-
-    .edu-card-body {
-      padding: 2rem;
-    }
-
-    .edu-card:hover {
-      box-shadow: 0 0 30px var(--neon-dim);
-    }
-
-    .edu-year {
-      font-family: var(--mono);
-      font-size: .66rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-bottom: .6rem;
-    }
-
-    .edu-school {
-      font-family: var(--display);
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--white);
-      margin-bottom: .25rem;
-    }
-
-    .edu-degree {
-      font-size: .87rem;
-      color: var(--neon);
-      margin-bottom: 1rem;
-      font-style: italic;
-    }
-
-    .edu-notes {
-      font-size: .8rem;
-      color: var(--muted2);
-      line-height: 1.65;
-    }
-
-    /* ── CONTACT ── */
-    #contact {
-      background: var(--surface);
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-
-    .contact-info p {
-      font-size: .9rem;
-      color: var(--muted2);
-      margin-bottom: 2rem;
-      line-height: 1.78;
-    }
-
-    .contact-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .contact-list li {
-      display: flex;
-      align-items: center;
-      gap: .85rem;
-      font-size: .88rem;
-    }
-
-    .c-icon {
-      width: 34px;
-      height: 34px;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .c-icon svg {
-      width: 14px;
-      height: 14px;
-      stroke: var(--neon);
-      fill: none;
-      stroke-width: 1.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .contact-list span,
-    .contact-list a {
-      color: var(--muted2);
-      text-decoration: none;
-    }
-
-    .contact-list a:hover {
-      color: var(--neon);
-    }
-
-    .contact-form-wrap {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 2rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-family: var(--mono);
-      font-size: .62rem;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: .45rem;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: .7rem .9rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--body);
-      font-size: .88rem;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      border-radius: var(--radius);
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--neon);
-      box-shadow: 0 0 14px var(--neon-dim);
-    }
-
-    .form-group textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    ::placeholder {
-      color: var(--muted);
-      font-family: var(--body);
-    }
-
-    .btn-send {
-      width: 100%;
-      padding: .8rem;
-      background: var(--neon);
-      color: var(--bg);
-      border: none;
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: .7rem;
-      font-weight: 500;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      transition: background .2s, box-shadow .2s;
-      border-radius: var(--radius);
-    }
-
-    .btn-send:hover {
-      background: #33b5ff;
-      box-shadow: 0 0 24px var(--neon-glow);
-    }
-
-    footer {
-      background: var(--bg);
-      text-align: center;
-      padding: 1.5rem;
-      border-top: 1px solid var(--border);
-      font-family: var(--mono);
-      font-size: .66rem;
-      color: var(--muted);
-      letter-spacing: .08em;
-    }
-
-    footer span {
-      color: var(--neon);
-    }
-
-    .fs-photo {
-      width: 100%;
-      border: 1px solid var(--border2);
-      margin-bottom: 1.75rem;
-      display: block;
-      object-fit: cover;
-      max-height: 320px;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(22px);
-      transition: opacity .65s ease, transform .65s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    @media (max-width: 900px) {
-      nav {
-        padding: 1rem 1.5rem;
-      }
-
-      .nav-links {
-        display: none;
-      }
-
-      .hamburger {
-        display: flex;
-      }
-
-      #hero {
-        grid-template-columns: 1fr;
-        padding: 7rem 1.5rem 3rem;
-        gap: 3rem;
-        text-align: center;
-      }
-
-      .hero-visual {
-        order: -1;
-      }
-
-      .hero-summary {
-        margin: 0 auto 2.5rem;
-      }
-
-      .hero-btns {
-        justify-content: center;
-      }
-
-      .hero-stats {
-        justify-content: center;
-      }
-
-      section {
-        padding: 4rem 1.5rem;
-      }
-
-      .about-grid,
-      .edu-grid,
-      .contact-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-
-      .avatar-wrap {
-        width: 240px;
-        height: 280px;
-      }
-
-      .avatar-circle {
-        width: 160px;
-        height: 160px;
-        font-size: 2.8rem;
-      }
-
-      .avatar-ring {
-        width: 210px;
-        height: 210px;
-      }
-
-      .fs-topbar {
-        padding: 1rem 1.5rem;
-      }
-
-      .fs-inner {
-        padding: 2rem 1.5rem 4rem;
-      }
-
-      .fs-layout {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-      }
-
-      .fs-right {
-        position: static;
-      }
-
-      .fs-title {
-        font-size: 2rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Marian Garabana · Data Scientist & Business Analytics</title>
+<meta name="description" content="Portfolio of Marian Garabana, MSc Business Analytics &amp; Data Science at IE University, Madrid. Machine learning, forecasting, dashboards, and agentic AI projects with live demos." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#F3F2EE" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Marian Garabana · Data Scientist &amp; Business Analytics" />
+<meta property="og:description" content="Portfolio of Marian Garabana, MSc Business Analytics &amp; Data Science at IE University, Madrid. Machine learning, forecasting, dashboards, and agentic AI projects with live demos." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Marian Garabana · Data Scientist &amp; Business Analytics" />
+<meta name="twitter:description" content="Portfolio of Marian Garabana, MSc Business Analytics &amp; Data Science at IE University, Madrid. Machine learning, forecasting, dashboards, and agentic AI projects with live demos." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="stylesheet" href="styles.css" />
+<!-- Additive motion layer. Delete this line and the three script tags before </body> to revert. -->
+<link rel="stylesheet" href="enhance.css" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Marian Garabana",
+  "email": "mailto:marian.garabana@gmail.com",
+  "jobTitle": "Data Scientist",
+  "url": "https://mariangarabana.github.io/MyPortfolio/",
+  "image": "https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png",
+  "sameAs": [
+    "https://www.linkedin.com/in/marian-garabana-garrido",
+    "https://github.com/MarianGarabana"
+  ],
+  "alumniOf": [
+    { "@type": "CollegeOrUniversity", "name": "IE University" },
+    { "@type": "CollegeOrUniversity", "name": "Keiser University" }
+  ],
+  "knowsAbout": ["Machine Learning", "Business Analytics", "Data Science", "Python", "SQL", "Tableau", "Power BI", "Streamlit", "MLOps"]
+}
+</script>
+<style>
+/* ============================================================================
+   INDEX: dark crimson canvas.
+   Palette derived from the hero footage, not picked by eye. It was measured off
+   hero-matrix.mp4, which ran here from Aug 11 to Aug 17 2026: a crimson->rose
+   ramp on near-black, #5F0928 (344 deg), #772041 (340), #9C4064 (338), no violet
+   end, darkest family #050001. The footage is retired, in assets/_to_delete/,
+   and the PixelSnow canvas is the background now, but these values stay: they
+   are what every text colour below was measured against on the #0B0509 canvas.
+   Scoped to this page: project pages keep their own canvases for now.
+   ========================================================================== */
+body.idx-dark{
+  --bg:#0B0509;
+  --surface:#160A11;
+  --surface2:#1E0F17;
+  --ink:#FFFFFF;            /* 20.19 on canvas */
+  --ink-soft:#D9BCC7;       /* 12.3  dusty rose, NOT neutral grey: this is what
+                               stops it reading as "black page, white text"    */
+  --muted:#9B8490;          /*  5.86 */
+  --border:rgba(255,205,222,.14);
+  --border2:rgba(255,205,222,.26);
+  --accent:#FF3D7F;         /*  5.99 large text and marks only, never body     */
+  --accent-soft:#F79CBE;    /* 10.05 links and small accented text             */
+  color-scheme:dark;
+}
+body.idx-dark{background:var(--bg);color:var(--ink)}
+
+/* ---- hero: tinted glass (variant B) ---- */
+#hero.vhero{min-height:clamp(600px,86vh,860px)}
+.hero-panel{max-width:min(720px,58%);padding:2.1rem 2.2rem 1.9rem;
+  --lg-tint-1:rgba(74,10,34,.34);--lg-tint-2:rgba(30,3,14,.52);--lg-sat:185%}
+/* rim light is pink rather than white, so the glass belongs to the footage */
+.hero-panel .lg-fx::after{
+  background:radial-gradient(130% 90% at 6% -8%,rgba(255,150,190,.30),rgba(255,150,190,0) 46%);
+  box-shadow:inset 0 1px 0 rgba(255,190,215,.58),inset 1px 0 0 rgba(255,190,215,.26),
+             inset -1px 0 0 rgba(255,190,215,.15),inset 0 -1px 0 rgba(255,190,215,.28)}
+.hero-panel .hero-h1{color:#fff;font-size:clamp(2.3rem,4.4vw,3.5rem);line-height:1.0;
+  letter-spacing:-.035em;margin:0}
+/* the tagline keeps the serif italic: it was the signature of the old headline
+   and it is the only place on this page that face still appears */
+.hero-panel .hero-tag{margin:.85rem 0 0;color:#fff;font-weight:600;
+  font-size:clamp(1.15rem,1.85vw,1.55rem);line-height:1.15;letter-spacing:-.02em}
+.hero-panel .hero-tag em{font-family:var(--serif);font-style:italic;font-weight:400;
+  color:#FFC7DC}
+.hero-panel .hero-sub{color:#D9BCC7;margin-top:1.1rem}
+.hero-panel .hero-actions{margin-top:1.8rem}
+.hero-panel .btn-primary{background:#FF3D7F;border-color:#FF3D7F;color:#12040A}
+.hero-panel .btn-primary:hover{background:#FF5E93;border-color:#FF5E93}
+.hero-panel .btn-ghost{color:#FFC7DC;border-color:rgba(255,150,190,.45);background:transparent}
+.hero-panel .btn-ghost:hover{background:rgba(255,61,127,.14);border-color:rgba(255,150,190,.7)}
+.hero-panel .hero-cred{margin-top:1.9rem;color:#C29FAE}
+.hero-panel .hero-cred b{color:#fff}
+.hero-panel .hero-cred svg{stroke:#FFC7DC}
+@media(max-width:900px){ .hero-panel{max-width:100%} }
+@media(max-width:720px){ .hero-panel{padding:1.5rem 1.4rem 1.4rem} }
+
+/* ============================================================================
+   HERO COLLAGE
+   Three boxes beside the name. Positions and sizes are the measured percentages
+   from Marian's layout screenshot (702x724 frame): A 6.4%/7.5%, B 55.1%/22.0%,
+   C 8.4%/56.1%, each ~39% wide. The frame keeps that aspect via aspect-ratio, so
+   the arrangement holds at every size and only one number, the width, changes.
+
+   Hidden below 1000px. Three boxes at 39% of a phone's width are thumbnails, and
+   the hero already has to fit a headline, a tagline, a paragraph and two buttons.
+   ========================================================================== */
+.hero-collage{display:none}
+@media(min-width:1000px){
+  .vhero-in{display:flex;align-items:center;gap:clamp(1.75rem,3.4vw,3rem)}
+  .hero-panel{flex:1 1 auto;min-width:0;max-width:660px}
+  /* The collage bleeds into the page gutter rather than eating the panel. The
+     hero is full-bleed (100vw) while .vhero-in is capped at --max, so on a wide
+     screen there is dead margin either side. This claims it, up to 110px, and
+     clamps to 0 the moment the viewport is narrower than --max, so nothing ever
+     hangs off the right edge. The panel's LEFT edge is untouched, which matters:
+     it lines up with "01 Selected work" and everything below it. */
+  .hero-collage{display:block;flex:0 0 auto;position:relative;
+    width:clamp(340px,40vw,600px);aspect-ratio:702/724;
+    margin-right:calc(-1 * clamp(0px,(100vw - var(--max)) / 2 - 24px,110px))}
+}
+.hcol{position:absolute;border-radius:16px;overflow:hidden;
+  border:1px solid rgba(255,205,222,.22);
+  background:#160A11;
+  box-shadow:0 22px 50px -22px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.18)}
+/* ONE frame, Aug 17 2026. Three boxes at 39% each became a single box holding
+   all eleven photos, cycling at 1.5s. Sized to the span the three used to
+   occupy rather than to any one of them, so the collage's footprint in the
+   hero is unchanged and only the number of frames drops. Portraits and
+   landscapes both land in it, which is what object-fit:cover is doing. */
+.hcol-solo{left:6.4%;top:7.5%;width:88.7%;height:86.3%}
+.hcol img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transform:scale(1.05);
+  transition:opacity .62s var(--ease),transform .9s var(--ease)}
+/* .on is the visible frame. The script moves it; CSS never picks a winner, so
+   with the script blocked the first image of each box simply stays. */
+.hcol img.on{opacity:1;transform:scale(1)}
+/* Faces sit high in the portraits and centred in the landscapes. */
+.hcol img[src*="a3-munich"],.hcol img[src*="b1-soccer"],
+.hcol img[src*="b3-senior-day"],.hcol img[src*="b4-race"],
+.hcol img[src*="c1-headshot"]{object-position:50% 32%}
+@media(prefers-reduced-motion:reduce){
+  .hcol img{transition:none;transform:none}
+  .hcol img.on{transform:none}
+}
+
+/* ---- nav + floating pill on a dark canvas ---- */
+.idx-dark .nav,.idx-dark .nav.scrolled,.idx-dark .float-pill{
+  background:rgba(30,14,22,.72);border-color:rgba(255,205,222,.20);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%)}
+.idx-dark .nav a,.idx-dark .nav-links a{color:#D9BCC7}
+.idx-dark .nav a:hover,.idx-dark .nav-links a:hover{color:#fff}
+.idx-dark .nav .brand,.idx-dark .nav b{color:#fff}
+.idx-dark .nav-cta{background:#FF3D7F;border-color:#FF3D7F;color:#12040A}
+.idx-dark .nav-ava{background:linear-gradient(140deg,#5A2135,#3A1122);color:#FFD3E2}
+.idx-dark .nav-burger span{background:#F0D5DF}
+.idx-dark .float-pill .fp-txt b{color:#fff}
+.idx-dark .float-pill .fp-txt span{color:#B99AA6}
+.idx-dark .float-pill .fp-ico{color:#FF3D7F}
+
+/* ============================================================================
+   01 SELECTED WORK: two-row scroll rail
+   Two rows rather than one, so a single horizontal position shows twice as many
+   projects and there is half as far to scroll. grid-auto-flow:column with two
+   template rows fills top-then-bottom, then moves right, so ten cards become
+   five columns.
+
+   Below 720 it collapses to one row: two stacked cards on a 390px screen are
+   about 150px tall each and the title and the metric stop being readable.
+   ========================================================================== */
+.proj-grid{display:grid;grid-auto-flow:column;
+  /* styles.css still says grid-template-columns:repeat(2,1fr) for the old
+     two-column grid. grid-auto-columns only sizes IMPLICIT tracks, so leaving
+     that in place made columns 1 and 2 fr-sized and only 3 onward 420px: the
+     rail measured 1350 wide instead of 2174. Explicitly clear it. */
+  grid-template-columns:none;grid-template-rows:repeat(2,auto);
+  grid-auto-columns:min(420px,84vw);gap:1.15rem;
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;
+  /* overflow-x:auto forces overflow-y to auto too, which would clip the cards'
+     hover lift and focus ring. Padding gives them room, negative margin takes
+     the space back out of the layout. */
+  padding:6px 6px 8px;margin:-6px -6px -8px;
+  scrollbar-width:none;-ms-overflow-style:none}
+.proj-grid::-webkit-scrollbar{display:none}
+.proj{scroll-snap-align:start}
+/* The card is 420 wide here against 575 in the old two-column grid, so the meta
+   block's clearance for the foot row comes down with it. */
+.proj-meta{padding:1.1rem 1.2rem 4.3rem}
+.proj-meta h3{font-size:1.15rem;line-height:1.25}
+.proj-foot{padding:0 1.2rem .95rem}
+/* styles.css hides .proj-links below 820, so the foot drops from 68px to 37px.
+   The meta's clearance has to drop with it or the title floats 27px above
+   nothing. Matching her 820 breakpoint rather than inventing a second one. */
+@media(max-width:820px){ .proj-meta{padding:1.05rem 1.15rem 2.9rem} }
+@media(max-width:720px){
+  .proj-grid{grid-template-columns:none;grid-template-rows:auto;grid-auto-columns:min(420px,86vw)}
+}
+
+/* ---- 01 selected work ---- */
+.idx-dark .eyebrow{color:#F79CBE}
+.idx-dark .sec-title{color:#fff}
+.idx-dark .proj{background:var(--surface);border-color:var(--border)}
+.idx-dark .proj:hover{box-shadow:0 26px 60px -28px rgba(255,61,127,.34)}
+/* the meta strip was a white-to-transparent scrim built for light thumbnails */
+.idx-dark .proj-meta{background:linear-gradient(to top,
+  rgba(14,6,10,.96) 0%,rgba(14,6,10,.92) 62%,rgba(14,6,10,.55) 84%,rgba(14,6,10,0) 100%)}
+.idx-dark .proj-meta h3{color:#fff}
+.idx-dark .proj-meta p{color:#B99AA6}
+.idx-dark .proj-arrow{color:#FF3D7F}
+.idx-dark .proj-badge{background:rgba(255,61,127,.18);border:1px solid rgba(255,150,190,.42);color:#FFD3E2}
+.idx-dark .proj-foot{border-top:1px solid var(--border);background:rgba(255,255,255,.02)}
+.idx-dark .proj-proof{color:#C7AAB6}
+.idx-dark .proj-link{color:#F79CBE}
+.idx-dark .proj-link:hover{color:#fff}
+/* the art thumbnails were drawn for a cream page: seat them on the dark canvas */
+.idx-dark .proj-thumb{background:#120810}
+.idx-dark .proj-thumb img{opacity:.92;mix-blend-mode:luminosity;filter:saturate(.85) contrast(1.04)}
+.idx-dark .proj:hover .proj-thumb img{opacity:1;mix-blend-mode:normal;filter:none}
+
+/* ---- 02 skills ---- */
+.idx-dark #services .sec-title{color:#fff}
+.idx-dark .btn-ghost{color:#FFC7DC;border-color:rgba(255,150,190,.40)}
+.idx-dark .btn-ghost:hover{background:rgba(255,61,127,.14)}
+.idx-dark .btn-primary{background:#FF3D7F;border-color:#FF3D7F;color:#12040A}
+/* the portrait was 425px in a 735px column, leaving a hole. Taller crop rather
+   than a second photo: the image already exists and one more stock-ish picture
+   is exactly the thing the audit flagged. Sticky so it stays with the reader. */
+.idx-dark .about-photo{position:sticky;top:calc(var(--nav-h) + 2rem);
+  aspect-ratio:340/610}
+.idx-dark .about-photo img{object-position:50% 26%}
+@media(max-width:900px){ .idx-dark .about-photo{position:static;aspect-ratio:4/5} }
+
+/* work history: collapsed by default, same interaction as the education cards.
+   Collapsing also fixes the 634px of dead column that opened up under the photo
+   when the Advanced Tech Track entry moved out. */
+.wh-btn{all:unset;box-sizing:border-box;display:flex;width:100%;cursor:pointer;
+  align-items:baseline;justify-content:space-between;gap:1rem;padding:1.2rem 0 1rem}
+.wh-btn:focus-visible{outline:2px solid var(--accent,var(--ink));outline-offset:3px;border-radius:6px}
+.wh-rt{display:flex;align-items:center;gap:.7rem;flex:none}
+.wh-chev{width:14px;height:14px;position:relative;opacity:.45;
+  transition:transform .35s var(--ease),opacity .35s var(--ease)}
+.wh-chev::before{content:'';position:absolute;top:1px;left:2px;width:7px;height:7px;
+  border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
+  transform:rotate(45deg)}
+.wh-item.open .wh-chev{transform:rotate(180deg);opacity:.8}
+.wh-panel{max-height:0;overflow:hidden;transition:max-height .5s var(--ease)}
+.wh-panel p{padding:0 0 1.3rem}
+.idx-dark .wh-btn:hover .ro{color:#FFC7DC}
+.idx-dark .wh-chev{color:#F79CBE}
+/* 05 About me is text only since Aug 17 2026. The photo carousel that sat in
+   the right column was cut, and the grid and the .pcar theme overrides that
+   only existed to dress it went with it. .aboutme .body p in styles.css already
+   caps the measure at 40rem, so the column needs no layout of its own. */
+
+/* ============================================================================
+   HERO GREETING
+   Replaced the "AI-Driven Data Science" badge on Aug 11 2026. The
+   .hero-panel .hero-badge override went with it. The base .hero-badge rule in
+   styles.css stays: the project pages still use it.
+
+   THE TAIL TRAVELS WITH THE CARET. ", I am" sits directly after the cursor and
+   moves on every keystroke, which is what the reference site does and what
+   Marian asked for on the second pass.
+
+   Reserving a fixed 8.4ch for the word was built first, on the theory that a
+   still tail was calmer. It is not: the caret then floats in the middle of a
+   gap and every word shorter than "Bonjour" leaves a hole before the comma,
+   which reads as a layout bug rather than as a terminal. Marian called it, and
+   she was right. Do not re-add min-width here.
+
+   The cursor only appears once the script has turned typing on. A blinking
+   caret next to text that is never going to change is a lie about the UI.
+   ========================================================================== */
+.hero-hi{margin:0 0 1.05rem}
+.hero-hi .hi-line{display:flex;align-items:baseline;font-family:var(--mono);
+  font-size:clamp(1.25rem,2.2vw,1.85rem);font-weight:500;letter-spacing:-.005em;
+  line-height:1.15}
+.hero-hi .hi-slot{display:inline-block;flex:none;white-space:pre}
+.hero-hi .hi-word{color:#FFC7DC;font-weight:600}
+.hero-hi .hi-cursor{display:inline-block;color:#FF3D7F;font-weight:400;opacity:0}
+.hero-hi .hi-tail{color:#C29FAE}
+/* typed.js blinks its caret at .7s on a step timing function. Same here, so the
+   caret reads as a terminal caret and not as a fading glow. */
+.hero-hi .hi-line.typing .hi-cursor{opacity:1;animation:hiCaret .7s step-end infinite}
+@keyframes hiCaret{0%,100%{opacity:1}50%{opacity:0}}
+/* Resting state, not a frozen keyframe: the base style is already the readable
+   one, so killing the animation leaves "Hola, I am" on screen rather than an
+   empty box with a caret in it. That is the trap written up in CLAUDE.md. */
+@media(prefers-reduced-motion:reduce){
+  .hero-hi .hi-line.typing .hi-cursor{animation:none;opacity:0}
+}
+@media(max-width:720px){ .hero-hi .hi-line{font-size:1.2rem} }
+
+/* ============================================================================
+   02 SKILLS: tech stack grid
+   Category label in a fixed left column, pills wrapping in the right. Below
+   720px the label stacks above its own row instead of eating half the width.
+
+   The pills are not interactive and carry no href, so the hover is decoration
+   and the 24px target floor does not apply to them. They still clear it.
+   ========================================================================== */
+.stack{display:flex;flex-direction:column;gap:1.15rem;margin-top:2.6rem}
+.stack-row{display:grid;grid-template-columns:170px minmax(0,1fr);gap:1.5rem;
+  align-items:start}
+.stack-cat{margin:0;padding-top:.55rem;font-family:var(--mono);font-size:.62rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.stack-pills{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;margin:0;padding:0}
+.stack-pills li{display:inline-flex;align-items:center;gap:.45rem;
+  padding:.44rem .82rem;border:1px solid var(--border);border-radius:100px;
+  background:rgba(255,255,255,.045);color:var(--ink-soft);
+  font-size:.82rem;font-weight:600;line-height:1.25;
+  transition:background .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease)}
+.stack-pills li:hover{background:rgba(255,61,127,.13);
+  border-color:rgba(255,150,190,.42);color:#fff}
+/* Simple Icons ship with no fill, so they paint currentColor black. On this
+   canvas that makes them vanish. brightness(0) invert(1) forces a white
+   silhouette; opacity carries the hover, never the fill. */
+.stack-pills img{width:14px;height:14px;flex:none;object-fit:contain;
+  filter:brightness(0) invert(1);opacity:.5;transition:opacity .18s var(--ease)}
+.stack-pills li:hover img{opacity:1}
+@media(max-width:720px){
+  .stack{gap:1.5rem}
+  .stack-row{grid-template-columns:1fr;gap:.6rem}
+  .stack-cat{padding-top:0}
+}
+
+/* ============================================================================
+   04 EDUCATION: hover-expand rows
+   Replaced the photo-backed rail cards on Aug 13 2026. Measured, those cards
+   put 14px body text on a 40-character line in a 277px column, over a
+   photograph, with 762 characters crammed into a 238px panel that scrolled
+   inside a rail that also scrolled. Four separate reasons to give up reading.
+
+   The row keeps the reveal and moves the photograph out of the text's way. The
+   left two thirds is a solid surface, the right third is the plate. Measure
+   goes to 62 characters, nothing sits on an image, both scrolls are gone, and
+   the detail is complete rather than clipped.
+
+   Ported from the unlumen UI Hover Expand component, which is React, Tailwind
+   and Motion and so cannot be installed into this repo. Its numbers are kept
+   exactly: 68px collapsed, 340 expanded, a spring at stiffness 280, damping 32,
+   mass 0.9, the plate easing in from the edge, inactive rows to .38 opacity,
+   the detail sliding from -8px after a 120ms delay.
+
+   OPEN BY DEFAULT. Every row is fully expanded in this CSS and only collapses
+   once the script adds .js to .hx, so with JS blocked the whole section reads.
+   That is the same rule the cards it replaced followed, and the rule in
+   CLAUDE.md about never gating content behind script.
+   ========================================================================== */
+.rail-wrap{position:relative}
+
+.hx{border:1px solid var(--border);border-radius:16px;overflow:hidden;
+  margin-top:2.6rem}
+.hx-row{position:relative;isolation:isolate;overflow:hidden;
+  background:var(--surface);border-bottom:1px solid var(--border)}
+.hx-row:last-child{border-bottom:0}
+.hx-row--nomedia{background:linear-gradient(120deg,#1E0F17,#120711)}
+
+/* The plate. transform, not width: same travel, no second layout property in
+   an animation that already owns height. */
+.hx-plate{position:absolute;top:0;right:0;bottom:0;width:34%;z-index:0;
+  overflow:hidden;pointer-events:none}
+.hx-plate img{width:100%;height:100%;object-fit:cover;
+  filter:saturate(.82) contrast(1.02)}
+/* The seam. Without it the photograph starts at a hard vertical edge halfway
+   through the row, which reads as two pages rather than one. */
+.hx-plate::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(to right,var(--surface),rgba(22,10,17,.55) 26%,
+    rgba(22,10,17,0) 62%)}
+.hx-row--nomedia .hx-plate{background:radial-gradient(circle at 70% 40%,
+  rgba(255,61,127,.20),rgba(255,61,127,0) 66%)}
+.hx-row--nomedia .hx-plate::after{display:none}
+
+.hx-in{position:relative;z-index:2;height:100%;padding:0 1.5rem;
+  display:flex;flex-direction:column;justify-content:flex-start}
+
+/* EXACTLY the collapsed height, and flex:none. The detail below it is only
+   hidden with opacity, so it is still in flow; if this row could shrink or the
+   column centred its overflow, the title would be pushed out through the top
+   edge of a 68px box and clipped away. Pinning the head and letting the detail
+   overflow downward is what keeps the collapsed row showing its title. */
+.hx-head{all:unset;box-sizing:border-box;display:flex;align-items:baseline;
+  align-content:center;flex-wrap:wrap;gap:.9rem;width:100%;height:68px;flex:none;
+  padding-right:36%;cursor:pointer}
+.hx-head:focus-visible{outline:2px solid var(--accent,var(--ink));outline-offset:-3px;
+  border-radius:8px}
+.hx-title{font-size:clamp(1.05rem,1.5vw,1.28rem);font-weight:600;
+  letter-spacing:-.02em;color:#fff}
+.hx-meta{font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;
+  text-transform:uppercase;color:#F79CBE}
+.hx-idx{position:absolute;top:24px;right:1.5rem;z-index:3;font-family:var(--mono);
+  font-size:.7rem;color:var(--muted)}
+
+.hx-body{padding-right:36%;padding-bottom:1.6rem}
+.hx-note{margin:.75rem 0 0;font-size:var(--t-2);line-height:1.6;color:#D9BCC7;
+  max-width:62ch}
+.hx-list{list-style:none;margin:.85rem 0 0;padding:0;display:grid;gap:.45rem;
+  max-width:64ch}
+.hx-list li{position:relative;padding-left:1.05rem;font-size:var(--t-2);
+  line-height:1.55;color:#C7AAB6}
+.hx-list li::before{content:'';position:absolute;left:0;top:.62em;width:8px;
+  height:1.5px;background:var(--accent)}
+.hx-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
+.hx-tags span{font-family:var(--mono);font-size:.66rem;padding:.28rem .6rem;
+  border:1px solid var(--border);border-radius:100px;color:#B99AA6}
+
+/* Collapsed state. Applied by script only. The inline styles the spring writes
+   every frame override all three of these. */
+.hx.js .hx-row{height:68px}
+.hx.js .hx-body{opacity:0;transform:translateX(-8px)}
+.hx.js .hx-plate{opacity:0;transform:translateX(100%)}
+
+/* Below 760 the plate is about 130px wide, which is too narrow for a
+   photograph to read as anything, and a hover row on a touch screen is a tap
+   target pretending to be a hover. So the plate goes, the reserved gutter goes
+   with it, and every row is simply open. */
+@media(max-width:760px){
+  .hx-plate{display:none}
+  .hx-head{height:auto;padding:1.15rem 0 .35rem;padding-right:2.5rem}
+  .hx-body{padding-right:0}
+  .hx.js .hx-row{height:auto!important}
+  .hx.js .hx-body{opacity:1!important;transform:none!important}
+  .hx-idx{top:1.25rem;right:1.25rem}
+  .hx-in{padding:0 1.25rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .hx-row,.hx-body,.hx-plate{transition:none!important}
+}
+
+/* ---- rail controls ---- */
+/* Hidden until the script wires them, same rule as the plus button: never a
+   control that does nothing. The rail still scrolls without them. */
+.rail-nav,.rail-dots{display:none}
+.rail-wrap.js .rail-nav{display:grid}
+.rail-wrap.js .rail-dots{display:flex}
+.rail-nav{position:absolute;top:calc(50% - 22px);z-index:5;
+  width:44px;height:44px;padding:0;border-radius:50%;cursor:pointer;
+  -webkit-appearance:none;appearance:none;place-items:center;
+  background:rgba(30,14,22,.82);border:1px solid rgba(255,205,222,.24);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+          backdrop-filter:blur(14px) saturate(150%);
+  transition:background .2s var(--ease),border-color .2s var(--ease),opacity .2s var(--ease)}
+.rail-nav:hover{background:rgba(255,61,127,.30);border-color:rgba(255,150,190,.55)}
+.rail-nav:focus-visible{outline:2px solid #FFC7DC;outline-offset:3px}
+.rail-nav::before{content:'';width:9px;height:9px;
+  border-top:1.8px solid #fff;border-right:1.8px solid #fff}
+.rail-nav.prev{left:-20px}
+.rail-nav.prev::before{transform:translateX(2px) rotate(-135deg)}
+.rail-nav.next{right:-20px}
+.rail-nav.next::before{transform:translateX(-2px) rotate(45deg)}
+.rail-wrap.js .rail-nav[disabled]{opacity:0;pointer-events:none}
+@media(max-width:900px){ .rail-wrap.js .rail-nav{display:none} }
+
+.rail-dots{justify-content:center;gap:.35rem;margin-top:1.4rem}
+/* The visible mark is 32x4, which is nowhere near the 24px floor, so the button
+   itself is 24px tall and the mark is a pseudo-element inside it. */
+.rail-dots button{position:relative;width:34px;height:24px;padding:0;border:0;
+  background:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+.rail-dots button::before{content:'';position:absolute;left:2px;right:2px;top:10px;
+  height:4px;border-radius:2px;background:rgba(255,205,222,.26);
+  transition:background .2s var(--ease)}
+.rail-dots button:hover::before{background:rgba(255,205,222,.5)}
+.rail-dots button[aria-current="true"]::before{background:#FF3D7F}
+.rail-dots button:focus-visible{outline:2px solid #FFC7DC;outline-offset:2px;border-radius:6px}
+
+/* ============================================================================
+   PIXEL SNOW BACKGROUND
+   Added Aug 17 2026. Drifting flakes behind the whole page, hero included.
+   Ported from react-bits PixelSnow (JS-CSS). That component is React plus
+   three.js, which this repo does not ship; three was only being used to put one
+   fragment shader on a fullscreen quad, so the shader is kept and the wrapper
+   is 90 lines of raw WebGL2 instead. Nothing installed, no dependency added.
+   Do NOT run `npx shadcn add` for it: components.json points `tailwind.css` at
+   the real styles.css and the component drags in three@0.180.
+
+   IT IS THE HERO BACKGROUND TOO, since Aug 17 2026. hero-matrix.mp4 and its
+   poster were removed and #hero's own opaque #0c0e11 turned off, so the fixed
+   canvas shows through the hero the same way it shows through everything else.
+   That is 1.4 MB less on the homepage and one fewer element competing with the
+   glass panel. The .vhero-veil gradients stay and now double as the scrim that
+   keeps flakes from running under the headline.
+
+   The canvas is fixed at z-index -1, so it sits above the page background and
+   below every piece of in-flow content. Nothing on the page needs a stacking
+   change for that to hold; the one requirement is that no section paints an
+   opaque background of its own, which none of them does.
+
+   FULL RESOLUTION SINCE Aug 17 2026. The pixel-grid look is gone at her
+   request: the canvas renders at device resolution (capped at 2x), the shader's
+   quantiser is fed the backing width so it never buckets a fragment, and each
+   flake gets an antialiased rim so it reads as a round dot rather than a
+   square. Costs roughly 9x the fragments at 1440, 36x on a retina panel, which
+   is what the 2x cap and the two pause paths are protecting.
+   ========================================================================== */
+/* The #snowBg rules moved to styles.css on Aug 17 2026, when the project pages
+   took the same background. Only the index-specific rule is left here.
+   styles.css paints every .vhero #0c0e11 for the pages that still run a video
+   behind it. This hero has no video any more, so it hands the background back
+   to the canvas. Scoped to #hero so the shared rule is untouched. */
+#hero.vhero{background:transparent}
+</style>
 </head>
+<body class="idx-dark">
+<a class="skip-link" href="#main">Skip to content</a>
+<canvas id="snowBg" aria-hidden="true"></canvas>
 
-<body>
-
-  <!-- ════════════ FULL-SCREEN MODAL ════════════ -->
-  <div class="fs-modal" id="fsModal" role="dialog" aria-modal="true">
-    <!-- top bar -->
-    <div class="fs-topbar">
-      <div class="fs-breadcrumb">
-        <span>PORTFOLIO</span>
-        <span class="sep">/</span>
-        <span class="current" id="fsBreadSection">SKILLS</span>
-        <span class="sep">/</span>
-        <span id="fsBreadTitle">—</span>
-      </div>
-      <button class="fs-close" onclick="closeModal()" aria-label="Close">
-        <svg viewBox="0 0 24 24">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-        ESC TO CLOSE
-      </button>
+<!-- ================= NAV ================= -->
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand">
+      <div class="nav-ava" id="navAva">MG</div>
+      <span class="nav-name">Marian Garabana</span>
     </div>
-
-    <!-- scrollable body -->
-    <div class="fs-body" id="fsBody">
-      <div class="fs-inner" id="fsInner">
-        <!-- injected by JS -->
-      </div>
+    <div class="nav-links">
+      <a href="#projects">Work</a>
+      <a href="#services">Skills</a>
+      <a href="#education">Education</a>
+      <a href="#about">About</a>
     </div>
-  </div>
-
-  <!-- NAV -->
-  <nav id="navbar">
-    <a class="nav-logo" href="#hero">Marian<span>.</span></a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#education">Education</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    <a href="#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="#about" onclick="toggleMenu()">About</a>
-    <a href="#skills" onclick="toggleMenu()">Skills</a>
-    <a href="#experience" onclick="toggleMenu()">Experience</a>
-    <a href="#projects" onclick="toggleMenu()">Projects</a>
-    <a href="#education" onclick="toggleMenu()">Education</a>
-    <a href="#contact" onclick="toggleMenu()">Contact</a>
+</div>
+
+<main id="main">
+<!-- ================= HERO ================= -->
+<section id="hero" class="vhero">
+  <!-- The background here is the PixelSnow canvas behind the page, not a video.
+       Aug 17 2026: hero-matrix.mp4 and its poster were removed, 1.4 MB of the
+       heaviest bytes on the homepage, and the hero canvas made transparent so the
+       fixed canvas shows through. The veil stays: it is what seats the type, and
+       it now also keeps the flakes from running straight under the headline.
+       The .vhero-bg wrapper is kept so the veil holds its place in the stack. -->
+  <div class="vhero-bg" aria-hidden="true">
+    <div class="vhero-veil"></div>
   </div>
-
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-text">
-      <p class="hero-eyebrow">// hello, I'm</p>
-      <h1 class="hero-name">Marian<br>Garabana<br><span class="accent">Garrido</span></h1>
-      <p class="hero-title">MSc Business Analytics &amp; Data Science &nbsp;—&nbsp; IE University, Madrid</p>
-      <p class="hero-summary">Business Analyst with hands-on experience in BI, predictive modeling, SQL and Python-based
-        pipelines, and data-driven decision-making across retail and service sectors.</p>
-      <div class="hero-btns">
-        <a href="#contact" class="btn btn-primary">Get In Touch</a>
-        <a href="#projects" class="btn btn-outline">View Projects</a>
+  <div class="vhero-in">
+    <div class="lg hero-panel">
+      <div class="lg-fx" aria-hidden="true">
+        <span class="lg-face"></span>
+        <span class="lg-edge t"></span><span class="lg-edge b"></span>
+        <span class="lg-edge l"></span><span class="lg-edge r"></span>
       </div>
-      <div class="hero-stats">
-        <div class="stat-item">
-          <div class="stat-num">400K+</div>
-          <div class="stat-label">Sales Records Analyzed</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">75%</div>
-          <div class="stat-label">Forecast Accuracy</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">80%</div>
-          <div class="stat-label">Manual Work Reduced</div>
-        </div>
+      <!-- The greeting types itself out and backspaces. Edit the word list in the
+           heroHi script near the bottom of this file, not here. "Hola" is the
+           resting value: it ships in the markup so the line is never empty
+           before the script runs and never empty under reduced motion.
+
+           The animated half is aria-hidden and a static "Hello, I am" sits
+           beside it for screen readers. A node whose text changes every 80ms is
+           noise in the accessibility tree, and the cursor is a punctuation mark
+           that should never be read aloud. -->
+      <p class="hero-hi">
+        <span class="sr-only">Hello, I am</span>
+        <span class="hi-line" id="heroHiLine" aria-hidden="true"><span class="hi-slot"><span class="hi-word" id="heroHi">Hola</span><span class="hi-cursor">|</span></span><span class="hi-tail">, I am</span></span>
+      </p>
+      <h1 class="hero-h1">Marian Garabana Garrido</h1>
+      <p class="hero-tag">Data that <em>drives</em> decisions.</p>
+      <p class="hero-sub" id="heroSub">MSc Business Analytics and Data Science at IE University. I build AI-driven data work, from agentic pipelines to predictive models, that turns messy data into decisions people can act on.</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">View my work</a>
+        <a href="#contact" class="btn btn-ghost">Get in touch</a>
+      </div>
+      <div class="hero-cred">
+        <svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg>
+        <span><b>MSc Business Analytics &amp; Data Science</b> · IE University, Madrid '26</span>
       </div>
     </div>
-    <div class="hero-visual">
-      <div class="avatar-wrap">
-        <div class="avatar-ring"></div>
-        <div class="avatar-circle">MG</div>
-        <div class="avatar-badges">
-          <span class="badge">MEXICAN</span><span class="badge">SPANISH</span>
-          <span class="badge">ATHLETE</span><span class="badge">DATA SCIENTIST</span>
-        </div>
+
+    <!-- ===== HERO COLLAGE =====
+         Three boxes whose positions come from the layout screenshot Marian sent,
+         measured rather than eyeballed: box A at 6.4%/7.5%, box B at 55.1%/22.0%,
+         box C at 8.4%/56.1%, each about 39% of a 702x724 frame. Those numbers are
+         the percentages in the CSS below; change them there, not here.
+
+         Grouped by story, not by shape: A is IE and the masters, B is the athlete
+         years, C is Keiser and the portrait. 4 / 4 / 3.
+
+         The whole block is aria-hidden. It is decoration that swaps every two
+         seconds, and the alt text of eleven photos read out in sequence is noise
+         in the accessibility tree. Nothing here is stated only in these images.
+
+         ADDING A PHOTO: drop the webp in assets/me/hero/ and add one <img> to a
+         column. The script counts children, so no other change is needed. The
+         first <img> in each column carries class="on" and must stay eager; the
+         rest are lazy. -->
+    <div class="hero-collage" aria-hidden="true">
+      <div class="hcol hcol-solo">
+        <img class="on" src="assets/me/hero/c1-headshot.webp" alt="" width="480" height="720" decoding="async">
+        <img src="assets/me/hero/a1-ie-grad.webp" alt="" width="480" height="492" loading="lazy" decoding="async">
+        <img src="assets/me/hero/b1-soccer.webp" alt="" width="480" height="721" loading="lazy" decoding="async">
+        <img src="assets/me/hero/a2-datathon.webp" alt="" width="720" height="480" loading="lazy" decoding="async">
+        <img src="assets/me/hero/b2-mexico.webp" alt="" width="852" height="480" loading="lazy" decoding="async">
+        <img src="assets/me/hero/c2-keiser-stage.webp" alt="" width="720" height="480" loading="lazy" decoding="async">
+        <img src="assets/me/hero/a3-munich.webp" alt="" width="480" height="640" loading="lazy" decoding="async">
+        <img src="assets/me/hero/b3-senior-day.webp" alt="" width="480" height="640" loading="lazy" decoding="async">
+        <img src="assets/me/hero/c3-keiser-crowd.webp" alt="" width="517" height="480" loading="lazy" decoding="async">
+        <img src="assets/me/hero/a4-madrid-event.webp" alt="" width="720" height="480" loading="lazy" decoding="async">
+        <img src="assets/me/hero/b4-race.webp" alt="" width="480" height="640" loading="lazy" decoding="async">
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ABOUT -->
-  <section id="about">
-    <p class="section-eyebrow reveal">// 01 &mdash; profile</p>
-    <h2 class="section-title reveal">About Marian</h2>
-    <div class="section-line reveal"></div>
+<!-- ================= PROJECTS ================= -->
+<section id="projects">
+  <div class="wrap">
+    <div class="proj-top reveal">
+      <div class="sec-head" style="margin-bottom:0">
+        <span class="eyebrow">01 · Selected work</span>
+        <h2 class="sec-title">Latest <em>projects</em>.</h2>
+      </div>
+    </div>
+    <!-- Two-row scroll rail, same construction as 04 Education. All ten projects
+         live here now; the "View all projects" button was removed on Aug 11
+         because with a rail it had nothing left to do. Cards fill column-first,
+         so reading order is top-left, bottom-left, then right: the datathon
+         still lands first. Adding an eleventh project is one more <div>, no
+         layout or script change. -->
+    <div class="rail-wrap" id="projWrap">
+    <button class="rail-nav prev" type="button" aria-label="Previous projects"></button>
+    <div class="proj-grid" id="projGrid" tabindex="0" role="group" aria-label="Selected work, scrollable">
+      <div class="proj reveal" style="--c1:#e7e9e4;--c2:#ccd2c6"><div class="proj-badge">1st place · €3,000</div><a class="proj-main" href="datathon.html"><div class="proj-thumb"><img src="assets/datathon-team.webp" width="1086" height="725" alt="Aria Mavens winning team" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-datathon">Sustainable Aviation Datathon</h3><p>Winner · Forecasting</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">€123M cost path modelled to 2050</div><div class="proj-links"><a class="proj-link" href="https://github.com/vik01/datathon-2025" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e7e9ea;--c2:#ccd0d3"><a class="proj-main" href="hospital.html"><div class="proj-thumb"><img src="assets/art/hospital.webp" width="1200" height="825" alt="Isometric hospital ward with beds flagged by readmission risk, feeding a monitoring panel" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-hospital">Hospital Readmission MLOps</h3><p>MLOps</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">9,970 patients evaluated</div><div class="proj-links"><a class="proj-link" href="https://hospital-readmission-risk-predictor-pcv7.onrender.com/docs" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/NOSIEMPRE/Hospital-Prediction-System" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e8e9e4;--c2:#cfd2c8"><a class="proj-main" href="madrid.html"><div class="proj-thumb"><img src="assets/art/madrid.webp" width="1024" height="572" alt="Madrid rental district heat map art" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-madrid">Madrid Rental ML Dashboard</h3><p>ML · Live App</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">0.94 test AUC</div><div class="proj-links"><a class="proj-link" href="https://madridrentalanalysisapp-mariangarabana.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/Madrid_Rental_Analysis_StreamlitApp" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e9e7e2;--c2:#d3ccc2"><a class="proj-main" href="aerospace.html"><div class="proj-thumb"><img src="assets/art/aerospace.webp" width="1200" height="825" alt="Aircraft engine health monitoring panel art" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-aerospace">Aerospace Predictive Maintenance</h3><p>Deep Learning</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">13x return vs unplanned failure</div><div class="proj-links"><a class="proj-link" href="https://github.com/MarianGarabana/DeepLearning_PredictiveMaintenance" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e7e8ea;--c2:#ccd0d4"><a class="proj-main" href="trading.html"><div class="proj-thumb"><img src="assets/art/trading.webp" width="1200" height="825" alt="Trading system signal chart art" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-trading">Trading System Automation</h3><p>ML · Live App</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">31 tickers · 22 features</div><div class="proj-links"><a class="proj-link" href="https://pythongroupassignment.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/TradingSystemAutomation" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e6e9e6;--c2:#cbd1cb"><a class="proj-main" href="spain.html"><div class="proj-thumb"><img src="assets/art/spain.webp" width="1200" height="825" alt="Map of Spain showing proposed EV charging stations along interurban corridors, coloured by grid status" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-spain">Spanish EV Charging Network</h3><p>Datathon · Geospatial</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">190 stations proposed</div><div class="proj-links"><a class="proj-link" href="https://spanishelectricgrid-datathon-ravistar.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/SpanishElectricGrid" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e6e7ec;--c2:#c9ccd6"><a class="proj-main" href="titan.html"><div class="proj-thumb"><img src="assets/art/titan.webp" width="1200" height="825" alt="Isometric illustration of an AI orchestrator coordinating specialist agents" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-titan">Titan Operations Sentinel</h3><p>Multi-Agent AI</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">22,000+ daily alerts triaged</div><div class="proj-links"><a class="proj-link" href="https://github.com/ma731/Agentic-AI-for-IT" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e8e7ea;--c2:#d0cdd4"><a class="proj-main" href="rl.html"><div class="proj-thumb"><img src="assets/art/rl.webp" width="1200" height="825" alt="Isometric arena with a rocket-powered car boosting toward a ball along a predicted trajectory" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-rl">Reinforcement Learning Bot</h3><p>RL · MLOps</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">Two-stage reward curriculum</div><div class="proj-links"><a class="proj-link" href="https://github.com/moanv2/rlgym" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e9e8e2;--c2:#d4cdc4"><a class="proj-main" href="dicorsa.html"><div class="proj-thumb"><img src="assets/art/dicorsa.webp" width="1200" height="825" alt="Isometric beverage distribution network with product platforms at varying heights" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-dicorsa">Beverage Distribution Forecasting</h3><p>Internship · Forecasting &amp; BI</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">615,615 transactions</div></div></div>
+      <div class="proj reveal" style="--c1:#e8e8e3;--c2:#d1cfc7"><a class="proj-main" href="cinema.html"><div class="proj-thumb"><img src="assets/art/cinema.svg" alt="Abstract database schema art" width="880" height="605" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3>Cinema Chain Database</h3><p>SQL · Database Design</p></div><div class="proj-arrow">↗</div></div></a></div>
+    </div>
+    <button class="rail-nav next" type="button" aria-label="More projects"></button>
+    <div class="rail-dots" id="projDots" role="group" aria-label="Project columns"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= SERVICES / SKILLS ================= -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">02 · What I do</span>
+      <h2 class="sec-title sub">Skills that turn data<br>into decisions.</h2>
+    </div>
+    <!-- ===== TECH STACK =====
+         Replaced the capability chips and the looping tool marquee on Aug 11
+         2026. Those two lists named Python, SQL, Tableau, Power BI and
+         Streamlit twice between them; this is one inventory instead.
+
+         EDIT HERE. One <li> per tool, one .stack-row per category. Icons are
+         self-hosted in assets/icons/ and painted as monochrome silhouettes by
+         CSS, so a Simple Icons SVG with no fill attribute is correct. Tools
+         with no brand mark (XGBoost, statsmodels, RLGym-PPO) share
+         glyph-model.svg on purpose; do not go looking for their logos.
+
+         Every tool here is named on a project page or in the Advanced Tech
+         Track coursework. If you add one that is not, add the evidence to
+         FACTS.md first. -->
+    <div class="stack reveal">
+      <div class="stack-row">
+        <p class="stack-cat" id="stk-lang">Languages</p>
+        <ul class="stack-pills" aria-labelledby="stk-lang">
+          <li><img src="assets/icons/python.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Python</li>
+          <li><img src="assets/icons/sql.svg" alt="" width="14" height="14" loading="lazy" decoding="async">SQL</li>
+          <li><img src="assets/icons/mysql.svg" alt="" width="14" height="14" loading="lazy" decoding="async">MySQL</li>
+        </ul>
+      </div>
+      <div class="stack-row">
+        <p class="stack-cat" id="stk-ml">Machine learning</p>
+        <ul class="stack-pills" aria-labelledby="stk-ml">
+          <li><img src="assets/icons/scikitlearn.svg" alt="" width="14" height="14" loading="lazy" decoding="async">scikit-learn</li>
+          <li><img src="assets/icons/glyph-model.svg" alt="" width="14" height="14" loading="lazy" decoding="async">XGBoost</li>
+          <li><img src="assets/icons/keras.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Keras</li>
+          <li><img src="assets/icons/glyph-model.svg" alt="" width="14" height="14" loading="lazy" decoding="async">statsmodels</li>
+          <li><img src="assets/icons/glyph-model.svg" alt="" width="14" height="14" loading="lazy" decoding="async">RLGym-PPO</li>
+        </ul>
+      </div>
+      <div class="stack-row">
+        <p class="stack-cat" id="stk-data">Data</p>
+        <ul class="stack-pills" aria-labelledby="stk-data">
+          <li><img src="assets/icons/pandas.svg" alt="" width="14" height="14" loading="lazy" decoding="async">pandas</li>
+          <li><img src="assets/icons/polars.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Polars</li>
+          <li><img src="assets/icons/geopandas.svg" alt="" width="14" height="14" loading="lazy" decoding="async">GeoPandas</li>
+          <li><img src="assets/icons/numpy.svg" alt="" width="14" height="14" loading="lazy" decoding="async">NumPy</li>
+          <!-- Simple Icons has no matplotlib mark (checked against 16.28.0), so this
+               takes the house chart glyph, the same rule that sends XGBoost,
+               statsmodels and RLGym to glyph-model.svg. -->
+          <li><img src="assets/icons/glyph-chart.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Matplotlib</li>
+        </ul>
+      </div>
+      <div class="stack-row">
+        <p class="stack-cat" id="stk-viz">Visualization and BI</p>
+        <ul class="stack-pills" aria-labelledby="stk-viz">
+          <li><img src="assets/icons/tableau.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Tableau</li>
+          <li><img src="assets/icons/powerbi.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Power BI</li>
+          <li><img src="assets/icons/streamlit.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Streamlit</li>
+        </ul>
+      </div>
+      <div class="stack-row">
+        <p class="stack-cat" id="stk-ops">MLOps and cloud</p>
+        <ul class="stack-pills" aria-labelledby="stk-ops">
+          <li><img src="assets/icons/mlflow.svg" alt="" width="14" height="14" loading="lazy" decoding="async">MLflow</li>
+          <li><img src="assets/icons/fastapi.svg" alt="" width="14" height="14" loading="lazy" decoding="async">FastAPI</li>
+          <li><img src="assets/icons/docker.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Docker</li>
+          <li><img src="assets/icons/aws.svg" alt="" width="14" height="14" loading="lazy" decoding="async">AWS</li>
+          <li><img src="assets/icons/git.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Git</li>
+          <li><img src="assets/icons/github.svg" alt="" width="14" height="14" loading="lazy" decoding="async">GitHub</li>
+          <li><img src="assets/icons/wandb.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Weights &amp; Biases</li>
+        </ul>
+      </div>
+      <div class="stack-row">
+        <p class="stack-cat" id="stk-ai">Agentic AI</p>
+        <ul class="stack-pills" aria-labelledby="stk-ai">
+          <li><img src="assets/icons/langgraph.svg" alt="" width="14" height="14" loading="lazy" decoding="async">LangGraph</li>
+          <li><img src="assets/icons/claude.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Claude</li>
+          <li><img src="assets/icons/gemini.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Gemini</li>
+          <li><img src="assets/icons/openai.svg" alt="" width="14" height="14" loading="lazy" decoding="async">ChatGPT</li>
+          <!-- Simple Icons has no grok, no xai (checked against 16.28.0). The X mark
+               is the platform's, not the model's, so it would be the wrong logo;
+               Grok takes glyph-model.svg like the other unmarked models. -->
+          <li><img src="assets/icons/glyph-model.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Grok</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT (experience) ================= -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">03 · Experience</span>
+      <h2 class="sec-title">Where I've worked.</h2>
+    </div>
     <div class="about-grid">
+      <div class="about-photo reveal" id="aboutPhoto">
+        <img src="assets/portrait.webp" alt="Marian Garabana standing among seated graduates at her graduation ceremony, wearing a blue cap and gown with a yellow stole" width="656" height="820" loading="lazy" decoding="async" />
+      </div>
       <div class="about-text reveal">
-        <p>I'm a data-driven problem solver currently pursuing my MSc in Business Analytics & Data Science at IE
-          University in Madrid — a journey fueled by a genuine passion for turning raw data into strategic decisions
-          that matter.</p>
-        <p>My background bridges business and technology: I've built forecasting models on hundreds of thousands of
-          records, automated reporting workflows that slashed manual workload by half, and designed dashboards that
-          bring clarity to complex operations.</p>
-        <p>I hold dual Mexican and Spanish citizenship, am fluent in both Spanish and English, and am actively seeking
-          global opportunities in analytics and data science.</p>
-
-        <p class="about-subsection-label">// THE PERSON BEHIND THE CV</p>
-        <p>I'm someone who has grown a lot by stepping outside of my comfort zone. I left my hometown in Mexico to study
-          and play college soccer in the United States, and now I've moved to Madrid to pursue my Master's degree. Those
-          experiences shaped my adaptability, resilience, and international mindset. Living and working in different
-          countries has taught me how to collaborate with diverse teams, the importance of clear and constant
-          communication, and to stay flexible in fast-changing environments.</p>
-        <p>Being a student-athlete also strengthened my discipline, my ability to work under pressure, my time
-          management, and my ownership of my actions. Balancing academics, competitive sports, and leadership required
-          organization, accountability, and communication skills that I now bring everywhere with me. I'm naturally
-          proactive, hands-on, and comfortable taking initiative when something needs to get done.</p>
-        <p>I care deeply about continuous growth, both professionally and personally. I value taking care of my physical
-          and mental well-being, as I believe sustainable performance comes from balance. I bring positive energy,
-          curiosity, and a strong willingness to learn — motivated by contributing meaningfully to the teams and
-          projects I'm part of.</p>
-      </div>
-      <div class="about-highlights reveal">
-        <div class="exp-card" onclick="toggleExpCard(this)">
-          <div class="exp-card-header">
-            <div class="exp-card-header-text">
-              <h4>Class Representative</h4>
-              <p> MBDS Cohort · IE University, Madrid</p>
-            </div>
-            <div class="exp-chevron"><svg viewBox="0 0 24 24">
-                <polyline points="6 9 12 15 18 9" />
-              </svg></div>
-          </div>
-          <div class="exp-card-body">
-            <div class="exp-card-body-inner">
-              <p>Elected as the official representative of the MSc Business Analytics & Data Science Section 1 at IE
-                University. Serve as the main link between students and faculty, easing communication,
-                addressing academic concerns, and fostering a collaborative learning environment across an international
-                and diverse class.</p>
-            </div>
-          </div>
+        <div class="about-name">Marian Garabana</div>
+        <div class="about-role">Business Analytics &amp; Data Science · Madrid</div>
+        <div class="about-stat">
+          <div class="st"><b>10</b><span>Projects built</span></div>
+          <div class="st"><b>600K+</b><span>Records modelled</span></div>
+          <div class="st"><b>5</b><span>Academic awards</span></div>
         </div>
-        <div class="exp-card" onclick="toggleExpCard(this)">
-          <div class="exp-card-header">
-            <div class="exp-card-header-text">
-              <h4>Advanced Tech Track Student</h4>
-              <p> MBDS Cohort · IE University, Madrid</p>
-            </div>
-            <div class="exp-chevron"><svg viewBox="0 0 24 24">
-                <polyline points="6 9 12 15 18 9" />
-              </svg></div>
+        <div class="wh">
+          <div class="wh-item">
+            <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">Accumin Intelligence · Madrid</span><span class="ro">Business Analyst</span></span><span class="wh-rt"><span class="yr">From Sep 2026</span><span class="wh-chev"></span></span></button>
+            <div class="wh-panel"><p>I join Accumin Intelligence in September 2026 as a Business Analyst, on a transformation project to digitalise the company and put AI into how it operates. The work is automating processes and building the analysis behind better data-driven decisions.</p></div>
           </div>
-          <div class="exp-card-body">
-            <div class="exp-card-body-inner">
-              <p>Selected among the top 15% students to join this program, which consists on tracking
-                advanced courses in Python and SQL and later on working on a project with the skills and
-                concepts learned. Some concepts I have learned and applied so far are data virtualization in SQL
-                and introduction to Polars library.
-              </p>
-            </div>
+          <div class="wh-item">
+            <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">IEX Labs · IE University</span><span class="ro">Research Intern</span></span><span class="wh-rt"><span class="yr">2026</span><span class="wh-chev"></span></span></button>
+            <div class="wh-panel"><p>I research how ventures and emerging technologies will shape the future of insurance, with Vienna Insurance Group. I am building an AI agent pipeline that finds mitigating technologies and estimates their financial impact, feeding a climate risk simulation framework VIG can use to plan ahead. We defended the work to VIG executives in Bilbao, and it doubles as my masters capstone.</p></div>
           </div>
-        </div>
-        <div class="exp-card" onclick="toggleExpCard(this)">
-          <div class="exp-card-header">
-            <div class="exp-card-header-text">
-              <h4>MXT Program Member</h4>
-              <p>IE University's Impact Xcelerator Program</p>
-            </div>
-            <div class="exp-chevron"><svg viewBox="0 0 24 24">
-                <polyline points="6 9 12 15 18 9" />
-              </svg></div>
+          <div class="wh-item">
+            <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">Kreston BSG México</span><span class="ro">Tax Reporting Automation Specialist &amp; Project Lead</span></span><span class="wh-rt"><span class="yr">2025</span><span class="wh-chev"></span></span></button>
+            <div class="wh-panel"><p>I automated recurring reporting workflows and cut manual tax reporting by 80 percent, and reduced manual workload by 50 percent per project. I used SQL, Power Query, and AI-driven tools, and cleaned large datasets to improve accuracy by 20 percent while managing several client projects at once.</p></div>
           </div>
-          <div class="exp-card-body">
-            <div class="exp-card-body-inner">
-              <p>Selected for IE University's MXT cross-disciplinary program, which brings together top-performing
-                students across different undergraduate and graduate programs to collaborate on complex, real-world
-                challenges.
-                Becoming an MXT Member has allowed me to join a community of innovators and future leaders at the
-                intersection
-                of business and exponential technologies. Inspired by programs such as Berkeley's
-                M.E.T. and Wharton's M&T, MXT combines rigorous training with real-world projects
-                that push me to apply AI, data, and strategic thinking to meaningful challenges.</p>
-            </div>
-          </div>
-        </div>
-        <div class="exp-card" onclick="toggleExpCard(this)">
-          <div class="exp-card-header">
-            <div class="exp-card-header-text">
-              <h4>Wellness Ambassador</h4>
-              <p>Student Well-Being Club · IE University</p>
-            </div>
-            <div class="exp-chevron"><svg viewBox="0 0 24 24">
-                <polyline points="6 9 12 15 18 9" />
-              </svg></div>
-          </div>
-          <div class="exp-card-body">
-            <div class="exp-card-body-inner">
-              <p>As a Wellbeing Ambassador at the IE Center for Health & Well-Being, I help promote a healthy, balanced,
-                and
-                inclusive student experience across campus. My role involves listening to student needs, contributing
-                ideas to improve
-                wellbeing initiatives, and helping cultivate a culture of empathy, resilience, and positive lifestyle
-                habits within the IE community.</p>
-            </div>
-          </div>
-        </div>
-        <div class="exp-card" onclick="toggleExpCard(this)">
-          <div class="exp-card-header">
-            <div class="exp-card-header-text">
-              <h4>Athletic Scholar — Women's Soccer</h4>
-              <p>Keiser University · All-Academic Award (2022-2024)</p>
-            </div>
-            <div class="exp-chevron"><svg viewBox="0 0 24 24">
-                <polyline points="6 9 12 15 18 9" />
-              </svg></div>
-          </div>
-          <div class="exp-card-body">
-            <div class="exp-card-body-inner">
-              <p>Competed on the Keiser University Women's Soccer team for three years under an athletic scholarship
-                while maintaining Summa Cum Laude academic standing. Earned All-Academic Awards in 2022, 2023, and 2024.
-              </p>
-              <div class="exp-tags"><span class="exp-tag">ATHLETIC SCHOLARSHIP</span><span class="exp-tag">ALL-ACADEMIC
-                  2022–2024</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="exp-card" onclick="toggleExpCard(this)">
-          <div class="exp-card-header">
-            <div class="exp-card-header-text">
-              <h4>Model UN — Best Delegate</h4>
-              <p>Best Delegate 2022 · Outstanding 2021 & 2022 · Honorific 2020</p>
-            </div>
-            <div class="exp-chevron"><svg viewBox="0 0 24 24">
-                <polyline points="6 9 12 15 18 9" />
-              </svg></div>
-          </div>
-          <div class="exp-card-body">
-            <div class="exp-card-body-inner">
-              <p>Participated in Model United Nations competitions over three consecutive years, earning escalating
-                recognition: Honorific Mention (2020), Outstanding Delegate (2021), and Best Delegate (2022). Built
-                strong foundations in international diplomacy, persuasive argumentation, and cross-cultural
-                communication.</p>
-              <div class="exp-tags"><span class="exp-tag">BEST DELEGATE 2022</span><span class="exp-tag">PUBLIC
-                  SPEAKING</span></div>
-            </div>
+          <div class="wh-item">
+            <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">DICORSA</span><span class="ro">Business Analyst Intern: Sales Analytics &amp; Predictive Modeling</span></span><span class="wh-rt"><span class="yr">2024–25</span><span class="wh-chev"></span></span></button>
+            <div class="wh-panel"><p>I developed the MySQL database, built six Tableau dashboards, and my analysis fed three cost-saving strategies and route-optimisation plans.</p></div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- SKILLS -->
-  <section id="skills">
-    <p class="section-eyebrow reveal">// 02 &mdash; capabilities</p>
-    <h2 class="section-title reveal">My Strengths</h2>
-    <div class="section-line reveal"></div>
-    <div class="skills-grid">
+<!-- The "How I work" / Understand-Build-Deliver section was cut Aug 8 2026.
+     Three equal cards of process description, 477px at 1440 and 1,049px at 390,
+     saying what every analytics portfolio says. DESIGN-DIRECTION.md names
+     three-equal-card sections as the weakest genre on the site and the
+     anti-vibe checklist bans them. The .steps / .step rules in styles.css are
+     NOT dead with it: dicorsa, titan and trading all use them. -->
 
-      <div class="skill-card reveal" onclick="openModal('skill','bi')">
-        <p class="skill-card-label">BI &amp; Visualization</p>
-        <h3>Business Intelligence</h3>
-        <p>Building end-to-end BI pipelines from raw data to executive dashboards that drive real decisions.</p>
-        <div class="skill-tags"><span class="skill-tag">Tableau</span><span class="skill-tag">Power Query</span><span
-            class="skill-tag">Excel</span></div>
-        <div class="card-open-hint"><svg viewBox="0 0 24 24">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>VIEW FULL DETAILS</div>
-      </div>
-
-      <div class="skill-card reveal" onclick="openModal('skill','python')">
-        <p class="skill-card-label">Programming</p>
-        <h3>Data Science With Python</h3>
-        <p>Writing clean, production-grade Python for data wrangling, statistical analysis, and predictive modeling.</p>
-        <div class="skill-tags"><span class="skill-tag">Python</span><span class="skill-tag">Pandas</span><span
-            class="skill-tag">Scikit-learn</span><span class="skill-tag">Polars</span></div>
-        <div class="card-open-hint"><svg viewBox="0 0 24 24">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>VIEW FULL DETAILS</div>
-      </div>
-
-      <div class="skill-card reveal" onclick="openModal('skill','db')">
-        <p class="skill-card-label">Databases</p>
-        <h3>Database Management</h3>
-        <p>Designing and querying relational databases to structure, clean, and extract meaningful signals from large
-          datasets.</p>
-        <div class="skill-tags"><span class="skill-tag">SQL</span><span class="skill-tag">MySQL</span><span
-            class="skill-tag">PostgreSQL</span></div>
-        <div class="card-open-hint"><svg viewBox="0 0 24 24">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>VIEW FULL DETAILS</div>
-      </div>
-
-      <div class="skill-card reveal" onclick="openModal('skill','ml')">
-        <p class="skill-card-label">Machine Learning</p>
-        <h3>Predictive Modeling</h3>
-        <p>Building and validating regression and forecasting models to anticipate business outcomes and optimize
-          strategy.</p>
-        <div class="skill-tags"><span class="skill-tag">Linear Regression</span><span
-            class="skill-tag">Forecasting</span><span class="skill-tag">ML</span></div>
-        <div class="card-open-hint"><svg viewBox="0 0 24 24">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>VIEW FULL DETAILS</div>
-      </div>
-
-      <div class="skill-card reveal" onclick="openModal('skill','auto')">
-        <p class="skill-card-label">Efficiency</p>
-        <h3>Automation &amp; Reporting</h3>
-        <p>Automating repetitive reporting workflows to free teams for higher-value analytical work.</p>
-        <div class="skill-tags"><span class="skill-tag">Power Query</span><span class="skill-tag">SQL
-            Automation</span><span class="skill-tag">Python Scripts</span></div>
-        <div class="card-open-hint"><svg viewBox="0 0 24 24">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>VIEW FULL DETAILS</div>
-      </div>
-
-      <div class="skill-card reveal" onclick="openModal('skill','comm')">
-        <p class="skill-card-label">Communication</p>
-        <h3>Data Storytelling & Communication</h3>
-        <p>Translating complex technical results into clear narratives for diverse audiences: from engineers to
-          executives.</p>
-        <div class="skill-tags"><span class="skill-tag">Public Speaking</span><span
-            class="skill-tag">Storytelling</span><span class="skill-tag">Presentations</span></div>
-        <div class="card-open-hint"><svg viewBox="0 0 24 24">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>VIEW FULL DETAILS</div>
-      </div>
-
+<!-- ================= EDUCATION ================= -->
+<section id="education">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">04 · Education</span>
+      <h2 class="sec-title sub">What I've studied.</h2>
     </div>
-  </section>
+    <!-- ===== EDUCATION =====
+         Hover-expand rows, Aug 13 2026. Replaced the photo-backed rail cards.
+         Why, and the numbers kept from the unlumen component they are ported
+         from, are in the 04 EDUCATION block in the <style> above.
 
-  <!-- EXPERIENCE -->
-  <section id="experience">
-    <p class="section-eyebrow reveal">// 03 &mdash; career</p>
-    <h2 class="section-title reveal">Work Experience</h2>
-    <div class="section-line reveal"></div>
-    <div class="timeline">
-      <div class="tl-item reveal">
-        <div class="tl-dot">01</div>
-        <p class="tl-date">Apr 2026 – Jun 2026 &nbsp;·&nbsp; Madrid, Spain</p>
-        <p class="tl-company">IEX Labs · IE University</p>
-        <p class="tl-role">Student Research Intern — Think Tank Lab &nbsp;<span
-            style="font-size:.65rem;color:var(--muted);font-family:var(--mono)">(UPCOMING)</span></p>
-        <ul class="tl-bullets">
-          <li>Selected by Dean Ikhlaq Sidhu (IE Sci-Tech &amp; Berkeley Co-Lab Co-chair) for a research internship
-            within IEX Labs, in partnership with the Berkeley International Co-Lab and CITRIS HQ at Berkeley.</li>
-          <li>Systematically identifying and assessing <strong>emerging technologies and ventures</strong> that could
-            materially impact insurance risk, underwriting, and cost structures — translating venture intelligence into
-            strategic insight.</li>
-          <li>Producing Venture Track Briefs, industry reports, and summary slides across 8–12 week research sprints;
-            maintaining a live venture tracking database (12 hrs/week).</li>
-        </ul>
-      </div>
+         EDIT HERE. One .hx-row per entry. The script counts rows, so adding a
+         fifth needs no other change. A row with no photograph takes
+         .hx-row--nomedia and an empty .hx-plate, which becomes a tinted panel.
 
-      <div class="tl-item reveal">
-        <div class="tl-dot">02</div>
-        <p class="tl-date">May 2025 – Aug 2025 · Puebla, Mexico</p>
-        <p class="tl-company">Kreston BSG</p>
-        <p class="tl-role">Tax Reporting Automation &amp; Project Lead (Internship)</p>
-        <ul class="tl-bullets">
-          <li>Automated recurring reporting workflows, reducing manual workload by <strong>50%</strong> using SQL per
-            project.</li>
-          <li>Collaborated with coworkers to transform and reduce manual tax reporting by <strong>80%</strong>.</li>
-          <li>Cleaned and structured large datasets to improve quality and accuracy by <strong>20%</strong> using Python
-            and Power Query.</li>
-        </ul>
+         HOW IT DEGRADES. Every row is expanded in the CSS and only collapses
+         once the script adds .js to .hx, so with JS blocked the section reads
+         in full. Below 760px the plate is dropped and every row stays open:
+         a hover row on a touch screen is a tap target pretending to be a
+         hover, and a 130px photograph is not a photograph. -->
+    <div class="hx" id="eduHx">
+    <div class="hx-row">
+      <div class="hx-plate" aria-hidden="true"><img src="assets/me/iegrad2026.webp" alt="" width="1125" height="1500" loading="lazy" decoding="async" style="object-position:50% 56%"></div>
+      <div class="hx-in">
+        <button class="hx-head" type="button" aria-expanded="false">
+          <span class="hx-title">MSc in Business Analytics &amp; Data Science</span>
+          <span class="hx-meta">IE University · 2025–2026 · Madrid</span>
+        </button>
+        <div class="hx-body">
+          <p class="hx-note">Selected for the Advanced Tech Track, the program for the top 10 to 15 percent of the cohort, and a member of MXT. My work spans machine learning, agentic AI, deep learning, MLOps, and cloud analytics.</p>
+          <ul class="hx-list">
+            <li>Coursework across Machine Learning I and II, Agentic AI, Deep Learning, MLOps, Reinforcement Learning, Cloud Data Analytics, and Modern Data Architectures.</li>
+            <li>Advanced Tech Track: advanced SQL with indexing and partitioning, high-performance processing with Polars, and a project joining databases and AI.</li>
+            <li>Built most of the projects on this site here, including the agentic AI systems and the deep learning platform.</li>
+            <li>Class Representative and Wellbeing Ambassador, so I stayed close to both my cohort and the faculty.</li>
+          </ul>
+          <div class="hx-tags"><span>Advanced AI</span><span>Machine Learning</span><span>Agentic AI</span><span>Python</span><span>SQL</span></div>
+        </div>
       </div>
-      <div class="tl-item reveal">
-        <div class="tl-dot">03</div>
-        <p class="tl-date">Aug 2024 – May 2025 · Puebla, Mexico</p>
-        <p class="tl-company">DICORSA</p>
-        <p class="tl-role">Junior Business Analyst — Sales Analytics &amp; Forecasting</p>
-        <ul class="tl-bullets">
-          <li>Built and validated a linear regression forecasting model on <strong>400K+ sales records</strong>,
-            achieving 75% forecast accuracy.</li>
-          <li>Developed a MySQL database and designed <strong>6 Tableau dashboards</strong> for operations visibility.
-          </li>
-          <li>Implemented 3 cost-saving strategies and route optimization plans.</li>
-        </ul>
+      <span class="hx-idx" aria-hidden="true">01</span>
+    </div>
+    <div class="hx-row">
+      <div class="hx-plate" aria-hidden="true"><img src="assets/me/keisergrad.webp" alt="" width="1200" height="800" loading="lazy" decoding="async"></div>
+      <div class="hx-in">
+        <button class="hx-head" type="button" aria-expanded="false">
+          <span class="hx-title">BA in Business Analytics</span>
+          <span class="hx-meta">Keiser University · 2022–2025 · Summa Cum Laude</span>
+        </button>
+        <div class="hx-body">
+          <p class="hx-note">Graduated with academic distinction and several research and academic awards. I was also a student athlete on the women’s soccer team, which is where I learned to work under pressure and as part of a team.</p>
+          <ul class="hx-list">
+            <li>Finished Summa Cum Laude with a foundation in analytics, statistics, and business intelligence.</li>
+            <li>Led my capstone with DICORSA, a weekly forecast of average order size on more than 600,000 records that came within about 25 percent on average, which is 75 percent on a mean absolute percentage error basis.</li>
+            <li>Took third place at an undergraduate research symposium.</li>
+            <li>Played on the women’s soccer team as a student athlete while keeping top academic standing.</li>
+          </ul>
+          <div class="hx-tags"><span>Analytics</span><span>Statistics</span><span>Leadership</span></div>
+        </div>
       </div>
-      <div class="tl-item reveal">
-        <div class="tl-dot">04</div>
-        <p class="tl-date">Sep 2023 – May 2025 · West Palm Beach, Florida</p>
-        <p class="tl-company">Sodexo</p>
-        <p class="tl-role">Barista</p>
-        <ul class="tl-bullets">
-          <li>Enhanced customer service and communication, increasing revenue by <strong>20%</strong> year over year.
-          </li>
-          <li>Led smooth closing operations including inventory control and restocking, finishing on time
-            <strong>90%</strong> of shifts.
-          </li>
-          <li> Part-time on-campus job at Keiser University, while being a student-athlete.</li>
-        </ul>
+      <span class="hx-idx" aria-hidden="true">02</span>
+    </div>
+    <div class="hx-row">
+      <div class="hx-plate" aria-hidden="true"><img src="assets/me/iegrad-stage.webp" alt="" width="900" height="1200" loading="lazy" decoding="async" style="object-position:50% 30%"></div>
+      <div class="hx-in">
+        <button class="hx-head" type="button" aria-expanded="false">
+          <span class="hx-title">Certifications</span>
+          <span class="hx-meta">GenAI &amp; Data Science · 2024–2026 · In progress</span>
+        </button>
+        <div class="hx-body">
+          <p class="hx-note">Generative AI for Data Analysis (Professional Certificate) and the IBM Data Science Professional Specialization. Currently studying for the AWS Cloud Practitioner certification.</p>
+          <ul class="hx-list">
+            <li>Generative AI for Data Analysis, Professional Certificate.</li>
+            <li>IBM Data Science Professional Specialization.</li>
+            <li>Business Intelligence Data Analyst career path.</li>
+            <li>Data Scientist analytics career path.</li>
+            <li>AWS Cloud Practitioner, in progress.</li>
+          </ul>
+          <div class="hx-tags"><span>Generative AI</span><span>IBM Data Science</span><span>AWS</span></div>
+        </div>
+      </div>
+      <span class="hx-idx" aria-hidden="true">03</span>
+    </div>
+    <div class="hx-row">
+      <div class="hx-plate" aria-hidden="true"><img src="assets/me/keiser-stage-awards.webp" alt="" width="900" height="1200" loading="lazy" decoding="async" style="object-position:50% 34%"></div>
+      <div class="hx-in">
+        <button class="hx-head" type="button" aria-expanded="false">
+          <span class="hx-title">Awards &amp; Recognition</span>
+          <span class="hx-meta">Honors · Academic and research · Five awards</span>
+        </button>
+        <div class="hx-body">
+          <p class="hx-note">Summa Cum Laude and the Academic Excellence Graduate Award. Third place at an undergraduate research symposium, plus Best Delegate and Outstanding Delegate at Model United Nations.</p>
+          <ul class="hx-list">
+            <li>Summa Cum Laude.</li>
+            <li>Academic Excellence Graduate Award.</li>
+            <li>Third place at an undergraduate research symposium.</li>
+            <li>Best Delegate and Outstanding Delegate at Model United Nations.</li>
+          </ul>
+          <div class="hx-tags"><span>Summa Cum Laude</span><span>Research</span><span>Model UN</span></div>
+        </div>
+      </div>
+      <span class="hx-idx" aria-hidden="true">04</span>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ME (narrative) ================= -->
+<section id="aboutme">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">05 · About me</span>
+      <h2 class="sec-title sub">A bit about me.</h2>
+    </div>
+    <!-- The pull quote and the signed name were cut Aug 8 2026. It was Marian's
+         own sentence set in curly quotation marks with her name signed under it,
+         on her own about page: the self-testimonial shape P3-5 listed, and the
+         second of the two instances the earlier pass miscounted as one. The
+         section now opens on her own prose. The left column went with it. -->
+    <div class="aboutme">
+      <div class="body reveal">
+        <p>I was born and raised in Mexico, and I moved to Florida to study Business Analytics at Keiser University. I went there on an athletic scholarship to play for the women's soccer team, which right now is ranked number one in the nation in the NAIA. Competing and carrying a full course load at the same time is where I learned to plan my weeks carefully and to keep my standards up in both.</p>
+        <p>After finishing my bachelor's I decided to move to Madrid for a master's in Business Analytics and Data Science at IE University, with a concentration in Advanced AI. I chose that program for two reasons: I wanted to make my technical side stronger, and I wanted to reach the job market ready to work rather than still catching up. I set a second goal alongside it, which was to be the healthiest version of myself. That means training for half marathons and getting stronger in the gym, and it keeps me steady when the academic side gets heavy.</p>
+        <p>These days my work is AI-driven from start to finish. I build agentic pipelines, predictive models, and dashboards, and I care about the parts that make them last: clean data, honest metrics, and results a person can act on. I was a student athlete before this, so I am used to working hard, staying calm under pressure, and pulling my weight on a team.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- PROJECTS -->
-  <section id="projects">
-    <p class="section-eyebrow reveal">// 04 &mdash; work</p>
-    <h2 class="section-title reveal">Major Projects</h2>
-    <div class="section-line reveal"></div>
-    <div class="projects-grid">
-
-      <div class="project-card reveal" onclick="openModal('project','datathon')">
-        <div class="project-card-header"><img src="https://i.imgur.com/CLg2Zfx.jpg"
-            alt="IE Sustainability Datathon" /><span class="project-card-num">PRJ_01</span></div>
-        <div class="project-card-body">
-          <p class="project-card-label">Datathon · Nov–Dec 2025</p>
-          <h3>IE Sustainability Datathon</h3>
-          <p>Data visualization & analysis of EU aviation emissions and SAF adoption using PostgreSQL and Tableau.</p>
-          <div class="project-card-footer">
-            <span class="project-award-pill">1ST PLACE</span>
-            <span class="card-open-hint"><svg viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>VIEW DETAILS</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-card reveal" onclick="openModal('project','bootcamp')">
-        <div class="project-card-header"><img src="https://i.imgur.com/XnXUf4Y.jpg"
-            alt="IE Tech Venture Bootcamp" /><span class="project-card-num">PRJ_02</span></div>
-        <div class="project-card-body">
-          <p class="project-card-label">Bootcamp · Oct 2025</p>
-          <h3>IE Tech Venture Bootcamp</h3>
-          <p>Tech startup concept designed and pitched in 12 days using the Berkeley Method for Innovation.</p>
-          <div class="project-card-footer">
-            <span></span>
-            <span class="card-open-hint"><svg viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>VIEW DETAILS</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-card reveal" onclick="openModal('project','thesis')">
-        <div class="project-card-header"><img src="https://i.imgur.com/sDjHUZo.jpg"
-            alt="Sales Forecasting Thesis" /><span class="project-card-num">PRJ_03</span></div>
-        <div class="project-card-body">
-          <p class="project-card-label">Capstone · Jan–Apr 2025</p>
-          <h3>Sales Forecasting Thesis</h3>
-          <p>BI-driven forecasting model on 400K+ records achieving 75% accuracy — published capstone research.</p>
-          <div class="project-card-footer">
-            <span class="project-award-pill">3RD PLACE</span>
-            <span class="card-open-hint"><svg viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>VIEW DETAILS</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="project-card reveal" onclick="openModal('project','sql')">
-        <div class="project-card-header"><img src="https://i.imgur.com/wr2Egns.jpg" alt="Cinema Chain Database" /><span
-            class="project-card-num">PRJ_04</span></div>
-        <div class="project-card-body">
-          <p class="project-card-label">Academic &middot; IE University &middot; 2026</p>
-          <h3>Cinema Chain Database</h3>
-          <p>End-to-end relational database for a multi-location cinema chain — full DDL, DML, and 5 complex business
-            SQL queries.</p>
-          <div class="project-card-footer"><span></span><span class="card-open-hint"><svg viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>VIEW DETAILS</span></div>
-        </div>
-      </div>
-
-      <div class="project-card reveal" onclick="openModal('project','madrid-ml')">
-        <div class="project-card-header"><img src="https://i.imgur.com/UtqjNum.jpg"
-            alt="Madrid Rental Market — Interactive ML Dashboard" /><span class="project-card-num">PRJ_05</span></div>
-        <div class="project-card-body">
-          <p class="project-card-label">Academic &middot; IE University &middot; 2026</p>
-          <h3>Madrid Rental Market — ML Dashboard</h3>
-          <p>Live Streamlit app bringing a full ML pipeline to life — K-Means clustering, OLS regression, and logistic
-            classification on 2,100 Madrid listings.</p>
-          <div class="project-card-footer">
-            <span class="project-award-pill">LIVE APP</span>
-            <span class="card-open-hint"><svg viewBox="0 0 24 24">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>VIEW DETAILS</span>
-          </div>
-        </div>
+<!-- ================= CTA + FOOTER ================= -->
+<section id="contact">
+  <div class="wrap">
+    <!-- Redesigned Aug 14 2026. Was a centred white slab with one button, and
+         the only element on the page carrying no information: no location, no
+         availability, no second route in. Same copy, now with a live
+         availability line and the two profiles a recruiter opens next.
+         Kept centred; the three-button row is what stops it reading as the
+         generic footer banner it was. -->
+    <div class="cta-frame reveal">
+    <div class="cta">
+      <p class="cta-status"><span class="cta-dot" aria-hidden="true"></span>Open to 2026 roles · Madrid</p>
+      <h2>Let's build something<br>with your <em>data</em>.</h2>
+      <p class="cta-lead">Have a project, a role, or just want to talk data? I'd love to hear from you.</p>
+      <div class="cta-acts">
+        <a href="mailto:marian.garabana@gmail.com" class="btn">Get in touch <span aria-hidden="true">↗</span></a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener" class="btn btn-ghost cta-alt">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05a4.2 4.2 0 0 1 3.75-2c4 0 4.4 2.5 4.4 5.9V21h-4v-5.6c0-1.4-.03-3.1-1.9-3.1-1.9 0-2.2 1.5-2.2 3v5.7h-4V9Z"/></svg>LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener" class="btn btn-ghost cta-alt">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.54 2.36 1.09 2.93.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>GitHub</a>
       </div>
     </div>
-  </section>
-
-  <!-- EDUCATION -->
-  <section id="education">
-    <p class="section-eyebrow reveal">// 05 &mdash; academic</p>
-    <h2 class="section-title reveal">Education</h2>
-    <div class="section-line reveal"></div>
-    <div class="edu-grid">
-      <div class="edu-card reveal">
-        <img class="edu-card-img" src="https://i.imgur.com/NftAZ77.jpg" alt="IE University" />
-        <div class="edu-card-body">
-          <p class="edu-year">Sep 2025 – Jul 2026 · Madrid, Spain</p>
-          <p class="edu-school">IE University</p>
-          <p class="edu-degree">MSc Business Analytics &amp; Data Science</p>
-          <p class="edu-notes">Class Representative · Advanced Tech Track Program · Research Intern</p>
-        </div>
-      </div>
-      <div class="edu-card reveal">
-        <img class="edu-card-img" src="https://i.imgur.com/i6JUu34.jpg" alt="Keiser University" />
-        <div class="edu-card-body">
-          <p class="edu-year">Sep 2022 – May 2025 · West Palm Beach, Florida</p>
-          <p class="edu-school">Keiser University</p>
-          <p class="edu-degree">BA Business Analytics — Summa Cum Laude</p>
-          <p class="edu-notes">Athletic Scholarship · Women's Soccer · Dean's President List (4 semesters) ·
-            All-Academic
-            Award (2022–2024)</p>
-        </div>
-      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <p class="section-eyebrow reveal">// 06 &mdash; connect</p>
-    <h2 class="section-title reveal">Contact Me</h2>
-    <div class="section-line reveal"></div>
-    <div class="contact-grid">
-      <div class="contact-info reveal">
-        <p>I'm actively seeking global opportunities in Business Analytics, Data Science, and BI. Whether it's a
-          full-time role, internship, or a conversation about data — I'd love to hear from you.</p>
-        <ul class="contact-list">
-          <li><span class="c-icon"><svg viewBox="0 0 24 24">
-                <path
-                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                  stroke="none" fill="#00a3ff" />
-              </svg></span><span>Madrid, Spain 28036</span></li>
-          <li><span class="c-icon"><svg viewBox="0 0 24 24">
-                <path
-                  d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11a19.79 19.79 0 01-3-8.59A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.09 6.09l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-              </svg></span><span>+34 600 67 03 45</span></li>
-          <li><span class="c-icon"><svg viewBox="0 0 24 24">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg></span><a
-              href="/cdn-cgi/l/email-protection#1b767a69727a75357c7a697a797a757a5b686f6e7f7e756f35727e357e7f6e"><span
-                class="__cf_email__"
-                data-cfemail="4f222e3d262e2161282e3d2e2d2e212e0f3c3b3a2b2a213b61262a612a2b3a">[email&#160;protected]</span></a>
-          </li>
-          <li><span class="c-icon"><svg viewBox="0 0 24 24">
-                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
-                <circle cx="4" cy="4" r="2" />
-              </svg></span><a href="https://www.linkedin.com/in/marian-garabana-garrido/"
-              target="_blank">linkedin.com/in/marian-garabana-garrido</a></li>
-          <li><span class="c-icon"><svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-              </svg></span><span>Mexican &amp; Spanish Citizenships</span></li>
-        </ul>
-      </div>
-      <div class="contact-form-wrap reveal">
-        <div class="form-group"><label for="cname">Your Name</label><input type="text" id="cname"
-            placeholder="Jane Smith" /></div>
-        <div class="form-group"><label for="cemail">Your Email</label><input type="email" id="cemail"
-            placeholder="jane@company.com" /></div>
-        <div class="form-group"><label for="cmsg">Message</label><textarea id="cmsg"
-            placeholder="Tell me about the opportunity..."></textarea></div>
-        <button class="btn-send" onclick="handleSend()">Send Message</button>
-      </div>
-    </div>
-  </section>
-
+</main>
+<!-- footer sits outside main so it maps to the contentinfo landmark. P1-9. -->
+<div class="wrap">
   <footer>
-    <p>© 2026 <span>Marian Garabana Garrido</span> · Business Analytics &amp; Data Science</p>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
   </footer>
+</div>
+<!-- ================= FLOATING PILL ================= -->
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-  <script>
-    /* ══════════════ DATA ══════════════ */
-    const DATA = {
-      skill: [
-        {
-          id: 'bi', section: 'SKILLS', category: 'BI & Visualization', title: 'Business Intelligence',
-          tags: ['Tableau', 'Power Query', 'Excel', 'Microsoft Access'],
-          body: [
-            'Designed and deployed 6 Tableau dashboards at DICORSA to monitor sales performance across distribution routes in real time, enabling data-driven operational decisions for a $3M USD beverage distribution company.',
-            'Proficient in Microsoft Excel with Power Query for ETL workflows — automating data transformation pipelines that previously required hours of manual processing each reporting cycle.',
-            'Consolidated multi-source datasets at the IE Sustainability Datathon, merging EU aviation data from multiple carriers and regulatory bodies into a unified PostgreSQL schema for emissions trend analysis and SAF adoption modeling.',
-            'Experienced in Microsoft Access for lightweight database management and reporting within business contexts where enterprise databases are not in place.'
-          ],
-          meta: [{ k: 'PRIMARY TOOL', v: 'Tableau' }, { k: 'CONTEXT', v: 'DICORSA / IE Datathon' }, { k: 'OUTPUT', v: '6 Dashboards Built' }, { k: 'LEVEL', v: 'Professional' }]
-        },
-        {
-          id: 'python', section: 'SKILLS', category: 'Programming', title: 'Python & Data Science',
-          tags: ['Python', 'Pandas', 'NumPy', 'Scikit-learn', 'Matplotlib', 'Polars', 'Plotly', 'OOP'],
-          body: [
-            'Applied Python extensively at Kreston BSG for data cleaning and transformation, reducing dataset inconsistencies by 20% and significantly cutting preparation time across recurring tax reporting cycles.',
-            'Core data science stack: Pandas for data manipulation, NumPy for numerical computing, Matplotlib and Plotly for exploratory visualization, and Scikit-learn for machine learning model development and validation.',
-            'Currently deepening expertise through the MSc Business Analytics & Data Science program at IE University, with advanced coursework in machine learning, statistical modeling, deep learning, and Polars library.',
-            'Emphasis on writing clean, readable, production-quality code that can be maintained and extended by collaborators — not just scripts that work once.'
-          ],
-          meta: [{ k: 'EXPERIENCE', v: '2+ Years' }, { k: 'WHERE APPLIED', v: 'Kreston BSG / IE University' }, { k: 'FOCUS', v: 'Data Engineering & ML' }, { k: 'LEVEL', v: 'Intermediate–Advanced' }]
-        },
-        {
-          id: 'db', section: 'SKILLS', category: 'Databases', title: 'Database Management',
-          tags: ['SQL', 'MySQL', 'PostgreSQL', 'DBMS Architectures', 'ETL', 'ELT', 'OLAP/OLTP'],
-          body: [
-            'Designed and implemented a MySQL database at DICORSA from the ground up to centralize 400K+ historical sales records across distribution channels, enabling structured querying and repeatable reporting at scale.',
-            'Used PostgreSQL at the IE Sustainability Datathon to consolidate multiple EU aviation datasets into a unified schema, supporting cross-carrier emissions analysis and Sustainable Aviation Fuel adoption modeling.',
-            'At Kreston BSG, automated SQL-based reporting workflows with Microsoft Access and Power Query that eliminated 50% of manual workload per project cycle, significantly reducing the time the tax reporting team spent on data preparation.',
-            'Comfortable with full database lifecycle tasks: schema design, de/normalization, query optimization, data cleaning, and integrating databases with visualization and analytics tools such as Tableau and PowerBI.'
-          ],
-          meta: [{ k: 'DATABASES', v: 'MySQL, PostgreSQL, Microsoft Access' }, { k: 'CONTEXT', v: 'DICORSA / Kreston BSG / IE University' }, { k: 'SCALE', v: '400K+ Records' }, { k: 'LEVEL', v: 'Proficient' }]
-        },
-        {
-          id: 'ml', section: 'SKILLS', category: 'Machine Learning', title: 'Predictive Modeling',
-          tags: ['Linear Regression', 'Forecasting', 'Model Validation', 'Scikit-learn', 'Statistical Analysis'],
-          body: [
-            'Built and validated a linear regression forecasting model at DICORSA trained on 400K+ historical sales records, achieving 75% forecast accuracy. The central deliverable of my undergraduate capstone thesis.',
-            'The model directly informed three cost-saving strategies and route optimization plans that were implemented across DICORSA\'s distribution network, creating tangible operational impact for the business.',
-            'The research was recognized with Third Place at the Keiser University Undergraduate Research Symposium (2025), presented competitively alongside graduate-level submissions.',
-            'Currently expanding into more advanced modeling techniques through IE University\'s MSc program, including classification, clustering, time series, and neural network approaches.'
-          ],
-          meta: [{ k: 'MODEL', v: 'Linear Regression' }, { k: 'DATASET', v: '400K+ Records' }, { k: 'ACCURACY', v: '75%' }, { k: 'RECOGNITION', v: '3rd — Research Symposium' }]
-        },
-        {
-          id: 'auto', section: 'SKILLS', category: 'Efficiency', title: 'Automation & Reporting',
-          tags: ['Power Query', 'SQL Automation', 'Python Scripts', 'Workflow Design'],
-          body: [
-            'Led a full reporting automation initiative at Kreston BSG, redesigning manual tax workflows using SQL and Power Query. Result: 50% reduction in manual workload per project and 80% less manual intervention in the overall tax reporting process.',
-            'Cleaned and restructured large, inconsistent datasets to improve data quality by 20%, enabling more reliable downstream analysis and reporting for the firm\'s clients — reducing revision cycles and increasing stakeholder confidence.',
-            'Designed automation solutions with maintainability in mind: parameterized queries, documented scripts, and modular Power Query steps that non-technical team members could update without breaking pipelines.',
-            'Strong belief that automation work is only valuable when the freed-up capacity is redirected toward higher-order analysis — not just cost reduction.'
-          ],
-          meta: [{ k: 'TOOLS', v: 'SQL, Power Query, Python' }, { k: 'CONTEXT', v: 'Kreston BSG' }, { k: 'WORKLOAD REDUCED', v: '50–80%' }, { k: 'QUALITY GAIN', v: '+20% Accuracy' }]
-        },
-        {
-          id: 'comm', section: 'SKILLS', category: 'Storytelling', title: 'Data Storytelling',
-          tags: ['Public Speaking', 'Data Storytelling', 'Executive Presentations', 'Pitch Design', 'Bilingual'],
-          body: [
-            'Delivered the final presentation at the IE Sustainability Datathon to a panel of industry judges, translating complex EU aviation emissions data into a strategic narrative that secured first place among all competing teams.',
-            'Led the storytelling and pitch strategy for the IE Tech Venture Bootcamp — distilling a 12-day product development sprint into a compelling 2-minute investor-style presentation, balancing technical depth with business clarity.',
-            'Presented capstone research findings at the Keiser University Undergraduate Research Symposium, earning Third Place recognition for translating a rigorous quantitative forecasting model into accessible, actionable insights.',
-            'Strong bilingual communication skills (Spanish/English) across academic and professional contexts, consistently serving as a bridge between technical analytics teams and non-technical stakeholders in both languages.'
-          ],
-          meta: [{ k: 'LANGUAGES', v: 'Spanish & English' }, { k: 'AUDIENCES', v: 'Judges, Execs, Faculty' }, { k: 'FORMATS', v: 'Dashboards, Reports, Live Pitches' }, { k: 'RECOGNITION', v: 'Multiple Awards' }]
-        }
-      ],
-      project: [
-        {
-          id: 'datathon', imgKey: 'datathon', section: 'PROJECTS', category: 'Datathon · Nov–Dec 2025', title: 'IE Sustainability Datathon',
-          award: '1ST PLACE WINNERS',
-          tags: ['PostgreSQL', 'Tableau', 'EU Aviation Data', 'SAF Analysis', 'Machine Learning', 'Sustainability'],
-          body: [
-            'Competed in the IE Sustainability Datathon, a competitive data challenge requiring teams to extract actionable sustainability insights from real-world industry datasets under strict time constraints.',
-            'Led the data gathering and visualization track: consolidated multiple European Union aviation datasets from different carriers and regulatory bodies into a unified PostgreSQL schema, enabling cross-source analysis of carbon emissions trends and Sustainable Aviation Fuel (SAF) adoption rates across routes and regions.',
-            'Built a suite of interactive Tableau dashboards that communicated complex emissions patterns to a mixed technical and business audience — translating raw data into a clear narrative about aviation\'s sustainability trajectory and the levers available to accelerate SAF adoption.',
-            'Delivered the team\'s final presentation to a panel of industry judges, distilling technical findings into strategic policy implications. The combination of analytical rigor and communication clarity was a key factor in securing first place among all competing teams.'
-          ],
-          meta: [{ k: 'TOOLS', v: 'PostgreSQL, Tableau' }, { k: 'ROLE', v: 'Data Lead & Presenter' }, { k: 'TEAM', v: 'International Cohort' }, { k: 'RESULT', v: '1st Place' }]
-        },
-        {
-          id: 'bootcamp', imgKey: 'bootcamp', section: 'PROJECTS', category: 'Bootcamp · Oct 2025', title: 'IE Tech Venture Bootcamp',
-          award: null,
-          tags: ['Berkeley Method', 'Product Design', 'Startup Pitch', 'Innovation', 'Cross-cultural Teams'],
-          body: [
-            'Participated in IE University\'s intensive Tech Venture Bootcamp — a 12-day sprint designed to simulate building a real tech startup from zero to pitch, structured around the Berkeley Method for Innovation, a framework used widely in Silicon Valley product development.',
-            'Led three critical workstreams: idea generation (guiding the team through hypothesis testing and problem validation with real potential users), front-end platform design (wireframing and defining the end-to-end user experience), and pitch storytelling (crafting the narrative arc and visual structure for the final investor-style presentation).',
-            'Operated within a culturally and academically diverse team — navigating different working styles, communication preferences, and levels of technical knowledge to synthesize a coherent product vision under intense time pressure.',
-            'The experience reinforced the ability to move fast from abstract insight to structured solution, to communicate across functional boundaries, and to make confident decisions with incomplete information.'
-          ],
-          meta: [{ k: 'DURATION', v: '12 Days' }, { k: 'METHOD', v: 'Berkeley Innovation' }, { k: 'ROLE', v: 'Ideation Lead & Strategist' }, { k: 'FORMAT', v: '2-Min Investor Pitch' }]
-        },
-        {
-          id: 'thesis', imgKey: 'thesis', section: 'PROJECTS', category: 'Capstone · Jan–Apr 2025', title: 'Sales Forecasting Thesis',
-          award: '3RD PLACE — Undergraduate Research Symposium 2025',
-          tags: ['Python', 'SQL', 'Tableau', 'Linear Regression', 'MySQL', 'Business Intelligence'],
-          body: [
-            'Authored a full capstone thesis titled "Integrating Business Intelligence for Sales Forecasting and Strategic Decision-Making," completed during the final semester at Keiser University in direct partnership with DICORSA, a $3M USD beverage distribution company in Puebla, Mexico.',
-            'The core deliverable was a linear regression forecasting model trained and validated on over 400,000 historical sales records. The model achieved a 75% accuracy rate and was used to directly inform three cost-saving strategies and route optimization plans that the company subsequently implemented.',
-            'Supplemented the model with 6 custom Tableau dashboards and a fully designed MySQL database architecture, providing DICORSA with a complete self-serve analytics infrastructure that remained actively in use after the project concluded.',
-            'Presented the research at the Keiser University Undergraduate Research Symposium, where the project earned Third Place recognition out of all undergraduate research submissions — competing alongside work from students across multiple disciplines and program years.'
-          ],
-          meta: [{ k: 'TOOLS', v: 'Python, SQL, Tableau' }, { k: 'DATASET', v: '400K+ Records' }, { k: 'ACCURACY', v: '75%' }, { k: 'RECOGNITION', v: '3rd — Research Symposium' }]
-        },
-        {
-          id: 'sql', section: 'PROJECTS', category: 'Academic - IE University - 2026', title: 'Cinema Chain Database',
-          award: null,
-          tags: ['MySQL', 'SQL', 'Database Design', 'DDL/DML', '3NF', 'Analytics'],
-          body: ['Designed and implemented a fully normalised relational database for a multi-location cinema chain operating across Madrid, Barcelona, and Sevilla. The schema spans 16 tables across five domains - Location, Films & Scheduling, Movie Tickets, Concessions, and Shared Entities - satisfying Third Normal Form (3NF) throughout.',
-            'Key design decisions included auditorium-based dynamic pricing via a Price_Multiplier, a many-to-many film-genre junction table, and separate ticketing systems: movie tickets requiring customer registration and card payment, versus concessions supporting anonymous walk-ins with any payment method. A Showtime Group time-range mechanism bridges both revenue streams for unified time-of-day analytics.',
-            'Wrote complete DDL with all constraints and foreign keys, plus DML populating 255 movie tickets and 104 concession orders across 12 months. Answered 5 complex business queries: most profitable film (Dune: Part Two, evenings), Popcorn & Coke combo purchase rate (68.27%), peak sales window (Evening, 242 combined transactions), 12-month revenue by location exported to Excel, and highest avg revenue per auditorium type (VIP at 30.53 avg; IMAX leading on total volume at 1,571.79).',
-            'Presented design rationale to faculty, demonstrating how each structural choice - from a denormalized Location_ID on movie_ticket for query performance, to a nullable Customer_ID on shop_ticket for walk-in support - was grounded in real operational requirements rather than convention.'],
-          meta: [{ k: 'TOOLS', v: 'MySQL, SQL' }, { k: 'SCALE', v: '16 Tables, 255+ Records' }, { k: 'QUERIES', v: '5 Business Questions' }, { k: 'DESIGN', v: '3NF Normalised Schema' }],
-          links: [
-            { label: 'View on GitHub', icon: 'github', url: 'https://github.com/MarianGarabana/SQL-Cinema-Project' },
-            { label: 'Download Report', icon: 'pdf', url: 'https://raw.githubusercontent.com/MarianGarabana/SQL-Cinema-Project/main/SQL_Project.pdf' }
-          ]
-        }
-        , {
-          id: 'madrid-ml', imgKey: 'madridml', section: 'PROJECTS', category: 'Academic · IE University · 2026', title: 'Madrid Rental Market — Interactive ML Dashboard',
-          award: 'LIVE STREAMLIT APP',
-          tags: ['Python', 'Streamlit', 'K-Means', 'OLS Regression', 'Logistic Regression', 'Plotly', 'sklearn', 'statsmodels', 'EDA'],
-          body: [
-            'Built a fully interactive Streamlit web application that brings a complete machine learning pipeline to life using ~2,100 Madrid rental listings from Idealista. Rather than a static notebook, the app lets users explore, predict, and classify in real time — all models are trained live from the raw data at startup.',
-            'Market Explorer: filter listings by district and rent range, exploring rent distributions, median rent by district, rent vs. size scatter plots, and a full correlation heatmap — turning EDA into an interactive experience.',
-            'Property Segments (K-Means, k=5): after validating with the elbow method and silhouette scores, five distinct market segments emerged — Entry-Level Interior, High-Rise Exterior, Grand Estate, Standard Exterior Living, and Urban Premium. Users enter any property attributes and the app classifies it into its market segment with a radar chart profile.',
-            'Rent Predictor (OLS Linear Regression): uses VIF-based multicollinearity filtering and RFECV feature selection (Repeated K-Fold, 5×3) via statsmodels. Users get a monthly rent prediction with a 95% prediction interval, plus a visual of where it sits in the full market distribution.',
-            'High Rent Classifier (Logistic Regression): classifies any property as High Rent (≥ €1,800/month) with an interactive ROC curve, confusion matrix, odds ratio chart, and a probability gauge — making model outputs tangible and actionable for a real estate audience.'
-          ],
-          meta: [{ k: 'TOOLS', v: 'Python, Streamlit, Plotly, sklearn, statsmodels' }, { k: 'DATASET', v: '2,100 Listings · Idealista' }, { k: 'PAGES', v: 'Market Explorer · Segments · Rent Predictor · Classifier' }, { k: 'CONTEXT', v: 'Machine Learning I — IE University' }],
-          links: [
-            { label: 'Open Live App', icon: 'globe', url: 'https://madridrentalapp-mariangarabana.streamlit.app/' },
-            { label: 'View on GitHub', icon: 'github', url: 'https://github.com/mariangarabana/MadridRental' }
-          ]
-        }
-      ]
-    };
+<script>
+/* The hero cards and their scroll morph were removed: the hero is now video
+   plus one glass panel, and the projects grid below already shows the same
+   four projects. window.onPageScroll is left undefined on purpose; main.js
+   only calls it if present. */
 
-    var IMGS = {
-      datathon: 'https://i.imgur.com/CLg2Zfx.jpg',
-      bootcamp: 'https://i.imgur.com/XnXUf4Y.jpg',
-      thesis: 'https://i.imgur.com/sDjHUZo.jpg',
-      madridml: 'https://i.imgur.com/UtqjNum.jpg'
-    };
+/* Stat counters used to animate from 0 and could freeze there. The real values
+   are in the markup now; nothing to script. */
 
-    /* ══════════════ MODAL LOGIC ══════════════ */
-    let currentType = null;
-    let currentIdx = 0;
+/* The "view all projects" toggle was removed on Aug 11 2026 with the switch to a
+   scroll rail: all ten cards are in the rail, so there is nothing left to
+   reveal. .proj-extra and .show-all are gone from the markup; their rules are
+   still in styles.css and are now dead. */
 
-    function openModal(type, id) {
-      currentType = type;
-      currentIdx = DATA[type].findIndex(d => d.id === id);
-      renderModal();
-      const modal = document.getElementById('fsModal');
-      modal.classList.add('active');
-      document.body.classList.add('modal-open');
-      document.getElementById('fsBody').scrollTop = 0;
+/* ---------- collapsible panel helpers (P1-8) ----------
+   A panel clipped to max-height:0 is still in the accessibility tree, so a screen
+   reader reads collapsed content while the trigger says aria-expanded="false". These
+   helpers pair each trigger with its panel via aria-controls and take the panel out of
+   the tree with hidden once the collapse transition finishes. Applied by JS only, so
+   with JS off the panels stay exactly as they were rather than becoming unreachable. */
+let panelSeq = 0;
+function linkPanel(btn, panel){
+  if(!panel.id) panel.id = 'panel-' + (++panelSeq);
+  if(btn) btn.setAttribute('aria-controls', panel.id);
+  if(!isPanelOpen(panel)) panel.hidden = true;
+}
+function isPanelOpen(panel){ return !!panel.style.maxHeight && panel.style.maxHeight !== '0px'; }
+function cancelPendingHide(panel){
+  clearTimeout(panel._hideTimer);
+  if(panel._hideOnEnd){ panel.removeEventListener('transitionend', panel._hideOnEnd); panel._hideOnEnd = null; }
+}
+function openPanel(panel){
+  // the accordion closes every panel before opening one, so a pending hide from that
+  // close must be cancelled or it fires at the end of THIS panel's open transition
+  cancelPendingHide(panel);
+  panel.hidden = false;
+  requestAnimationFrame(()=>{ panel.style.maxHeight = panel.scrollHeight + 'px'; });
+}
+function closePanel(panel){
+  cancelPendingHide(panel);
+  panel.style.maxHeight = '0px';
+  panel._hideOnEnd = e => {
+    if(e.target !== panel || isPanelOpen(panel)) return;
+    panel.hidden = true; cancelPendingHide(panel);
+  };
+  panel.addEventListener('transitionend', panel._hideOnEnd);
+  // transitionend never fires when the transition is suppressed (reduced motion) or when
+  // the panel was already collapsed, so hide on a timer as well
+  panel._hideTimer = setTimeout(()=>{ if(!isPanelOpen(panel)) panel.hidden = true; }, 600);
+}
+
+/* ---------- hero collage ----------
+   ONE frame, all eleven photos, a new one every 1.5 seconds. Rewritten Aug 17
+   2026; it used to be three boxes swapping one at a time on a 2s scatter.
+
+   In order, not at random: with a single frame the reader sees every photo in a
+   fixed rotation instead of the same two recurring while others never appear.
+   The markup order interleaves the old three columns, so consecutive frames come
+   from different parts of her life rather than four IE photos in a row.
+
+   Three ways it stops, and it needs all three. Reduced motion returns before the
+   first swap. The footer pause button writes .motion-paused on <html>, and a
+   frame changing every 1.5s is exactly the auto-updating content that control
+   exists for. A hidden tab is decode work nobody sees.
+
+   With the script blocked or paused, whichever photo carries .on stays. CSS
+   never picks the visible frame, the markup does. */
+(function(){
+  var box = document.querySelector('.hero-collage .hcol');
+  if(!box) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var imgs = [].slice.call(box.querySelectorAll('img'));
+  if(imgs.length < 2) return;
+
+  var EVERY = 1500, root = document.documentElement, i = 0, timer = null;
+  function tick(){
+    imgs[i].classList.remove('on');
+    i = (i + 1) % imgs.length;
+    imgs[i].classList.add('on');
+  }
+  function want(){ return !document.hidden && !root.classList.contains('motion-paused'); }
+  function sync(){
+    if(want()){ if(!timer) timer = setInterval(tick, EVERY); }
+    else if(timer){ clearInterval(timer); timer = null; }
+  }
+  document.addEventListener('visibilitychange', sync);
+  /* main.js builds the pause button after this runs, so watch the class it
+     writes rather than the control itself. */
+  new MutationObserver(sync).observe(root, { attributes:true, attributeFilter:['class'] });
+  sync();
+})();
+
+/* ---------- hero greeting: typewriter ----------
+   EDIT THE WORD LIST HERE. One rule: latin only, because the fonts are subset
+   to latin and a non-latin greeting drops to a system face mid-cycle. Length is
+   free now that the tail travels with the caret, though keep them short enough
+   that the line does not wrap at 390.
+
+   This is a hand-rolled port of typed.js, not the library. Marian pointed at
+   mattboldt/typed.js and CLAUDE.md forbids shipped dependencies, so the three
+   behaviours that make that library feel right were reproduced directly:
+
+   1. HUMANIZER. typed.js never uses a flat interval. Its delay is
+      Math.round(Math.random() * speed / 2) + speed, so every keystroke lands
+      somewhere between speed and 1.5x speed. A constant interval is what makes
+      a typewriter read as a machine instead of a person.
+   2. BACK DELAY. It holds the finished word before deleting. typed.js defaults
+      to 700ms; 1500 here, because these are words to read rather than a demo
+      string, and the caret keeps blinking through the pause.
+   3. SMART BACKSPACE. It only deletes down to the prefix the next word shares.
+      Hola into Hallo keeps the H, Hello into Hallo keeps the H. It looks like
+      someone correcting themselves rather than clearing the field.
+
+   Under reduced motion the whole block returns before doing anything, so the
+   markup's "Hola" stays and the caret never turns on. */
+(function(){
+  var word = document.getElementById('heroHi');
+  var line = document.getElementById('heroHiLine');
+  if(!word || !line) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var WORDS = ['Hola','Hello','Bonjour','Ciao','Olá','Hallo','Salut','Hej'];
+  var TYPE = 78, BACK = 42, HOLD = 1500, START = 1600;
+
+  // typed.js humanizer: speed to 1.5x speed, never the same twice
+  function human(speed){ return Math.round(Math.random() * speed / 2) + speed; }
+
+  // The markup ships the first word already typed, so the run starts from the
+  // hold at the end of it rather than from an empty box.
+  var i = 0, pos = WORDS[0].length, deleting = false, stop = 0, timer = null;
+
+  function tick(){
+    var cur = WORDS[i];
+    if(deleting){
+      pos--;
+      word.textContent = cur.slice(0, pos);
+      if(pos <= stop){ deleting = false; i = (i + 1) % WORDS.length; }
+      timer = setTimeout(tick, human(BACK));
+      return;
     }
-
-    function renderModal() {
-      const items = DATA[currentType];
-      const d = items[currentIdx];
-
-      document.getElementById('fsBreadSection').textContent = d.section;
-      document.getElementById('fsBreadTitle').textContent = d.title;
-
-      const imgSrc = d.imgKey ? IMGS[d.imgKey] : null;
-      const imgHTML = imgSrc ? `<img class="fs-photo" src="${imgSrc}" alt="${d.title}"/>` : '';
-      const tagHTML = d.tags.map(t => `<span class="fs-tag">${t}</span>`).join('');
-      const awardHTML = d.award ? `<div class="fs-award">${d.award}</div>` : '';
-      const paraHTML = d.body.map(p => `<p>${p}</p>`).join('');
-      const metaHTML = d.meta.map(m => `
-    <div class="fs-meta-row">
-      <div class="fs-meta-key">${m.k}</div>
-      <div class="fs-meta-val">${m.v}</div>
-    </div>`).join('');
-
-      const linksHTML = d.links ? d.links.map(l => {
-        const iconSVG = l.icon === 'github'
-          ? `<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>`
-          : l.icon === 'globe'
-            ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-right:7px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>`
-            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="margin-right:7px;flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
-        return `<a href="${l.url}" target="_blank" rel="noopener" class="fs-link-btn">${iconSVG}${l.label}</a>`;
-      }).join('') : '';
-
-      const linksBlockHTML = d.links ? `
-        <div class="fs-links-block">
-          <div class="fs-meta-box-title">LINKS</div>
-          <div class="fs-links-list">${linksHTML}</div>
-        </div>` : '';
-
-      const prev = currentIdx > 0 ? items[currentIdx - 1].title : null;
-      const next = currentIdx < items.length - 1 ? items[currentIdx + 1].title : null;
-
-      document.getElementById('fsInner').innerHTML = `
-    <div class="fs-layout">
-      <div class="fs-left">
-        <p class="fs-category">${d.category}</p>
-        <h1 class="fs-title">${d.title}</h1>
-        ${imgHTML}
-        ${awardHTML}
-        <div class="fs-tags">${tagHTML}</div>
-        <p class="fs-section-label">OVERVIEW</p>
-        <div class="fs-divider" style="margin-top:0"></div>
-        <div class="fs-paragraphs">${paraHTML}</div>
-
-        <div class="fs-nav-row">
-          <button class="fs-nav-btn" onclick="navigateModal(-1)" ${!prev ? 'disabled' : ''}>
-            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-            ${prev ? prev : 'PREVIOUS'}
-          </button>
-          <span class="fs-nav-counter"><span>${currentIdx + 1}</span> / ${items.length}</span>
-          <button class="fs-nav-btn" onclick="navigateModal(1)" ${!next ? 'disabled' : ''}>
-            ${next ? next : 'NEXT'}
-            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="fs-right">
-        <div class="fs-meta-box">
-          <div class="fs-meta-box-title">AT A GLANCE</div>
-          <div class="fs-meta-list">${metaHTML}</div>
-        </div>
-        ${linksBlockHTML}
-      </div>
-    </div>`;
-
-      document.getElementById('fsBody').scrollTop = 0;
+    if(pos < cur.length){
+      pos++;
+      word.textContent = cur.slice(0, pos);
+      timer = setTimeout(tick, pos === cur.length ? HOLD : human(TYPE));
+      return;
     }
+    // word complete and the hold is spent: work out how far back to go
+    var next = WORDS[(i + 1) % WORDS.length];
+    stop = 0;
+    while(stop < cur.length && stop < next.length && cur[stop] === next[stop]) stop++;
+    deleting = true;
+    tick();
+  }
 
-    function navigateModal(dir) {
-      const items = DATA[currentType];
-      const next = currentIdx + dir;
-      if (next < 0 || next >= items.length) return;
-      currentIdx = next;
-      renderModal();
-    }
+  function start(){ if(!timer) timer = setTimeout(tick, human(BACK)); }
+  function pause(){ clearTimeout(timer); timer = null; }
+  // A caret blinking in a background tab is work nobody sees.
+  document.addEventListener('visibilitychange', function(){
+    document.hidden ? pause() : start();
+  });
 
-    function closeModal() {
-      document.getElementById('fsModal').classList.remove('active');
-      document.body.classList.remove('modal-open');
-    }
+  line.classList.add('typing');
+  timer = setTimeout(tick, START);
+})();
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+/* ---------- horizontal card rails ----------
+   Shared by 01 Selected work and 04 Education. Construction measured on
+   yashahire.info rather than guessed: flex or grid, scroll-snap-type x
+   mandatory, cards around 360-420 wide.
 
-    /* ══════════════ ABOUT EXPAND ══════════════ */
-    function toggleExpCard(card) {
-      const isOpen = card.classList.contains('open');
-      card.closest('.about-highlights').querySelectorAll('.exp-card.open').forEach(c => c.classList.remove('open'));
-      if (!isOpen) card.classList.add('open');
-    }
+   The rail scrolls on its own. overflow-x plus scroll-snap gives trackpad,
+   touch swipe, shift-wheel and focus-scroll with no script at all. Everything
+   below is the mouse affordance layered on top, which is why the arrows and
+   dots are display:none until .js lands on the wrapper.
 
-    /* ══════════════ NAV ══════════════ */
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+   Positions are read from getBoundingClientRect, not offsetLeft. The rail is a
+   scroll container inside a positioned wrapper, so offsetLeft is measured
+   against the wrapper and does not change as the rail scrolls, which makes it
+   useless for "how far do I still have to go". */
+function initRail(wrapId, railId, dotsId, cardSel, noun){
+  var wrap = document.getElementById(wrapId);
+  var rail = document.getElementById(railId);
+  var dotsBox = document.getElementById(dotsId);
+  if(!wrap || !rail || !dotsBox) return;
+  var cards = [].slice.call(rail.querySelectorAll(cardSel));
+  if(cards.length < 2) return;
+
+  var SMOOTH = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  var prev = wrap.querySelector('.rail-nav.prev');
+  var next = wrap.querySelector('.rail-nav.next');
+
+  /* ONE DOT PER REACHABLE COLUMN, NOT ONE PER CARD. On the education rail at
+     1440 the track is 1128 wide holding 1587, so it only scrolls 459px and the
+     last two cards can never be brought to the left edge. One dot per card
+     there means two that never light up and do nothing when clicked. A position
+     counts as reachable when the scroll that would put it at the left edge is
+     inside the scroll range. Rebuilt on resize, but only when the count
+     changes, so a drag-resize is not rebuilding DOM every frame. */
+  var dots = [];
+  function columns(){
+    /* Two-row rails stack two cards at the same x. Deduplicate by left edge so a
+       column counts once, or the projects rail would draw ten dots for five
+       scroll positions. */
+    var seen = [], out = [];
+    var rl = rail.getBoundingClientRect().left, base = rail.scrollLeft;
+    cards.forEach(function(card){
+      var x = Math.round(base + (card.getBoundingClientRect().left - rl));
+      if(seen.indexOf(x) === -1){ seen.push(x); out.push({x:x, card:card}); }
     });
-    function toggleMenu() {
-      document.getElementById('mobileMenu').classList.toggle('open');
+    return out.sort(function(a,b){ return a.x - b.x; });
+  }
+  function reachable(){
+    var max = rail.scrollWidth - rail.clientWidth;
+    return Math.max(1, columns().filter(function(c){ return c.x <= max + 2; }).length);
+  }
+  function buildDots(){
+    var n = reachable();
+    if(dots.length === n) return;
+    dotsBox.textContent = '';
+    dots = [];
+    for(var i = 0; i < n; i++){
+      dots.push((function(i){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Go to ' + noun + ' ' + (i + 1) + ' of ' + n);
+        b.addEventListener('click', function(){ go(i); });
+        dotsBox.appendChild(b);
+        return b;
+      })(i));
     }
+  }
 
-    /* ══════════════ REVEAL ══════════════ */
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((e, i) => {
-        if (e.isIntersecting) {
-          setTimeout(() => e.target.classList.add('visible'), i * 55);
-          observer.unobserve(e.target);
-        }
+  function go(i){
+    var cols = columns();
+    var col = cols[Math.max(0, Math.min(cols.length - 1, i))];
+    rail.scrollBy({
+      left: col.card.getBoundingClientRect().left - rail.getBoundingClientRect().left,
+      behavior: SMOOTH
+    });
+  }
+
+  /* Nearest column to the rail's left edge. Snap points are
+     scroll-snap-align:start, so "current" is the one closest to the start, not
+     the one nearest the centre. */
+  function current(){
+    var x = rail.getBoundingClientRect().left, best = 0, bestD = Infinity;
+    columns().forEach(function(col, i){
+      var d = Math.abs(col.card.getBoundingClientRect().left - x);
+      if(d < bestD){ bestD = d; best = i; }
+    });
+    return best;
+  }
+
+  var raf = null;
+  function sync(){
+    raf = null;
+    buildDots();
+    var i = Math.min(current(), dots.length - 1);
+    dots.forEach(function(d, n){
+      if(n === i) d.setAttribute('aria-current', 'true');
+      else d.removeAttribute('aria-current');
+    });
+    /* Geometry, not scrollLeft. The rail carries 6px of padding so the cards'
+       hover shadow and focus ring are not clipped by the scroll container, and
+       that padding shifts the snapport, so the rail RESTS AT scrollLeft 6 rather
+       than 0. A `scrollLeft <= 2` test therefore never fires and the prev arrow
+       stays lit at the start forever. Comparing the first and last card edges
+       against the rail's own edges is immune to that, and to fractional scroll
+       values at fractional zoom. */
+    var r = rail.getBoundingClientRect();
+    prev.disabled = cards[0].getBoundingClientRect().left >= r.left - 2;
+    next.disabled = cards[cards.length - 1].getBoundingClientRect().right <= r.right + 2;
+  }
+  rail.addEventListener('scroll', function(){ if(!raf) raf = requestAnimationFrame(sync); }, {passive:true});
+  window.addEventListener('resize', function(){ if(!raf) raf = requestAnimationFrame(sync); });
+
+  prev.addEventListener('click', function(){ go(current() - 1); });
+  next.addEventListener('click', function(){ go(current() + 1); });
+  rail.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ e.preventDefault(); go(current() + 1); }
+    else if(e.key === 'ArrowLeft'){ e.preventDefault(); go(current() - 1); }
+  });
+
+  wrap.classList.add('js');
+  sync();
+}
+initRail('projWrap', 'projGrid', 'projDots', '.proj', 'column');
+
+/* ---------- education: hover-expand rows ----------
+   Ported from the unlumen UI Hover Expand component. That component is React,
+   Tailwind and Motion, so `npx shadcn add` cannot put it in this repo; these
+   are its numbers reimplemented against the DOM.
+
+   THE SPRING IS INTEGRATED, NOT APPROXIMATED. Motion's default for this
+   component is {stiffness:280, damping:32, mass:0.9}, and the whole reason to
+   use a spring instead of a timed accordion is that the open and the close
+   feel physical. A cubic-bezier of the same duration reads as an easing curve,
+   which is the one thing it is not. Fifteen lines of Euler integration buys
+   the actual behaviour, including a close that carries velocity out of an
+   interrupted open.
+
+   HEIGHT IS A LAYOUT PROPERTY and animating it is not free. That is inherent:
+   there is no transform that grows a row and reflows the rows beneath it. Four
+   rows is well inside what this costs; forty would not be. Everything else
+   here, the plate and the detail, moves on transform and opacity.
+
+   THREE WAYS IN, ONE STATE, same as the cards this replaced. Hover always
+   previews, and leaving the list reverts to whatever a click pinned, so moving
+   the mouse away never closes a row the reader deliberately opened. Note the
+   pin must NOT gate hover: a list-wide "is anything pinned" guard means one
+   click freezes all four rows, and since the head is a button with a pointer
+   cursor, clicking is invited. That reads as the component breaking.
+
+   The collapse lives in CSS behind .js, so with this blocked every row reads
+   in full. Under reduced motion, and below 760px where the CSS forces rows
+   open, the spring never runs. */
+(function(){
+  var root = document.getElementById('eduHx');
+  if(!root) return;
+
+  var COLLAPSED = 68;
+  var K = 280, D = 32, M = 0.9;
+  var REDUCE = matchMedia('(prefers-reduced-motion: reduce)');
+  var WIDE = matchMedia('(min-width: 761px)');
+  var FINE = matchMedia('(hover:hover) and (pointer:fine)');
+
+  var rows = [].slice.call(root.querySelectorAll('.hx-row')).map(function(el, i){
+    var body = el.querySelector('.hx-body');
+    if(body && !body.id) body.id = 'edu-panel-' + (i + 1);
+    var btn = el.querySelector('.hx-head');
+    if(btn && body) btn.setAttribute('aria-controls', body.id);
+    return { el:el, plate:el.querySelector('.hx-plate'), body:body, btn:btn,
+             h:COLLAPSED, v:0, target:COLLAPSED, expanded:COLLAPSED, pinned:false };
+  });
+  if(!rows.length) return;
+
+  root.classList.add('js');
+
+  var active = -1, raf = null, last = 0;
+
+  /* PER-ROW HEIGHT, not one expandedHeight for all four. The component this
+     comes from ships a single number because its items are one line of text;
+     these entries run from two bullets to five, and one number either clips the
+     longest row or leaves the shortest half empty. The detail is opacity-hidden
+     rather than removed, so it is in flow and offsetHeight is its real height.
+     Re-measured on resize because the bullets rewrap. */
+  function measure(){
+    rows.forEach(function(r){
+      r.expanded = COLLAPSED + (r.body ? r.body.offsetHeight : 0);
+      if(r.target !== COLLAPSED) r.target = r.expanded;
+    });
+  }
+
+  function paint(r){
+    var p = (r.h - COLLAPSED) / Math.max(1, r.expanded - COLLAPSED);
+    r.el.style.height = r.h.toFixed(1) + 'px';
+    if(r.plate){
+      r.plate.style.opacity = Math.min(1, p * 1.4).toFixed(3);
+      r.plate.style.transform = 'translateX(' + ((1 - p) * 100).toFixed(2) + '%)';
+    }
+  }
+
+  function step(now){
+    var dt = Math.min(0.032, (now - last) / 1000) || 0.016;
+    last = now;
+    var moving = false;
+    rows.forEach(function(r){
+      var dx = r.h - r.target;
+      if(Math.abs(dx) < 0.15 && Math.abs(r.v) < 0.15){
+        r.h = r.target; r.v = 0; paint(r); return;
+      }
+      r.v += ((-K * dx) - (D * r.v)) / M * dt;
+      r.h += r.v * dt;
+      paint(r);
+      moving = true;
+    });
+    raf = moving ? requestAnimationFrame(step) : null;
+  }
+  function wake(){ if(!raf){ last = performance.now(); raf = requestAnimationFrame(step); } }
+
+  function setActive(i){
+    if(active === i) return;
+    active = i;
+    rows.forEach(function(r, n){
+      var on = n === i;
+      r.target = on ? r.expanded : COLLAPSED;
+      r.el.style.opacity = (i === -1 || on) ? '1' : '0.38';
+      r.el.style.transition = 'opacity .3s var(--ease)';
+      if(r.btn) r.btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      if(r.body){
+        /* delay only on the way in: the detail should appear once the row has
+           opened far enough to read, and disappear the moment it starts to
+           close. */
+        r.body.style.transition = 'opacity .32s var(--ease)' + (on ? ' .12s' : '') +
+          ', transform .42s var(--ease)' + (on ? ' .12s' : '');
+        r.body.style.opacity = on ? '1' : '0';
+        r.body.style.transform = on ? 'translateX(0)' : 'translateX(-8px)';
+      }
+    });
+    if(REDUCE.matches){
+      rows.forEach(function(r){ r.h = r.target; r.v = 0; paint(r); });
+      return;
+    }
+    wake();
+  }
+
+  function pinnedIndex(){
+    for(var i = 0; i < rows.length; i++) if(rows[i].pinned) return i;
+    return -1;
+  }
+
+  rows.forEach(function(r, i){
+    if(r.btn){
+      r.btn.addEventListener('click', function(){
+        var willPin = !r.pinned;
+        rows.forEach(function(o){ o.pinned = false; });
+        r.pinned = willPin;
+        setActive(willPin ? i : -1);
       });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    /* ══════════════ CONTACT ══════════════ */
-    function handleSend() {
-      const name = document.getElementById('cname').value;
-      const email = document.getElementById('cemail').value;
-      const msg = document.getElementById('cmsg').value;
-      if (!name || !email || !msg) { alert('Please fill in all fields.'); return; }
-      window.location.href = `mailto:marian.garabana@student.ie.edu?subject=Portfolio Enquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(msg)}%0A%0AFrom: ${encodeURIComponent(name)} (${encodeURIComponent(email)})`;
     }
-  </script>
-</body>
+    r.el.addEventListener('pointerenter', function(){
+      if(FINE.matches) setActive(i);
+    });
+    r.el.addEventListener('focusin', function(){ setActive(i); });
+  });
+  root.addEventListener('pointerleave', function(){
+    if(FINE.matches) setActive(pinnedIndex());
+  });
+  root.addEventListener('focusout', function(e){
+    if(!root.contains(e.relatedTarget)) setActive(pinnedIndex());
+  });
 
+  /* Below 760 the CSS forces every row open with !important, so the spring has
+     nothing to do and the inline heights it wrote would be stale on the way
+     back up. Clearing them on the crossing is cheaper than guarding paint(). */
+  function syncWidth(){
+    if(WIDE.matches){ measure(); setActive(-1); rows.forEach(paint); }
+    else {
+      if(raf){ cancelAnimationFrame(raf); raf = null; }
+      active = -1;
+      rows.forEach(function(r){
+        r.h = COLLAPSED; r.v = 0; r.target = COLLAPSED;
+        r.el.style.height = ''; r.el.style.opacity = '';
+        if(r.plate){ r.plate.style.opacity = ''; r.plate.style.transform = ''; }
+        if(r.body){ r.body.style.opacity = ''; r.body.style.transform = ''; }
+      });
+    }
+  }
+  if(WIDE.addEventListener) WIDE.addEventListener('change', syncWidth);
+
+  var rt = null;
+  addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      if(!WIDE.matches) return;
+      measure();
+      if(active !== -1){ rows[active].target = rows[active].expanded; wake(); }
+    }, 140);
+  });
+  /* Webfonts change the line count, so the first measurement has to wait for
+     them or every row is sized against the fallback face. */
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  syncWidth();
+})();
+
+/* ---------- work history accordion ----------
+   Same helpers as the education cards so both behave identically. One open at a
+   time, and the first entry starts open so the section is never a wall of
+   closed bars. */
+(function(){
+  var items=[].slice.call(document.querySelectorAll('.wh-item'));
+  items.forEach(function(item, i){
+    var btn=item.querySelector('.wh-btn'), panel=item.querySelector('.wh-panel');
+    if(!btn||!panel) return;
+    linkPanel(btn,panel);
+    btn.addEventListener('click',function(){
+      var willOpen=!item.classList.contains('open');
+      items.forEach(function(other){
+        if(other===item) return;
+        other.classList.remove('open');
+        var op=other.querySelector('.wh-panel'), ob=other.querySelector('.wh-btn');
+        if(op) closePanel(op);
+        if(ob) ob.setAttribute('aria-expanded','false');
+      });
+      item.classList.toggle('open',willOpen);
+      if(willOpen) openPanel(panel); else closePanel(panel);
+      btn.setAttribute('aria-expanded', willOpen?'true':'false');
+    });
+    if(i===0){ item.classList.add('open'); openPanel(panel); btn.setAttribute('aria-expanded','true'); }
+  });
+})();
+</script>
+<script src="main.js" defer></script>
+<!-- ============================================================================
+     MOTION LAYER
+     One local script. It injects gsap, ScrollTrigger, SplitType and Lenis
+     itself, local copies first and pinned CDN as fallback, each on a 5s
+     ceiling. They are NOT <script src> tags here on purpose: a deferred script
+     delays the document load event, so a library that hangs rather than 404s
+     takes the whole page down with it. Local copies only, from assets/vendor/,
+     with no CDN fallback. See the header comment in enhance.js.
+     Delete this tag and the enhance.css link in <head> to revert.
+     ========================================================================= -->
+<script src="enhance.js" defer></script>
+<!-- ============================================================================
+     PIXEL SNOW BACKGROUND. The shader, the props and the reasoning are in
+     snow-bg.js, which the project pages load too. The #snowBg rules are in
+     styles.css. Delete this tag and the <canvas id="snowBg"> after <body> to
+     revert; nothing else on this page refers to either.
+     index has no data-color on the canvas on purpose, so the script keeps
+     reading --accent off body.idx-dark exactly as it did inline.
+     ========================================================================= -->
+<script src="snow-bg.js" defer></script>
+<script>
+/* proj-link sits inside the card anchor. Invalid to nest <a>, so these are
+   real anchors that stop the card's navigation when clicked directly. */
+document.addEventListener('click',function(e){var l=e.target.closest('.proj-link');
+  if(l){e.stopPropagation();}},true); /* projLinkGuard */
+</script>
+</body>
 </html>

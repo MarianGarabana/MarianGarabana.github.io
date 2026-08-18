@@ -1,0 +1,4 @@
+<!-- House glyph for plotting libraries with no Simple Icons mark, same role as
+     glyph-model.svg. Fill only, no stroke, 24x24, so the brightness(0) invert(1)
+     rule in index.html renders it as a white silhouette like every other pill. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 3h1.6v16.4H21V21H3V3Z"/><path d="M7 11.5h2.6v7.9H7v-7.9ZM11.2 7.5h2.6v11.9h-2.6V7.5ZM15.4 13.5H18v5.9h-2.6v-5.9Z"/></svg>

@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sustainable Aviation Datathon · Marian Garabana</title>
+<meta name="description" content="1st place at the IEU Sustainability Datathon 2025: forecasting European aviation to 2050 and pricing the path to decarbonisation through sustainable aviation fuel." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/datathon.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#070F0A" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Sustainable Aviation Datathon · Marian Garabana" />
+<meta property="og:description" content="1st place at the IEU Sustainability Datathon 2025: forecasting European aviation to 2050 and pricing the path to decarbonisation through sustainable aviation fuel." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/datathon.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Sustainable Aviation Datathon · Marian Garabana" />
+<meta name="twitter:description" content="1st place at the IEU Sustainability Datathon 2025: forecasting European aviation to 2050 and pricing the path to decarbonisation through sustainable aviation fuel." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* ===== datathon theme: dark forest canvas, leaf-green accents =====
+     Converted from the cream palette Aug 17 2026, so this page joins the shared
+     dark canvas the other project pages already use. The three green tokens keep
+     their names and their ordering (forest = the primary accent, leaf and sage
+     the two deeper steps) but every VALUE is re-derived, because the cream ones
+     invert: #2E6B3E measured 6.71:1 on a white card and measures 2.29:1 on this
+     canvas. Ratios below are computed against the worst point of the canvas, the
+     lightest part of the radial gradient (#13291B), not against flat --bg. */
+  body.theme-datathon{
+    --bg:#070F0A; --surface:#122019; --surface2:#0D1811;
+    --ink:#E8F2E9; --ink-soft:#C2D5C5; --muted:#8CA391;
+    /* --border/--border2 are declared HERE, not inherited. styles.css carries
+       the shared dark-canvas pair on a selector list that does not name
+       theme-datathon, so without these two lines the page would keep the cream
+       ink hairlines and every border on a dark surface would vanish. */
+    --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.18);
+    /* forest 8.49:1 on the canvas and 9.27:1 on --surface, so it carries the
+       eyebrows, the category line and the ledger's result column as text.
+       leaf and sage are mark colours, checked against --surface at 5.74:1 and
+       4.47:1 and inside the validator's dark lightness band; slate is the
+       re-derived "actual data" blue, and unlike the cream #4C6E8F it clears the
+       OKLCH chroma floor (0.101 against 0.10) instead of failing it. */
+    --forest-ink:#8FD08A; --leaf:#57A85B; --sage:#46974E; --slate:#559ACB; --gold:#B98A2C;
+    /* KPI card tokens. The cream note here said the value gradient ran ink to
+       forest because "a light far stop would fade out on white". That reasoning
+       is dead: on this canvas both stops are light, so the far stop is
+       --ink-soft, and --kpi-v2 is what scripts/a11y-check.mjs measures as the
+       glyph colour. 10.93:1 on --surface. */
+    --kpi-accent:var(--forest-ink); --kpi-accent-rgb:143,208,138; --kpi-v2:#C2D5C5; }
+  body.theme-datathon{background:radial-gradient(1100px 560px at 70% -12%,#13291B 0%,var(--bg) 55%)}
+  .theme-datathon .nav{border-color:rgba(255,255,255,.14)}
+  .theme-datathon .nav.scrolled{background:rgba(18,32,25,.62)}
+  .theme-datathon .nav-ava{background:linear-gradient(135deg,#16281C,#0E1A12);color:var(--forest-ink)}
+  .theme-datathon .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-datathon ::selection{background:var(--forest-ink);color:#08150C}
+  .theme-datathon .pd-cat{color:var(--forest-ink)}
+  .theme-datathon .h-sec .eyebrow{color:var(--forest-ink)}
+  /* dark ink on the accent, not white: white on --forest-ink is 1.82:1 */
+  .theme-datathon .pd-links a{border-color:var(--forest-ink);background:var(--forest-ink);color:#08150C}
+  .theme-datathon .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+  .dt-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(143,208,138,.10);border:1px solid rgba(143,208,138,.32);padding:.4rem .8rem;border-radius:100px;margin-bottom:1.4rem}
+  .dt-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(185,138,44,.2)}
+
+  /* ===== HERO: video + liquid glass =========================================
+     The panel is DARK glass with light text. That is forced, not a style pick:
+     nature.mp4 averages luminance 42/61/48, so dark text on light glass cannot
+     reach 4.5:1 over it at any tint that still looks like glass. Light-on-dark
+     inverts the contrast budget and lets the tint drop far enough to read as
+     glass. Numbers verified by sampling composited pixels across video frames.
+     Edge treatment follows the four-strip technique: each rim strip runs its own
+     backdrop pass through #distortion, which is what makes the panel read as a
+     thick pane rather than a translucent rectangle. */
+  .dt-hero{position:relative;margin-inline:calc(50% - 50vw);width:100vw;max-width:100vw;
+           min-height:clamp(560px,82vh,780px);display:flex;align-items:center;
+           overflow:hidden;isolation:isolate;background:#0d1410}
+  .dt-hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+  .dt-hero-bg video,.dt-hero-bg img{width:100%;height:100%;object-fit:cover;
+    object-position:58% 50%;display:block}
+  /* light touch only: the video carries the hero, the veil just seats the type */
+  .dt-hero-veil{position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(100deg,rgba(8,14,10,.42) 0%,rgba(8,14,10,.30) 40%,
+                      rgba(8,14,10,.10) 72%,rgba(8,14,10,.04) 100%),
+      linear-gradient(180deg,rgba(8,14,10,.30) 0%,rgba(8,14,10,0) 34%,
+                      rgba(8,14,10,.34) 100%)}
+  .dt-hero-in{position:relative;z-index:1;width:100%;max-width:var(--max);
+              margin:0 auto;padding:5.5rem 2rem 2.75rem}
+  .dt-hero .pd-back{display:inline-block;margin-bottom:1rem;color:rgba(255,255,255,.80)}
+  .dt-hero .pd-back:hover{color:#fff}
+
+  /* --- the glass ---------------------------------------------------------- */
+  .dt-panel{position:relative;max-width:min(680px,54%);border-radius:28px;
+            padding:1.7rem 1.9rem 1.6rem;border:0;background:none;isolation:isolate}
+  .dt-glassfx{position:absolute;inset:0;border-radius:inherit;overflow:hidden;z-index:0;
+              pointer-events:none}
+  .dt-glassfx .face{position:absolute;inset:0;
+    background:linear-gradient(148deg,rgba(18,26,20,.30),rgba(10,16,12,.40));
+    -webkit-backdrop-filter:blur(16px) saturate(155%);
+            backdrop-filter:blur(16px) saturate(155%)}
+  /* four rim strips, each distorting its own slice of the backdrop */
+  .dt-glassfx .lg{position:absolute;-webkit-backdrop-filter:url(#distortion) blur(1px);
+                          backdrop-filter:url(#distortion) blur(1px)}
+  .dt-glassfx .lg.t{top:0;left:0;right:0;height:14px}
+  .dt-glassfx .lg.b{bottom:0;left:0;right:0;height:14px}
+  .dt-glassfx .lg.l{left:0;top:0;bottom:0;width:14px}
+  .dt-glassfx .lg.r{right:0;top:0;bottom:0;width:14px}
+  /* rim light and thickness */
+  .dt-glassfx::after{content:'';position:absolute;inset:0;border-radius:inherit;
+    background:radial-gradient(130% 90% at 6% -8%,rgba(255,255,255,.22),rgba(255,255,255,0) 44%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.42),
+               inset 1px 0 0 rgba(255,255,255,.20),
+               inset -1px 0 0 rgba(255,255,255,.13),
+               inset 0 -1px 0 rgba(255,255,255,.22)}
+  .dt-panel{box-shadow:0 3px 6px rgba(0,0,0,.16),0 36px 80px -30px rgba(0,0,0,.55)}
+  .dt-panel > *:not(.dt-glassfx){position:relative;z-index:1}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .dt-glassfx .face{background:rgba(10,16,12,.72)}
+  }
+
+  /* --- type on dark glass -------------------------------------------------- */
+  .dt-panel .pd-title{margin:0 0 .7rem;text-wrap:balance;color:#fff;
+                      font-size:clamp(2.1rem,3.4vw,3.05rem);line-height:1.02}
+  .dt-panel .pd-sub{margin:0 0 1.25rem;max-width:50ch;font-size:.95rem;
+                    color:rgba(255,255,255,.88)}
+  .dt-panel .pd-facts{margin:0 0 1.2rem;display:grid;
+                      grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem 1.6rem}
+  .dt-panel .pd-fact .k{color:rgba(255,255,255,.70)}
+  .dt-panel .pd-fact .v{color:#fff}
+  .dt-panel .pd-cat{margin:0;color:#A9DCA4}
+  .dt-panel .pd-links{margin:0}
+  .theme-datathon .dt-panel .pd-links a{background:rgba(255,255,255,.94);
+    border-color:rgba(255,255,255,.94);color:#101511}
+  .theme-datathon .dt-panel .pd-links a:hover{background:#fff;border-color:#fff}
+  .dt-meta{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.95rem}
+  .dt-meta .dt-badge{margin-bottom:0;color:#fff;background:rgba(255,255,255,.12);
+                     border-color:rgba(255,255,255,.28)}
+
+  /* --- KPI strip, same glass ------------------------------------------------ */
+  .dt-kpis{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:1px;margin-top:1.3rem;max-width:min(680px,54%);border-radius:20px;overflow:hidden;
+    background:rgba(255,255,255,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 -1px 0 rgba(255,255,255,.16),
+               0 28px 64px -30px rgba(0,0,0,.5)}
+  .dt-kpi{padding:1rem 1.05rem;
+    background:linear-gradient(148deg,rgba(18,26,20,.34),rgba(10,16,12,.44));
+    -webkit-backdrop-filter:blur(16px) saturate(155%);
+            backdrop-filter:blur(16px) saturate(155%)}
+  .dt-kpi .sk{font-family:var(--mono);font-size:.55rem;letter-spacing:.12em;
+              text-transform:uppercase;color:rgba(255,255,255,.72);line-height:1.35}
+  .dt-kpi .sv{font-size:1.55rem;font-weight:800;letter-spacing:-.025em;margin-top:.3rem;
+              line-height:1;color:#fff;width:fit-content}
+  /* same value gradient as the shared card, in the strip's own light-on-glass
+     palette. #d8ecd0 is luminance 0.791 against the 0.529 the labels already
+     carry over this glass, so the far stop is the lighter end of the ramp and
+     cannot be the failing one. */
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){
+    .dt-kpi .sv{background-image:linear-gradient(135deg,#fff 38%,#d8ecd0 100%);
+      -webkit-background-clip:text;background-clip:text;
+      color:#d8ecd0;-webkit-text-fill-color:transparent}
+  }
+  /* the strip is one pane cut into four cells by 1px seams, so the cells take
+     the cursor spotlight but not the lift or the per-card top edge: either would
+     break the seam and turn four readings into four floating boxes */
+  .dt-kpi{--kpi-accent-rgb:143,196,127}
+  .dt-kpi::after{background:none}
+  @media(hover:hover){ .dt-kpi:hover{transform:none} }
+
+  @media(max-width:900px){
+    .dt-panel{max-width:100%}
+    .dt-kpis{max-width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media(max-width:720px){
+    .dt-hero{min-height:0}
+    .dt-hero-in{padding:5.5rem 1.25rem 2.5rem}
+    .dt-panel{padding:1.4rem 1.3rem 1.3rem;border-radius:22px}
+    /* rim distortion is a GPU cost with no payoff at this size */
+    .dt-glassfx .lg{display:none}
+    .dt-glassfx .face{-webkit-backdrop-filter:blur(12px) saturate(140%);
+                              backdrop-filter:blur(12px) saturate(140%);
+                      background:rgba(10,16,12,.52)}
+  }
+  @media(prefers-reduced-motion:reduce){ .dt-hero-bg video{display:none} }
+
+  /* ===== SECTION RAIL =====
+     Was a tablist that hid four fifths of the case study behind a click. The
+     panels are real sections now and this is a scrollspy over them. Anchors,
+     not buttons, so every label still jumps with the script blocked; the pill
+     declarations are copied from styles.css's .secnav button so the pills are
+     pixel-identical to the ones they replace. Same rail as madrid, trading and
+     titan, in this page's own accent. */
+  .secnav{--secnav-mt:1.75rem;--secnav-focus:var(--forest-ink);
+    position:sticky;z-index:6;top:calc(var(--nav-h) - 2px);padding-top:.75rem;
+    background:var(--bg);transition:top .3s var(--ease)}
+  /* main.js hides the nav on scroll-down; the rail rides up with it rather than
+     leaving a 76px hole. */
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--muted);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  .secnav a:hover{background:rgba(255,255,255,.07);border-color:var(--border);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--forest-ink);outline-offset:2px}
+  /* the lit pill is the accent with dark ink, the same shape rl and dicorsa use.
+     It cannot stay var(--ink) with #fff on top: on this canvas --ink IS near
+     white, so that pair was white on white. 10.29:1. */
+  .secnav a[aria-current="true"]{background:var(--forest-ink);color:#08150C;border-color:var(--forest-ink)}
+  /* Clears the nav and the rail together, so a jump never lands under the pills. */
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  /* Only the section's OWN opening block tightens up. The h-sec blocks further
+     down inside a section keep the sitewide margin, because those are real
+     subsections, not boundaries. */
+  /* Section boundaries. Titan's 10px worked there because its sections end with
+     panels carrying their own bottom margin; here a section ends flush with the
+     edge of a chart card, so 10px read as cramped. */
+  .case-sec > .h-sec:first-child,
+  .case-sec > .dt-split:first-child{margin-top:4rem}
+  /* The first section sits right under the rail, which already has its own
+     padding and rule, so it keeps the tighter opening. */
+  #s-challenge > .dt-split:first-child{margin-top:1.75rem}
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+  /* Figures carried in prose need to be findable without being shouted. Same
+     rule as madrid.html, trading.html and titan.html. */
+  .lead strong{font-weight:700;color:var(--ink)}
+
+  /* ===== layout: text column left, evidence right ===== */
+  .dt-split{display:grid;grid-template-columns:minmax(0,42fr) minmax(0,58fr);
+            gap:1rem 3.25rem;align-items:start;margin:4rem 0 0}
+  .dt-split.flip{grid-template-columns:minmax(0,58fr) minmax(0,42fr)}
+  .dt-split.flip .col-txt{order:2}
+  .dt-split.flip .col-fig{order:1}
+  .dt-split .col-txt .eyebrow{display:block;margin-bottom:.55rem}
+  .dt-split .col-txt h2{margin:0 0 .8rem}
+  .dt-split .col-txt .lead{margin:0}
+  /* the 2x2 KPI block that sat under the opening paragraph is gone (markup
+     removed): three of its four readings were already in the hero strip above
+     it, and the fourth is a bold figure in the sentence now. Same move as
+     madrid.html. */
+
+  /* ===== figures ===== */
+  /* ===== CHART SURFACES =====
+     Ported from madrid.html's .m-card, deriving from --forest-ink instead of --mag.
+     The charts sat bare on the cream canvas, which read as four loose plots
+     rather than four exhibits.
+
+     GLASS, at Marian's request, Aug 17 2026. It was a flat green-tinted surface
+     for a few hours between the dark conversion and this. The project rule is
+     that frosted panels go over real imagery, never over a flat fill, and this
+     one now clears that bar for a reason that did not exist before: the snow
+     canvas drifts behind these cards, so the blur has a moving field to work
+     on. Take the snow away and this should go back to a flat surface.
+
+     THE SCRIM IS LOAD-BEARING, not decoration. Every contrast ratio in the four
+     chart scripts below was measured against one flat value, --surface #122019.
+     The glass has to keep them true, so it is tuned to composite to roughly
+     that value. SAMPLED off the rendered card, 10 frames of drifting snow, at
+     the padding band where a label can sit:
+       darkest  #0A1110
+       lightest #15221B  (3/255 lighter than #122019, at a passing flake)
+       axis label #8CA391 on the lightest composite: 6.08:1, was 6.23:1 flat
+       --ink #E8F2E9 on the lightest composite:     14.34:1
+     So the labels lost 0.15 of a ratio point and sit 1.6x above the 4.5 floor.
+     Predicted values sat one step darker than this; these are the measured
+     ones, so treat 6.08 as the number to defend.
+
+     rgba(11,17,20,.62) is a cool near-black rather than a green one, which is
+     the part she asked for: the card reads as dark glass, not as a green panel.
+     Raising the alpha or dropping the blur is safe; lowering the alpha is not,
+     because the flakes start to reach the labels.
+
+     The hairline lost its forest tint with the fill. An accent-tinted rim on a
+     neutral panel was the last thing making it read green.
+
+     The cream version washed white into a 4% forest tint, which meant the card
+     spanned two backgrounds and every chart label had two possible readings.
+     The annotation labels moved from #2b2b27 to --ink and the hover-marker
+     rings from #FFFFFF to --surface, since a ring's job is to match the surface
+     behind the dot, and the composite above stays close enough to --surface
+     that they still do. */
+  .fig{margin:0;padding:1.5rem 1.5rem 1.3rem;border-radius:16px;
+    background:var(--surface);
+    border:1px solid var(--border2);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),
+      0 22px 44px -34px rgba(0,0,0,.75)}
+  /* Progressive, not assumed: a browser without backdrop-filter keeps the flat
+     --surface above and loses nothing but the blur. */
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .fig{background:rgba(11,17,20,.62);
+      -webkit-backdrop-filter:blur(16px) saturate(1.05);
+      backdrop-filter:blur(16px) saturate(1.05)}
+  }
+  /* same as dicorsa's: the caption runs the full width of its figure instead of
+     stopping at 58ch and leaving the rest of the track empty */
+  .fig-cap{font-size:.8rem;color:var(--muted);margin:0 0 .8rem;line-height:1.5;
+    max-width:none}
+  .fig svg{display:block;width:100%}
+  /* ApexCharts mount point, shared by all four charts on this page (fcBg,
+     co2, sc, cost): min-width:0 so the grid track can still shrink it
+     (defect measured in the chart lab: Apex pins an explicit pixel width on
+     its own inner svg and does not shrink it back on its own; a
+     ResizeObserver in the page script drives the actual redraw). min-height
+     holds the layout roughly steady before the lazy-loaded chart paints. */
+  .fig .apex-host{display:block;width:100%;min-width:0;overflow:hidden;min-height:280px}
+  @media(min-width:901px){ .fig .apex-host{min-height:380px} }
+  .dt-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+          gap:1.3rem;margin-top:1.6rem}
+  .dt-two .fig-cap{margin-bottom:.6rem}
+  .fig-leg{display:flex;gap:1.1rem;font-size:.74rem;color:var(--muted);
+           margin-top:.7rem;flex-wrap:wrap}
+  .fig-leg .sw{display:inline-block;width:11px;height:11px;border-radius:3px;
+               margin-right:.4rem;vertical-align:-1px}
+  @media(max-width:900px){
+    .dt-split,.dt-split.flip{grid-template-columns:1fr;gap:1.75rem;margin-top:3rem}
+    .dt-split.flip .col-txt,.dt-split.flip .col-fig{order:initial}
+    .dt-two{grid-template-columns:1fr;gap:1.3rem}
+  }
+
+  /* ===== legacy hero (superseded, markup removed) ===== */
+  .dthero{padding:1rem 0 2rem}
+  .dtstage{position:relative;border:1px solid var(--border);border-radius:20px;background:linear-gradient(180deg,var(--surface),var(--surface2));overflow:hidden;padding:1.6rem 1.8rem 1.4rem}
+  .dthead{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.6rem}
+  .dthead .dh{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .dthead .dlg{display:flex;gap:1.1rem;font-family:var(--mono);font-size:.6rem;color:var(--muted);flex-wrap:wrap}
+  /* legend keys mirror the stroke pattern of each line, so the scenarios are not
+     told apart by green shade alone (P1-7) */
+  .dthead .dlg i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:.4rem;vertical-align:3px}
+  .dthead .dlg i.sw-actual{background:var(--slate)}
+  .dthead .dlg i.sw-high{background:repeating-linear-gradient(90deg,var(--leaf) 0 11px,transparent 11px 15px)}
+  .dthead .dlg i.sw-base{background:repeating-linear-gradient(90deg,var(--sage) 0 5px,transparent 5px 9px)}
+  .dthead .dlg i.sw-low{background:repeating-linear-gradient(90deg,#337F3E 0 2px,transparent 2px 6px)}
+  .fc-svg{width:100%;height:300px;display:block}
+  @media(max-width:720px){.fc-svg{height:220px}}
+  .fc-svg .grid{stroke:rgba(255,255,255,.10)}
+  .fc-svg .lbl{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+  .fc-svg .endlbl{font-family:var(--mono);font-size:10px;font-weight:600}
+  .fc-line{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .dtstats{display:flex;gap:2rem;flex-wrap:wrap;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--border)}
+  .dtstat .sk{font-family:var(--mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .dtstat .sv{font-size:var(--t-5);font-weight:800;letter-spacing:-.02em;margin-top:.15rem}
+
+  /* ===== sections ===== */
+  /* the forest left rule this card used to carry is gone: the shared KPI card
+     carries its accent in the label, the specular top edge and the hover rim, so
+     a fifth accent on the same element was one too many */
+
+  /* h3 so the outline runs h1 > h2 > h3 with no skipped level; sizing keeps the
+     small mono chart caption look these were given as h4 (P1-9) */
+  .card h3{font-weight:600;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem}
+
+  /* ===== chartkit SVG rules below (co2/sc/cost): superseded, markup removed.
+     All three charts moved to ApexCharts 2026-08-10, same treatment as the
+     "challenge" chart. Rules kept, same convention as the legacy hero above,
+     since nothing in the current markup matches these selectors any more. */
+  /* CO2 avoided area */
+  .co2-svg{width:100%;height:240px;display:block}
+  .co2-svg .grid{stroke:rgba(255,255,255,.10)}
+  .co2-svg .lbl{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+  .co2-area{fill:url(#co2fill);opacity:0;transition:opacity 1s ease .4s}
+  .co2-area.in{opacity:1}
+  .co2-line{fill:none;stroke:var(--leaf);stroke-width:2.4;stroke-linecap:round}
+  .co2-mark{font-family:var(--mono);font-size:9.5px;font-weight:600;fill:var(--forest-ink)}
+
+  /* scatter */
+  .sc-svg{width:100%;height:240px;display:block}
+  .sc-svg .grid{stroke:rgba(255,255,255,.10)}
+  .sc-svg .lbl{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+  .sc-dot{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.3);transition:opacity .4s var(--ease),transform .5s var(--ease)}
+  .sc-dot.in{opacity:1;transform:scale(1)}
+
+  /* cost structure */
+  .cost-svg{width:100%;height:240px;display:block}
+  .cost-svg .grid{stroke:rgba(255,255,255,.10)}
+  .cost-svg .lbl{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+  .cost-base{fill:rgba(85,154,203,.32);opacity:0;transition:opacity .9s ease}
+  .cost-prem{fill:rgba(87,168,91,.5);opacity:0;transition:opacity .9s ease .3s}
+  .cost-base.in,.cost-prem.in{opacity:1}
+  .cost-note{font-family:var(--mono);font-size:9.5px;font-weight:600;fill:var(--ink)}
+  .chart-leg{display:flex;gap:1.2rem;font-size:.76rem;color:var(--muted);margin-top:.9rem;flex-wrap:wrap}
+  .chart-leg b{color:var(--ink-soft);font-weight:600}
+  .chart-leg .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:.4rem;vertical-align:-1px}
+
+  /* ===== PHASE LEDGER =====
+     Was three equal white cards, each with two bar meters, and every bar
+     encoded a number printed right beside it. This is one ruled ledger on the
+     page canvas instead: three rows, no second encoding, no reveal to wait for.
+     The reading the graphic exists for is the last column, and it is in the
+     paragraph above as well. */
+  .phz{width:100%;border-collapse:collapse;margin-top:1.6rem;
+    border-top:1px solid var(--border2);border-bottom:1px solid var(--border)}
+  .phz th,.phz td{text-align:right;padding:1rem 1.1rem;vertical-align:baseline}
+  /* Outer cells carry the same inset as the inner ones, so no figure sits on
+     the end of its own tint band. */
+  .phz th:first-child,.phz td:first-child{text-align:left;padding-left:1.1rem}
+  .phz thead th{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink);font-weight:600;
+    padding-top:.9rem;padding-bottom:.8rem;
+    border-bottom:1px solid var(--border2)}
+  .phz tbody tr + tr{border-top:1px solid var(--border)}
+  .phz tbody th{font-size:var(--t-3);font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+  .phz tbody th span{display:block;margin-top:.3rem;font-family:var(--mono);
+    font-size:.62rem;font-weight:400;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted)}
+  .phz td{font-size:var(--t-3);color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  /* One tint per phase, still one ramp rather than three unrelated hues,
+     because the phases are a progression and the ramp says so. On cream the
+     ramp ran sage -> leaf -> forest and got DARKER; on this canvas the three
+     deep greens at 7 to 10 percent would all land under the canvas and read as
+     no ramp at all, so it is one hue, --forest-ink, at rising alpha and the ramp
+     gets lighter instead. Worst case is the 14% row: --muted on it is 5.58:1,
+     --ink-soft 9.78:1 and --forest-ink 8.30:1. */
+  .phz tbody tr:nth-child(1){background:color-mix(in srgb,var(--forest-ink) 5%,transparent)}
+  .phz tbody tr:nth-child(2){background:color-mix(in srgb,var(--forest-ink) 9%,transparent)}
+  .phz tbody tr:nth-child(3){background:color-mix(in srgb,var(--forest-ink) 14%,transparent)}
+  /* the only coloured column is the one the ledger is for: the euro buys about
+     the same tonne in every phase */
+  .phz td.r{color:var(--forest-ink);font-weight:700}
+  @media(max-width:820px){
+    .phz th,.phz td{padding:.85rem .55rem;font-size:var(--t-2)}
+    .phz th:first-child,.phz td:first-child{padding-left:.7rem}
+    .phz th:last-child,.phz td:last-child{padding-right:.7rem}
+    .phz tbody th{font-size:var(--t-2)}
+    .phz thead th{font-size:.68rem;letter-spacing:.08em}
+  }
+</style>
+</head>
+<body class="theme-datathon">
+<canvas id="snowBg" data-color="#8FD08A" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <filter id="distortion">
+    <feTurbulence type="turbulence" baseFrequency="0.01 0.1" numOctaves="1" result="turbulence"/>
+    <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="8"
+                       xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<main class="wrap" id="main">
+  <!-- ===== HERO: the forecast is the background, glass carries the words ===== -->
+  <section class="dt-hero">
+    <div class="dt-hero-bg" aria-hidden="true">
+      <video id="heroVid" autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-nature-poster.webp">
+        <source src="assets/hero-nature.webm" type="video/webm" />
+        <source src="assets/hero-nature.mp4" type="video/mp4" />
+      </video>
+      <img class="vid-fallback" src="assets/hero-nature-poster.webp" alt=""
+           width="1600" height="844" hidden />
+      <div class="dt-hero-veil"></div>
+    </div>
+    <div class="dt-hero-in">
+      <a href="index.html#projects" class="pd-back">← All projects</a>
+      <div class="dt-panel">
+        <div class="dt-glassfx" aria-hidden="true">
+          <span class="face"></span>
+          <span class="lg t"></span><span class="lg b"></span>
+          <span class="lg l"></span><span class="lg r"></span>
+        </div>
+        <div class="dt-meta">
+          <div class="dt-badge"><span class="dot"></span>1st place · IEU Sustainability Datathon 2025</div>
+          <div class="pd-cat">Forecasting · Sustainability · Time Series</div>
+        </div>
+        <h1 class="pd-title" style="view-transition-name:vt-datathon">Sustainable Aviation Datathon</h1>
+        <p class="pd-sub">My team, Aria Mavens, won the December 2025 datathon. We forecast European aviation to 2050, modelled how sustainable aviation fuel bends the emissions curve, and priced what that path actually costs, told as one story the judges could follow end to end.</p>
+        <div class="pd-facts">
+          <div class="pd-fact"><div class="k">Role</div><div class="v">Analyst · Team Aria Mavens</div></div>
+          <div class="pd-fact"><div class="k">Result</div><div class="v">1st place · €3,000</div></div>
+          <div class="pd-fact"><div class="k">Event</div><div class="v">IEU Sustainability Datathon 2025</div></div>
+          <div class="pd-fact"><div class="k">Stack</div><div class="v">Python · ARIMA · Tableau</div></div>
+        </div>
+        <div class="pd-links">
+          <a href="https://github.com/vik01/datathon-2025" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+        </div>
+      </div>
+      <div class="dt-kpis">
+        <div class="dt-kpi kpicard"><div class="sk">Flights 2023</div><div class="sv">8.35M</div></div>
+        <div class="dt-kpi kpicard"><div class="sk">High scenario 2050</div><div class="sv">13.8M</div></div>
+        <div class="dt-kpi kpicard"><div class="sk">CO₂ avoided by 2050</div><div class="sv">115 Mt</div></div>
+        <div class="dt-kpi kpicard"><div class="sk">SAF share of fuel cost 2050</div><div class="sv">48%</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-challenge">The challenge</a>
+    <a href="#s-data">What the data said</a>
+    <a href="#s-economics">The economics</a>
+    <a href="#s-deliverables">The deliverables</a>
+  </nav>
+
+  <section id="s-challenge" class="case-sec" data-screen-label="Challenge">
+  <div class="dt-split">
+    <div class="col-txt">
+      <span class="eyebrow">The challenge</span>
+      <h2>Can aviation grow and <em>decarbonise</em>?</h2>
+      <!-- The four KPI cards that sat under this paragraph are gone. Three of
+           them repeated the hero strip and the fact list above it; the fourth
+           is the forecast horizon, which belongs in the sentence that
+           describes the forecast. -->
+      <p class="lead">The datathon asked us to make sense of aviation emissions and where they are heading. We worked with EUROCONTROL airport traffic data and CO₂ emissions history, forecast European flight demand to <strong>2050</strong> under <strong>three demand scenarios</strong>, and then asked the harder question: what does the sustainable path cost, and who pays for it.</p>
+    </div>
+    <figure class="fig col-fig">
+      <figcaption class="fig-cap">European flights per year, millions. Actual 2005 to 2023, then three demand scenarios to 2050.</figcaption>
+      <!-- no role="img"/aria-label here: Apex's own legend items are real,
+           individually-labelled, keyboard-toggleable buttons (confirmed via
+           axe: role="img" on an ancestor of focusable controls is a
+           nested-interactive violation, since role="img" declares no
+           focusable descendants). The sr-only paragraph below carries the
+           same finding as static text instead, so it does not depend on a
+           reader tabbing through the legend to get it. -->
+      <div id="fcBg" class="apex-host"></div>
+      <p class="sr-only">Line chart of European flight volumes: actual history 2005 to 2023 including the 2020 collapse to 4.08 million, then high, base and low forecast scenarios reaching 13.8, 11.8 and 9.4 million flights by 2050.</p>
+    </figure>
+  </div>
+  </section>
+
+  <section id="s-data" class="case-sec" data-screen-label="Data">
+  <div class="h-sec">
+    <span class="eyebrow">What the data said</span>
+    <h2>SAF bends the curve.</h2>
+    <p class="lead">Flights keep growing in every scenario, so efficiency alone cannot get aviation to its targets. Sustainable aviation fuel is the lever: as the blending share rises toward <strong>70 percent</strong> of the fuel mix, the CO₂ avoided each year climbs to about <strong>115 megatonnes</strong> by 2050.</p>
+  </div>
+  <div class="dt-two">
+    <figure class="fig">
+      <figcaption class="fig-cap">Annual CO₂ avoided through SAF adoption, megatonnes.</figcaption>
+      <!-- no role="img" on the host: Apex's own inner svg carries
+           role="application" tabindex="0" for its built-in arrow-key
+           data-point navigation, so wrapping it in role="img" would be a
+           nested-interactive violation (same finding as the challenge
+           chart above). The sr-only paragraph below carries the finding as
+           static text instead. -->
+      <div id="co2" class="apex-host"></div>
+      <p class="sr-only">Area chart of annual CO2 avoided through SAF adoption: 10.9 megatonnes by 2030, 58.3 by 2040, 115.4 by 2050.</p>
+    </figure>
+    <figure class="fig">
+      <figcaption class="fig-cap">SAF blending share against CO₂ avoided, 2026 to 2050.</figcaption>
+      <div id="sc" class="apex-host"></div>
+      <p class="sr-only">Scatter plot of SAF blending share against CO2 avoided, rising from near zero at a 2 percent share in 2026 to about 115 megatonnes at a 70 percent share in 2050. The chart's own point labels mark the 2026 and 2050 ends directly.</p>
+    </figure>
+  </div>
+  </section>
+
+  <section id="s-economics" class="case-sec" data-screen-label="Economics">
+  <div class="dt-split">
+    <div class="col-txt">
+      <span class="eyebrow">The economics</span>
+      <h2>What the path costs.</h2>
+      <p class="lead">The recommendation only holds if the cost side holds, so we priced it. By 2050 the SAF premium is about <strong>€60M</strong> of a <strong>€123M</strong> total fuel bill, roughly <strong>48 percent</strong>. We phased the deployment to see whether the trade gets worse as it scales, and it does not: every phase buys about <strong>1.2 megatonnes</strong> of CO₂ avoided per million euros of premium.</p>
+    </div>
+    <figure class="fig col-fig">
+      <figcaption class="fig-cap">Total fuel expenditure, baseline cost and SAF premium, millions of euros.</figcaption>
+      <!-- no role="img" here either, same nested-interactive reason as
+           above; Apex's own legend below carries "Baseline fuel cost" and
+           "SAF premium" as real, individually-labelled entries, so the old
+           static colour-chip legend is redundant with it and was removed. -->
+      <div id="cost" class="apex-host"></div>
+      <p class="sr-only">Stacked area chart of total fuel expenditure 2026 to 2050, split into baseline fuel cost and SAF premium, reaching 123 million euros total with a 60 million euro premium by 2050.</p>
+    </figure>
+  </div>
+
+  <!-- One ruled ledger, three rows. The bars this replaced encoded the same two
+       numbers that were printed next to them. -->
+  <table class="phz">
+    <thead>
+      <tr>
+        <th scope="col">Deployment phase</th>
+        <th scope="col">CO₂ avoided</th>
+        <th scope="col">SAF premium</th>
+        <th scope="col">Mt per €M</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Early<span>2026–2035</span></th>
+        <td>96.2 Mt</td><td>€82.3M</td><td class="r">1.17</td>
+      </tr>
+      <tr>
+        <th scope="row">Acceleration<span>2036–2045</span></th>
+        <td>377.6 Mt</td><td>€319.5M</td><td class="r">1.18</td>
+      </tr>
+      <tr>
+        <th scope="row">Maturity<span>2046–2050</span></th>
+        <td>315.6 Mt</td><td>€266.0M</td><td class="r">1.19</td>
+      </tr>
+    </tbody>
+  </table>
+  </section>
+
+  <section id="s-deliverables" class="case-sec" data-screen-label="Deliverables">
+  <div class="h-sec">
+    <span class="eyebrow">The deliverables</span>
+    <h2>The deck and the report.</h2>
+    <p class="lead">The presentation we gave the jury and the written report behind it, both scrollable in place.</p>
+  </div>
+  <div class="pd-block">
+    <div class="pd-embed">
+      <a class="pdf-fac" href="assets/datathon-deck.pdf" target="_blank" rel="noopener" data-frame-title="Aria Mavens final presentation, 11 slides">
+        <img src="assets/posters/datathon-deck.webp" alt="" width="1600" height="901" loading="lazy" decoding="async">
+        <span class="pdf-fac-cta">Load the deck <span class="sz">1.9 MB</span><span class="sr-only pdf-fac-note">, opens in a new tab</span></span>
+      </a>
+      <div class="pd-embed-bar">
+        <span class="lbl">Aria Mavens · final presentation (11 slides)</span>
+        <a href="assets/datathon-deck.pdf" target="_blank" rel="noopener">Open full screen <span>↗</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="pd-block" style="margin-top:1.3rem">
+    <div class="pd-embed">
+      <a class="pdf-fac" href="assets/datathon-report.pdf" target="_blank" rel="noopener" data-frame-title="Aria Mavens final report, 8 pages">
+        <img src="assets/posters/datathon-report.webp" alt="" width="640" height="905" loading="lazy" decoding="async">
+        <span class="pdf-fac-cta">Load the report <span class="sz">386 KB</span><span class="sr-only pdf-fac-note">, opens in a new tab</span></span>
+      </a>
+      <div class="pd-embed-bar">
+        <span class="lbl">Aria Mavens · final report (8 pages)</span>
+        <a href="assets/datathon-report.pdf" target="_blank" rel="noopener">Open full screen <span>↗</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- "Why we won" was its own tab. It is one paragraph and one photograph, so
+       it is the closing subsection of the deliverables instead of a fifth
+       section carrying almost nothing. -->
+  <div class="h-sec">
+    <span class="eyebrow">Why we won</span>
+    <h2>A story the judges could follow.</h2>
+    <p class="lead">We built the whole thing so the judges could follow it from the raw data to a clear recommendation without needing us to explain every chart. That clarity, backed by the forecasts and the cost analysis, is what put us in first place.</p>
+  </div>
+  <div class="pd-block reveal">
+    <div class="pd-img wide"><img src="assets/datathon-team.webp" width="1086" height="725" alt="Team Aria Mavens on stage receiving the first place prize at the IEU Sustainability Datathon 2025" loading="lazy" onerror="this.remove()"></div>
+  </div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="madrid.html">Madrid Rental ML Dashboard <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script>
+/* reduced motion: never autoplay the hero video, show the poster still instead */
+(function(){var m=matchMedia('(prefers-reduced-motion: reduce)');function a(){
+  var v=document.getElementById('heroVid'),f=document.querySelector('.vid-fallback');
+  if(!v||!f)return; if(m.matches){v.pause();v.removeAttribute('autoplay');f.hidden=false;}
+  else{f.hidden=true;v.play().catch(function(){f.hidden=false;});}}
+m.addEventListener?m.addEventListener('change',a):m.addListener(a);
+document.addEventListener('DOMContentLoaded',a);})();
+</script>
+<script>
+/* ===== data (from the team's Tableau analysis) ===== */
+var ACTUAL=[[2005,8.0],[2006,8.3],[2007,8.7],[2008,8.72],[2009,8.1],[2010,8.12],[2011,8.4],[2012,8.15],[2013,7.95],[2014,8.05],[2015,8.2],[2016,8.4],[2017,8.7],[2018,9.1],[2019,9.2],[2020,4.08],[2021,5.1],[2022,7.65],[2023,8.35]];
+var HIGH=[[2023,8.35],[2026,9.4],[2030,10.85],[2035,11.9],[2040,12.55],[2045,13.2],[2050,13.83]];
+var BASE=[[2023,8.35],[2026,9.0],[2030,9.85],[2035,10.2],[2040,10.85],[2045,11.4],[2050,11.83]];
+var LOW=[[2023,8.35],[2026,8.72],[2030,8.8],[2035,8.88],[2040,8.85],[2045,8.95],[2050,9.38]];
+var CO2=[[2026,0.5],[2028,6],[2030,10.89],[2032,20],[2034,30],[2035,36.5],[2036,40.5],[2038,49],[2040,58.27],[2042,68],[2044,79],[2046,90],[2048,102],[2050,115.39]];
+var COST=[[2026,29,0.5],[2030,32.5,5],[2035,40,19],[2040,46,31],[2045,54,44],[2050,63,60]]; // [year, baseline, premium]
+/* ===== shared chart chrome, dark card =====
+   ApexCharts' own defaults for axis labels, legend text and tooltips are the
+   near-black greys of its light theme (#373d3f), which were invisible the
+   moment this page's card stopped being white. Nothing here was needed on
+   cream, which is why none of it was set before. Declared once instead of four
+   times, and every value is measured against CHART_SURFACE, the flat
+   --surface the .fig card now paints:
+     AXIS_INK   6.23:1   LEGEND_INK 10.93:1   LABEL_INK 14.69:1
+   LABEL_INK is also checked against the two chart fills it can land on, the
+   cost premium band (6.03:1) and the CO2 area's top stop (8.99:1).
+   GRIDLINE is a reference rule, not content, and sits at 1.34:1, the same
+   near-invisible weight the cream rgba(17,17,16,.085) had. */
+var CHART_SURFACE='#122019';
+var AXIS_INK='#8CA391', LEGEND_INK='#C2D5C5', LABEL_INK='#E8F2E9';
+var GRIDLINE='rgba(255,255,255,.10)';
+/* factories, not shared object literals: Apex deep-merges the options object
+   into its own config and mutates what it is handed, so one literal reused by
+   four charts is a way for chart four to inherit chart one's leftovers. */
+function axisStyle(){ return {fontSize:'11px',colors:AXIS_INK}; }
+function legendLabels(){ return {colors:LEGEND_INK}; }
+function annoStyle(){ return {fontSize:'11px',fontWeight:600,color:LABEL_INK,background:'transparent'}; }
+/* defect, found in a render not a review: every annotation label carries
+   borderWidth:0 alongside annoStyle(). style.background:'transparent' only
+   clears the label's FILL; its border is a separate Apex default, #c2c2c2 at
+   1px, which was invisible against the cream card and draws a light-grey chip
+   around all six labels on this one. */
+
+var SAF=[[2,2],[4,4.5],[6,6.5],[8,8.5],[10,11],[14,15.5],[18,20.5],[22,25.5],[26,31],[30,36],[32.5,40.5],[35.5,44.5],[38,49],[41,53.5],[43.5,58],[46,63],[48.5,68],[51.5,73],[54,79],[56.5,84],[59.5,90],[62,96],[64.5,102.5],[67,109],[70,115.5]];
+
+/* Fires cb() once, the first time el has been reached, where "reached" includes
+   SCROLLED PAST. Not IntersectionObserver, for the reason madrid.html documents
+   at length: IO only fires on a state CHANGE, and the section rail makes
+   one-step jumps ordinary, so an element that goes from below the fold to above
+   the viewport in a single jump never intersects and never gets a callback.
+   Position is tested on scroll instead. This is what gates the four charts now
+   that the tabs are gone and every host has a real width from first paint. */
+var WATCH=[], vraf=0;
+function vReached(e){
+  var r=e.el.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return false;
+  return r.bottom<=0 || r.top<innerHeight-40;
+}
+function vSweep(){
+  vraf=0;
+  for(var i=WATCH.length-1;i>=0;i--){ if(vReached(WATCH[i])){ WATCH.splice(i,1)[0].cb(); } }
+}
+function vKick(){ if(!vraf) vraf=requestAnimationFrame(vSweep); }
+function onView(el,cb){
+  if(!el) return;
+  var e={el:el,cb:cb};
+  if(vReached(e)){ cb(); return; }
+  WATCH.push(e); vKick();
+}
+addEventListener('scroll',vKick,{passive:true});
+addEventListener('resize',vKick);
+addEventListener('load',vKick);
+
+/* ===== hero chart: European flight demand, ApexCharts =====
+   Marian reviewed a chart lab comparing ApexCharts against chartkit on this
+   exact series and picked ApexCharts for this one chart, with the 2020
+   collapse annotated below the lowest data point (2026-08-10, lab row 1).
+
+   Re-derived for the dark card, Aug 17 2026. The cream palette was
+   #4C6E8F/#6F8F60/#4C8540/#2E6B3E, all of which sit at 1.4:1 to 2.6:1 on
+   --surface and are simply not visible here. Run on the dark canvas:
+     node scripts/validate-palette.js "#559ACB,#337F3E,#46974E,#57A85B" --mode dark --surface "#122019"
+   lightness band PASS (all four inside L 0.48-0.67), chroma floor PASS (the
+   cream blue #4C6E8F failed it at C 0.065; #559ACB is 0.101), contrast vs
+   surface PASS (3.41 to 5.74), CVD separation and normal-vision floor still
+   FAIL, worst adjacent pair base/high delta-E 5.4. That last failure is
+   inherent to three steps of one green ramp and is the same finding the cream
+   version recorded (5.1 under protanopia). So colour is decoration here, never
+   the encoding: each scenario keeps its own stroke-dash pattern
+   (solid/short/medium/long) and its own named label in the legend.
+
+   Loaded lazily through window.loadApex() (main.js): the 164.6 KB gzipped
+   bundle is fetched only once this element has been reached AND reports a
+   real, nonzero width. With the tabs gone the width is real from first
+   paint, so the gate that matters is onView() above; without it all four
+   charts on this page would load and render before the reader has scrolled
+   past the hero. Redraws on every subsequent resize are driven the same way:
+   neither
+   chart.render() nor chart.updateOptions() resolving proves Apex actually
+   repainted its DOM (measured in the lab), and Apex pins an explicit pixel
+   width on its own inner svg that it does not shrink back on its own, so a
+   one-time render() call is not enough either way. */
+(function(){
+  var host=document.getElementById('fcBg'); if(!host) return;
+
+  var COL_ACTUAL='#559ACB', COL_LOW='#337F3E', COL_BASE='#46974E', COL_HIGH='#57A85B';
+  var LOW_END=LOW[LOW.length-1][1], BASE_END=BASE[BASE.length-1][1], HIGH_END=HIGH[HIGH.length-1][1];
+
+  function toXY(p){ return p.map(function(q){ return {x:q[0],y:q[1]}; }); }
+
+  function buildOptions(w,h){
+    return {
+      chart:{
+        type:'line', width:w, height:h, fontFamily:'inherit',
+        toolbar:{show:false}, zoom:{enabled:false},
+        /* defect: Apex's entrance animation tweens a width attribute, not
+           opacity or transform, and does not read prefers-reduced-motion.
+           Off, so the chart never needs an animation to reach its final
+           state and never breaks the opacity/transform-only rule. */
+        animations:{enabled:false}
+      },
+      series:[
+        {name:'Actual, 2005-2023', data:toXY(ACTUAL)},
+        {name:'Low · '+LOW_END+'M by 2050', data:toXY(LOW)},
+        {name:'Base · '+BASE_END+'M by 2050', data:toXY(BASE)},
+        {name:'High · '+HIGH_END+'M by 2050', data:toXY(HIGH)}
+      ],
+      colors:[COL_ACTUAL,COL_LOW,COL_BASE,COL_HIGH],
+      /* Apex's chart-wide default fill.opacity (0.85) otherwise leaks into
+         the line stroke colour itself, which would quietly shift every
+         value this file's contrast and palette-gate numbers were checked
+         against. Pinned to 1 so the rendered stroke is the exact hex above. */
+      fill:{ opacity:1 },
+      stroke:{ curve:'straight', width:2.4, dashArray:[0,5,8,14] },
+      markers:{ size:0, hover:{size:5}, strokeColors:CHART_SURFACE },
+      xaxis:{
+        type:'numeric', min:2005, max:2050, tickAmount:5,
+        labels:{ formatter:function(v){return Math.round(v);}, style:axisStyle() },
+        axisBorder:{show:false}, axisTicks:{show:false}
+      },
+      yaxis:{
+        /* defect: an unset min lets Apex auto-scale to negative ticks;
+           European flight counts cannot be negative, so both bounds are
+           fixed explicitly rather than left to auto-scale. */
+        min:0, max:15, tickAmount:3,
+        labels:{ formatter:function(v){return v;}, style:axisStyle() }
+      },
+      grid:{ borderColor:GRIDLINE, strokeDashArray:0, padding:{right:12} },
+      legend:{ position:'top', horizontalAlign:'left', fontSize:'11px', markers:{size:5},
+                labels:legendLabels(), itemMargin:{horizontal:10,vertical:4} },
+      tooltip:{
+        theme:'dark',
+        shared:false,
+        x:{ formatter:function(v){return 'Year '+Math.round(v);} },
+        y:{ formatter:function(v){return v+'M flights/year';} }
+      },
+      annotations:{
+        points:[{
+          x:2020, y:4.08,
+          marker:{ size:4, fillColor:COL_ACTUAL, strokeColor:CHART_SURFACE, strokeWidth:2 },
+          label:{
+            text:'2020 collapse · 4.08M',
+            /* defect: Apex's default data-label colour measured 3.79:1 on a
+               dark mark, below AA. The cream #2b2b27 measured 12.7:1 on
+               #F3F2EE and 1.2:1 on this card, so the label is LABEL_INK now,
+               14.69:1 against CHART_SURFACE, which is the open plot space it
+               lands in. offsetY is positive, pushing the label BELOW the point
+               as asked: 4.08 sits at 27% up the fixed 0-15 axis, so there is
+               room under the marker before the zero line, and it fits. */
+            style:annoStyle(), borderWidth:0,
+            offsetY:38
+          }
+        }]
+      }
+    };
+  }
+
+  /* defect: chart.render() / chart.updateOptions() resolving does not prove
+     Apex finished repainting its DOM (measured in the lab). A
+     MutationObserver on the host is what actually knows the inner svg
+     exists, used to sanity-check the x-axis ticks Apex produced once, since
+     a custom labels.formatter silently disables forceNiceScale.
+     Tried and reverted: hiding Apex's own inner svg with aria-hidden, on the
+     theory that the sr-only paragraph below already carries the finding.
+     Apex sets role="application" tabindex="0" on that svg itself, for its
+     own built-in arrow-key data-point navigation, so aria-hiding it created
+     a real WCAG failure instead (aria-hidden-focus: a hidden element must
+     not also be focusable), caught by scripts/a11y-check.mjs. Left alone,
+     Apex's own chart accessibility works as designed. */
+  var tickChecked=false;
+  var mo=new MutationObserver(function(){
+    var svg=host.querySelector('svg.apexcharts-svg');
+    if(!svg) return;
+    if(tickChecked) return;
+    var ticks=[].slice.call(host.querySelectorAll('.apexcharts-xaxis-texts-g text'));
+    if(!ticks.length) return;
+    tickChecked=true;
+    /* each tick <text> carries a <tspan> (the visible glyph) AND a <title>
+       (native tooltip) with the same string; reading textContent on the
+       <text> itself concatenates both ("20052005"), which is not a real
+       tick value, so read the tspan alone. */
+    var bad=ticks.map(function(t){
+        var span=t.querySelector('tspan');
+        return parseFloat(span?span.textContent:t.textContent);
+      })
+      .filter(function(v){return !isFinite(v)||v<2005||v>2050;});
+    if(bad.length) console.warn('fcBg: x-axis produced ticks outside 2005-2050', bad);
+  });
+  mo.observe(host,{childList:true,subtree:true});
+
+  var chart=null, loading=false, ready=false;
+  var pendingW=0, pendingH=0, lastW=0, lastH=0, renderedW=0, renderedH=0;
+
+  function ensureChart(){
+    if(loading||ready) return;
+    loading=true;
+    window.loadApex().then(function(ApexCharts){
+      chart=new ApexCharts(host, buildOptions(pendingW,pendingH));
+      renderedW=pendingW; renderedH=pendingH;
+      return chart.render();
+    }).then(function(){
+      // render() resolving is not proof the DOM settled (see the
+      // MutationObserver above), but it IS proof Apex will now accept
+      // updateOptions without racing its own first paint. Any resize that
+      // landed while this was loading is applied once, here.
+      ready=true;
+      if(pendingW && (pendingW!==renderedW || pendingH!==renderedH)){
+        renderedW=pendingW; renderedH=pendingH;
+        chart.updateOptions({chart:{width:pendingW,height:pendingH}}, false, false);
+      }
+    }).catch(function(err){
+      loading=false;
+      console.error('fcBg: ApexCharts failed to load or render', err);
+      host.textContent='European flights per year: actual history 2005 to 2023 '+
+        'including the 2020 collapse to 4.08 million, then high ('+HIGH_END+
+        'M), base ('+BASE_END+'M) and low ('+LOW_END+'M) scenarios by 2050.';
+    });
+  }
+
+  /* Sizing, and the arming of the load. Every size change (window resize, or
+     the rail jumping the reader here) drives an explicit width/height update
+     rather than trusting Apex's own resize handling; the load itself waits for
+     onView(). Observation starts only after
+     DOMContentLoaded: main.js is a deferred script that defines
+     window.loadApex, and it must already have run before this chart's own
+     first measurement,
+     or the very first ResizeObserver callback can fire before loadApex
+     exists (seen while building this: a bare TypeError, not a graceful
+     no-op, the one time the two races landed in the wrong order). */
+  document.addEventListener('DOMContentLoaded', function(){
+    var armed=false;
+    var ro=new ResizeObserver(function(entries){
+      var w=Math.round(entries[0].contentRect.width);
+      if(w<=0) return; // nothing to draw into yet
+      var h=w<520?280:380;
+      pendingW=w; pendingH=h;
+      if(w===lastW && h===lastH) return;
+      lastW=w; lastH=h;
+      if(ready){
+        renderedW=w; renderedH=h;
+        chart.updateOptions({chart:{width:w,height:h}}, false, false);
+      } else if(!armed){
+        armed=true;
+        onView(host, ensureChart);
+      }
+    });
+    ro.observe(host);
+  });
+})();
+
+/* ===== shared Apex mount/resize helper, "what the data said" + "the
+   economics" charts =====
+   Same technique as the fcBg chart above (chart lab row 1), factored out
+   once instead of copied three times: lazy-load through window.loadApex()
+   only when the host has been reached and reports a real width, drive every
+   redraw (including
+   the first one and every later resize) from a
+   ResizeObserver rather than trusting chart.render()/updateOptions() to
+   prove Apex repainted, and never call chart.windowResize() (does not
+   exist in this vendored v5.16.0). animations:{enabled:false} is set inside
+   each buildOptions function passed in below, not here, since it belongs
+   next to the rest of that chart's config. */
+function mountApex(host, buildOptions, opts){
+  if(!host) return;
+  opts = opts||{};
+  var chart=null, loading=false, ready=false;
+  var pendingW=0, pendingH=0, lastW=0, lastH=0, renderedW=0, renderedH=0;
+  var heightFor = opts.heightFor || function(w){ return w<520?210:250; };
+
+  function ensureChart(){
+    if(loading||ready) return;
+    loading=true;
+    window.loadApex().then(function(ApexCharts){
+      chart=new ApexCharts(host, buildOptions(pendingW,pendingH));
+      renderedW=pendingW; renderedH=pendingH;
+      return chart.render();
+    }).then(function(){
+      ready=true;
+      if(pendingW && (pendingW!==renderedW || pendingH!==renderedH)){
+        renderedW=pendingW; renderedH=pendingH;
+        chart.updateOptions({chart:{width:pendingW,height:pendingH}}, false, false);
+      }
+    }).catch(function(err){
+      loading=false;
+      console.error(host.id+': ApexCharts failed to load or render', err);
+      if(opts.fallbackText) host.textContent=opts.fallbackText;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var armed=false;
+    var ro=new ResizeObserver(function(entries){
+      var w=Math.round(entries[0].contentRect.width);
+      if(w<=0) return; // nothing to draw into yet
+      var h=heightFor(w);
+      pendingW=w; pendingH=h;
+      if(w===lastW && h===lastH) return;
+      lastW=w; lastH=h;
+      if(ready){
+        renderedW=w; renderedH=h;
+        chart.updateOptions({chart:{width:w,height:h}}, false, false);
+      } else if(!armed){
+        armed=true;
+        onView(host, ensureChart);
+      }
+    });
+    ro.observe(host);
+  });
+}
+
+/* ===== CO2 avoided area =====
+   Single series, so the colour ambiguity that forced the challenge chart
+   onto dash patterns does not apply here: one green line needs no second
+   category to be told apart from. The fill/stroke split INVERTS on the dark
+   card. On cream it was a light fill (#5B9E54) under a dark line (#2E6B3E),
+   so the line was the darker, more present mark. Here the line is the lighter
+   one: --forest-ink #8FD08A at 9.27:1 on the card, over a --sage #46974E fill that
+   fades to nothing. Keeping the cream pairing would have put a 2.3:1 line on
+   top of a fill brighter than itself. */
+(function(){
+  var host=document.getElementById('co2'); if(!host) return;
+  var last=CO2[CO2.length-1], lastLabel=last[1].toFixed(1)+' Mt';
+
+  function buildCo2Options(w,h){
+    return {
+      chart:{ type:'area', width:w, height:h, fontFamily:'inherit',
+        toolbar:{show:false}, zoom:{enabled:false}, animations:{enabled:false} },
+      series:[{ name:'CO2 avoided · '+lastLabel+' by '+last[0],
+                data: CO2.map(function(q){ return {x:q[0],y:q[1]}; }) }],
+      colors:['#46974E'],
+      stroke:{ curve:'straight', width:2.4, colors:['#8FD08A'] },
+      fill:{ type:'gradient', opacity:1,
+             gradient:{ shadeIntensity:1, opacityFrom:.34, opacityTo:0, stops:[0,100] } },
+      markers:{ size:0, hover:{size:5}, strokeColors:CHART_SURFACE },
+      dataLabels:{ enabled:false },
+      xaxis:{ type:'numeric', min:2026, max:2050, tickAmount:4,
+        labels:{ formatter:function(v){return Math.round(v);}, style:axisStyle() },
+        axisBorder:{show:false}, axisTicks:{show:false} },
+      yaxis:{
+        /* defect: an unset min lets Apex auto-scale to negative ticks; CO2
+           avoided cannot be negative, so both bounds are fixed, matching
+           the old chartkit chart's own fixed 0-120 axis. */
+        min:0, max:120, tickAmount:3,
+        labels:{ formatter:function(v){return v;}, style:axisStyle() }
+      },
+      grid:{ borderColor:GRIDLINE, strokeDashArray:0, padding:{right:12} },
+      legend:{ position:'top', horizontalAlign:'left', fontSize:'11px', markers:{size:5},
+                labels:legendLabels(), itemMargin:{horizontal:10,vertical:4} },
+      tooltip:{ theme:'dark',
+                 x:{ formatter:function(v){return 'Year '+Math.round(v);} },
+                 y:{ formatter:function(v){return v.toFixed(1)+' Mt avoided';} } },
+      annotations:{
+        points:[{
+          x:last[0], y:last[1],
+          marker:{ size:4, fillColor:'#8FD08A', strokeColor:CHART_SURFACE, strokeWidth:2 },
+          label:{
+            /* defect: Apex's default data-label colour measured 3.79:1 on a
+               dark mark, below AA. Re-measured for this card: LABEL_INK
+               against the actual composited background here, the co2 fill's
+               own top stop (#46974E at .34 opacity over CHART_SURFACE, which
+               blends to #24482B), is 8.99:1, computed by blending the two,
+               not assumed. offsetX pulls the label left of the endpoint marker
+               rather than above it, since the endpoint sits at 96% up a fixed
+               0-120 axis and there is not enough headroom above it to place a
+               label without clipping. */
+            text:lastLabel, style:annoStyle(), borderWidth:0,
+            offsetX:-58, offsetY:-2
+          }
+        }]
+      }
+    };
+  }
+
+  mountApex(host, buildCo2Options, {
+    fallbackText:'Annual CO2 avoided through SAF adoption: 10.9 megatonnes by 2030, 58.3 by 2040, 115.4 by 2050.'
+  });
+})();
+
+/* ===== SAF blending share vs CO2 avoided =====
+   The old chartkit version told points apart with a continuous light-to-dark
+   green ramp keyed to array position (earliest = lightest). Run through the
+   palette gate, that ramp itself fails the checks it exists to pass:
+     node scripts/validate-palette.js "#6F8F60,#2E6B3E" --mode light --surface "#FFFFFF" --pairs all
+   worst pair (the two ramp endpoints) is delta-E 14.1 under normal vision,
+   below the 15 floor the gate hard-fails on: even full-colour vision cannot
+   reliably read this ramp's direction from hue and lightness alone. That
+   finding survives the dark conversion unchanged, since it is about the ramp,
+   not the canvas; only the one accessible colour moved, from #2E6B3E (2.3:1 on
+   this card) to #5FB25E (6.43:1). Apex
+   also has no built-in per-point continuous fill for a scatter series (that
+   exists for heatmaps only, via colorScale, not scatter/line marker fill).
+   Rather than fake a ramp with a row of single-point series, this uses one
+   accessible colour for every point (position on the plot already carries
+   the trend) and labels the two ends directly, in text, exactly the
+   direct-labelling approach the challenge chart's legend uses instead of a
+   colour chip. The 2026/2050 year labels are not re-derived: the array's
+   own first and last points, "2026 to 2050" is the same span the figcaption
+   already states. */
+(function(){
+  var host=document.getElementById('sc'); if(!host) return;
+  var first=SAF[0], last=SAF[SAF.length-1];
+
+  function buildScOptions(w,h){
+    return {
+      chart:{ type:'scatter', width:w, height:h, fontFamily:'inherit',
+        toolbar:{show:false}, zoom:{enabled:false}, animations:{enabled:false} },
+      series:[{ name:'SAF blending share vs CO2 avoided',
+                data: SAF.map(function(q){ return {x:q[0],y:q[1]}; }) }],
+      colors:['#5FB25E'],
+      markers:{ size:5, hover:{size:7}, strokeColors:CHART_SURFACE, strokeWidth:1.5 },
+      dataLabels:{ enabled:false },
+      xaxis:{
+        min:0, max:75, tickAmount:5, type:'numeric',
+        labels:{ formatter:function(v){return Math.round(v)+'%';}, style:axisStyle() },
+        axisBorder:{show:false}, axisTicks:{show:false} },
+      yaxis:{
+        /* defect: unset min lets Apex auto-scale to negative ticks; CO2
+           avoided cannot be negative. */
+        min:0, max:120, tickAmount:3,
+        labels:{ formatter:function(v){return v;}, style:axisStyle() }
+      },
+      grid:{ borderColor:GRIDLINE, strokeDashArray:0, padding:{right:12} },
+      tooltip:{
+        theme:'dark',
+        x:{ formatter:function(v){return Math.round(v)+'% blending';} },
+        y:{ formatter:function(v){return v+' Mt avoided';} }
+      },
+      annotations:{
+        points:[
+          {
+            /* Marker only. The label rides a separate anchor below, because a
+               px offsetX big enough to clear the cluster does not survive a
+               resize: the ResizeObserver only pushes chart width/height into
+               the live chart, it never re-runs buildScOptions, so any
+               width-derived pixel offset goes stale the moment the panel
+               changes width. */
+            x:first[0], y:first[1],
+            marker:{ size:4, fillColor:'#5FB25E', strokeColor:CHART_SURFACE, strokeWidth:2 }
+          },
+          {
+            /* Label for the 2026 end, parked at 30% on the x axis where the
+               plot floor is empty (the series is at 36 Mt by then) so it can
+               never sit on a marker again. Anchored in DATA space, so it holds
+               that position at every width. Marker size 0: the real point
+               already has its marker above. */
+            x:30, y:5,
+            marker:{ size:0 },
+            label:{
+              /* LABEL_INK against CHART_SURFACE is 14.69:1; this point sits in
+                 open chart space with no fill under it, so the card surface is
+                 the whole background and no blending is involved. */
+              text:'2026 · '+first[0]+'% share', style:annoStyle(), borderWidth:0,
+              offsetX:0, offsetY:0
+            }
+          },
+          {
+            x:last[0], y:last[1],
+            marker:{ size:4, fillColor:'#5FB25E', strokeColor:CHART_SURFACE, strokeWidth:2 },
+            label:{
+              text:'2050 · '+last[0]+'% share, '+last[1]+' Mt', style:annoStyle(), borderWidth:0,
+              offsetX:-92, offsetY:-6
+            }
+          }
+        ]
+      }
+    };
+  }
+
+  mountApex(host, buildScOptions, {
+    fallbackText:'SAF blending share against CO2 avoided, rising from near zero at a 2 percent share in 2026 to about 115 megatonnes at a 70 percent share in 2050.'
+  });
+})();
+
+/* ===== cost structure, stacked =====
+   Two categories (baseline, premium), not three, and blue/green here are
+   nowhere near the challenge chart's worst-adjacent greens:
+     node scripts/validate-palette.js "#57A85B,#559ACB" --mode dark --surface "#122019"
+   ALL CHECKS PASS. The cream pair (#5B9E54,#4C6E8F) passed CVD separation but
+   FAILED the chroma floor on the blue (OKLCH C 0.065 against a 0.10 floor),
+   and that failure was reported here rather than fixed, on the grounds that
+   #4C6E8F was an established site colour. The dark conversion has to move the
+   blue anyway (#4C6E8F is 1.4:1 on this card), so the reported defect is
+   fixed in passing: #559ACB is C 0.101. */
+(function(){
+  var host=document.getElementById('cost'); if(!host) return;
+  var end=COST[COST.length-1], endYear=end[0], endBase=end[1], endPrem=end[2], endTotal=endBase+endPrem;
+
+  function buildCostOptions(w,h){
+    return {
+      chart:{ type:'area', stacked:true, width:w, height:h, fontFamily:'inherit',
+        toolbar:{show:false}, zoom:{enabled:false}, animations:{enabled:false} },
+      /* premium first so it stacks at the bottom and baseline stacks above
+         it, matching the old chartkit chart's own stacking order (baseline
+         drawn as the region ABOVE the premium-height line, not below it). */
+      series:[
+        { name:'SAF premium · €'+endPrem+'M by '+endYear,
+          data: COST.map(function(q){ return {x:q[0],y:q[2]}; }) },
+        { name:'Baseline fuel cost · €'+endBase+'M by '+endYear,
+          data: COST.map(function(q){ return {x:q[0],y:q[1]}; }) }
+      ],
+      colors:['#57A85B','#559ACB'],
+      fill:{ opacity:[0.5,0.32] },
+      stroke:{ curve:'straight', width:1.2, colors:['#57A85B','#559ACB'] },
+      markers:{ size:0 },
+      dataLabels:{ enabled:false },
+      xaxis:{ type:'numeric', min:2026, max:2050, tickAmount:4,
+        labels:{ formatter:function(v){return Math.round(v);}, style:axisStyle() },
+        axisBorder:{show:false}, axisTicks:{show:false} },
+      yaxis:{
+        /* defect: unset min lets Apex auto-scale to negative ticks; euros
+           of fuel cost cannot be negative. max is 150, not the old
+           chartkit chart's 130: 130/3 produces 43.33/86.67, decimal tick
+           values no reader asked for; 150 is the nearest value above the
+           123 total that still divides into round ticks at tickAmount 3. */
+        min:0, max:150, tickAmount:3,
+        labels:{ formatter:function(v){return v;}, style:axisStyle() }
+      },
+      grid:{ borderColor:GRIDLINE, strokeDashArray:0, padding:{right:12} },
+      legend:{ position:'top', horizontalAlign:'left', fontSize:'11px', markers:{size:5},
+                labels:legendLabels(), itemMargin:{horizontal:10,vertical:4} },
+      tooltip:{ theme:'dark', shared:true,
+        x:{ formatter:function(v){return 'Year '+Math.round(v);} },
+        y:{ formatter:function(v){return '€'+v+'M';} } },
+      annotations:{
+        /* both labels always drawn, at every width: the old chartkit chart
+           gated these behind if(!c.narrow) and silently dropped them on a
+           390px screen (found and fixed today, not repeated here). */
+        points:[
+          {
+            x:endYear, y:endTotal,
+            marker:{ size:0 },
+            label:{
+              /* LABEL_INK against CHART_SURFACE (open space just above the
+                 stacked total line) is 14.69:1. */
+              text:'Total €'+endTotal+'M', style:annoStyle(), borderWidth:0,
+              offsetX:-52, offsetY:-10
+            }
+          },
+          {
+            x:endYear, y:endPrem/2,
+            marker:{ size:0 },
+            label:{
+              /* LABEL_INK against the actual premium fill here, #57A85B at .5
+                 opacity over CHART_SURFACE, which blends to #35643A, is
+                 6.03:1, computed by blending the two, not assumed. This is the
+                 worst of the four annotation positions on the page. */
+              text:'SAF premium €'+endPrem+'M', style:annoStyle(), borderWidth:0,
+              offsetX:-86, offsetY:0
+            }
+          }
+        ]
+      }
+    };
+  }
+
+  mountApex(host, buildCostOptions, {
+    heightFor:function(w){ return w<520?220:270; },
+    fallbackText:'Total fuel expenditure 2026 to 2050, split into baseline fuel cost and SAF premium, reaching 123 million euros total with a 60 million euro premium by 2050.'
+  });
+})();
+
+/* the phase reveal that used to live here is gone with the .ph-card markup: the
+   ledger that replaced it is plain content and ships visible. */
+</script>
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The anchors work without this. It adds which pill is lit, an offset jump that
+   clears the sticky rail, and keeping the lit pill inside the rail's own
+   horizontal scroll on a phone. aria-current, not aria-selected: links, not
+   tabs. Same script as madrid.html, trading.html and titan.html. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    var a=links[i];
+    /* scrollIntoView would scroll the page as well, which fights the reader. */
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* Reading position, not intersection ratio: these sections are wildly
+     different heights, so the tallest would hold the marker while a short one
+     owns the screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  /* Jump target is computed here rather than handed to Lenis as an element plus
+     an offset. Measured on trading.html: passing {offset:-(navH+70)} landed the
+     section 52px too high, with the eyebrow entirely behind the rail, because
+     Lenis resolves an element target from offsetTop and does not account for
+     this page's sticky chrome the way the CSS scroll-margin path does. An
+     absolute pixel target has no such ambiguity, and the chrome is measured at
+     click time so a hidden nav (scroll-down) and a restored one (scroll-up)
+     both work. fix() re-asserts the landing after the travel, because the nav
+     can change state mid-flight and shift the rail under the heading we just
+     parked. */
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      var top=secs[i].getBoundingClientRect().top;
+      var need=rail.getBoundingClientRect().bottom+12;
+      if(top<need-1){
+        var to=Math.max(0,scrollY-(need-top));
+        if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+        else window.scrollTo(0,to);
+      }
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+<!-- Shared with index and the other project pages: snow-bg.js, the #snowBg
+     rules in styles.css, and the <canvas> right after <body>. data-color is
+     this page's own --forest-ink, the text-safe green, because the project pages
+     carry no --accent for the script to read. -->
+<script src="snow-bg.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cinema Chain Database · Marian Garabana</title>
+<meta name="description" content="A relational database for a cinema chain across Madrid, Barcelona, and Sevilla: 17 tables in third normal form, 817 seed rows, and five business questions answered in SQL." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/cinema.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#0d0606" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Cinema Chain Database · Marian Garabana" />
+<meta property="og:description" content="A relational database for a cinema chain across Madrid, Barcelona, and Sevilla: 17 tables in third normal form, 817 seed rows, and five business questions answered in SQL." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/cinema.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Cinema Chain Database · Marian Garabana" />
+<meta name="twitter:description" content="A relational database for a cinema chain across Madrid, Barcelona, and Sevilla: 17 tables in third normal form, 817 seed rows, and five business questions answered in SQL." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="preload" as="image" href="assets/hero-cinema-poster.webp" fetchpriority="high" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* ===== dark marquee-red theme scoped to this page ===== */
+  body.theme-cinema{
+    --bg:#0c0505; --surface:#1c1010; --surface2:#160c0c;
+    --ink:#f6ece7; --ink-soft:#dbc3bb; --muted:#93807b;
+    --red:#e2293f; --red-deep:#c11f34; --gold:#d7a94e;
+    /* text-safe companion to --red: --red measures 4.45:1 on --bg, under the
+       4.5:1 floor for small mono labels; --red-ink measures 8.06:1. Same
+       pattern as trading's --up/--down-ink pair. P1-3 precedent. */
+    --red-ink:#ff7a86;
+    /* this page is not in styles.css's shared dark-theme selector (the seven
+       project themes at line ~81), so --border/--border2 are declared here
+       rather than inherited; same rgba values every other dark theme gets. */
+    --border:rgba(255,255,255,.09); --border2:rgba(255,255,255,.18);
+    /* KPI card tokens, measured on the composited card: 7.31:1 and 10.71:1 */
+    --kpi-accent:var(--red-ink); --kpi-accent-rgb:255,122,134; --kpi-v2:#f0b9b0;
+  }
+  body.theme-cinema{background:radial-gradient(1100px 560px at 74% -12%,#2a1010 0%,var(--bg) 55%)}
+  .theme-cinema .nav{border-color:rgba(255,255,255,.14)}
+  .theme-cinema .nav.scrolled{background:rgba(28,16,16,.62)}
+  .theme-cinema .nav-ava{background:linear-gradient(135deg,#3a1414,#1c0d0d);color:#f0b8ab}
+  .theme-cinema .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-cinema ::selection{background:var(--red);color:#1a0508}
+  .theme-cinema .pd-cat{color:var(--red-ink)}
+  .theme-cinema .h-sec .eyebrow{color:var(--red-ink)}
+  .theme-cinema .pd-links a{border-color:var(--red-deep);background:var(--red-deep);color:#fff}
+  .theme-cinema .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+  .cin-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(226,41,63,.08);border:1px solid rgba(226,41,63,.3);padding:.4rem .8rem;border-radius:100px;margin-bottom:1.4rem}
+  .cin-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(226,41,63,.18)}
+
+  /* ===== IMAGE HERO =====
+     Uses the shared .vhero + .lg system in styles.css, not a fork of it. No
+     footage exists for this project yet, so the <video> element carries a
+     poster and no <source> child, the same shape aerospace and spain shipped
+     in before their clips arrived. With no source the video never plays and
+     simply displays its poster attribute, so normal motion and reduced motion
+     read identically: a still. The poster itself is derived from the
+     project's own ERD (assets/cinema-erd.png), recoloured into a dark
+     red/gold duotone so it reads as hero art instead of a pasted screenshot,
+     with no stock photography anywhere in it. The vhero-still fallback image
+     is intentionally not hidden, following the fix documented on
+     aerospace.html: styles.css hides .vhero-bg video under
+     prefers-reduced-motion (line ~717), and only the still img is left to
+     carry the hero for those readers. In normal flow the video element (100%
+     height, first child) fills the box and .vhero-bg's overflow:hidden clips
+     the img sitting below it, so the img only becomes visible once the video
+     is removed from flow. */
+  .cin-panel{max-width:min(560px,54%);padding:1.7rem 2rem 1.7rem;
+    --lg-tint-1:rgba(46,16,16,.40);--lg-tint-2:rgba(10,5,5,.58);--lg-sat:165%}
+  .cin-panel .lg-fx::after{
+    background:radial-gradient(130% 90% at 6% -8%,rgba(255,214,168,.22),rgba(255,214,168,0) 46%);
+    box-shadow:inset 0 1px 0 rgba(255,225,196,.42),inset 1px 0 0 rgba(255,225,196,.2),
+               inset -1px 0 0 rgba(255,225,196,.13),inset 0 -1px 0 rgba(255,225,196,.22)}
+  .cin-panel .pd-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .cin-panel .pd-back{margin-bottom:0;color:#f3d9c9}
+  .cin-panel .pd-back:hover{color:#fff}
+  .cin-panel .cin-badge{margin-bottom:0}
+  .cin-panel .pd-cat{margin-bottom:.7rem}
+  .cin-panel .pd-title{font-size:clamp(2rem,3.4vw,2.7rem);color:#fff}
+  .cin-panel .pd-sub{margin-top:.95rem;font-size:var(--t-3);color:#f0dcd2;max-width:33rem}
+  /* no backdrop-filter: the shared fallback is neutral black, retint it toward the canvas */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .cin-panel .lg-face{background:rgba(10,5,5,.84)}
+  }
+  @media(max-width:900px){.cin-panel{max-width:100%}}
+  @media(max-width:720px){
+    .cin-panel{padding:1.3rem 1.2rem 1.3rem}
+    .cin-panel .lg-face{background:rgba(10,5,5,.66)}
+    .cin-panel .pd-top{margin-bottom:1.3rem}
+  }
+
+  /* ===== fact belt, below the band ===== */
+  .pd-belt{display:flex;justify-content:space-between;align-items:flex-end;
+    gap:1.5rem 2.5rem;flex-wrap:wrap;margin-bottom:3.4rem}
+  .pd-belt .pd-facts{margin-top:0;gap:2rem}
+  .pd-belt .pd-links{margin-top:0}
+  @media(max-width:720px){
+    .pd-belt{margin-bottom:2.4rem}
+    .pd-belt .pd-facts{gap:1.1rem 1.6rem}
+  }
+
+  /* ===== SECTION RAIL =====
+     Was a tablist that hid three quarters of the case study behind a click. The
+     panels are real sections now and this is a scrollspy over them. Anchors, not
+     buttons, so every label still jumps with the script blocked; the pill styling
+     is the same set of --secnav-* properties the buttons used. Same rail as the
+     other case studies. */
+  .secnav{--secnav-hover:rgba(255,255,255,.07);--secnav-focus:var(--red-ink);
+          --secnav-on-bg:var(--red-deep);--secnav-on-ink:#fff;
+          position:sticky;z-index:6;top:calc(var(--nav-h) - 2px);padding-top:.75rem;
+          background:var(--bg);transition:top .3s var(--ease)}
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--ink-soft);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  .secnav a:hover{background:var(--secnav-hover);border-color:var(--border);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--secnav-focus);outline-offset:2px}
+  .secnav a[aria-current="true"]{background:var(--secnav-on-bg);
+    color:var(--secnav-on-ink);border-color:var(--secnav-on-bg)}
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  .case-sec > .h-sec:first-child{margin-top:4rem}
+  /* The first section opens directly under the rail, so it does not get the full
+     section rhythm. Same cut as aerospace and dicorsa. */
+  #s-schema > .h-sec:first-child{margin-top:.9rem}
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+
+  .h-sec .lead{color:var(--ink-soft);max-width:44rem;margin-top:1rem}
+  /* styles.css has no base rule for <code>, only .card code on the pages that use
+     it, so table and column names in running prose need one here. */
+  .lead code,.phz-d code,.spec-d code{font-family:var(--mono);font-size:.92em;color:var(--red-ink)}
+
+  /* ===== SCHEMA LEDGER =====
+     Was a four-up KPI grid printing 17 / 817 / 3 / 3NF, every one of which is in
+     the paragraph above it, and a pair of boxes holding tag pills. One ruled
+     ledger on the page canvas instead: the five functional groups the schema was
+     designed in, the tables in each, and the seed rows each group carries. Row
+     counts are counted from assets/cinema-dml.sql and total 817; the grouping is
+     the report's own (section 2). Below 620px the head is taken out and each row
+     stacks. Copied from spain.html's .phz. */
+  .phz{width:100%;border-collapse:collapse;margin-top:1.5rem;
+    border-top:1px solid rgba(255,255,255,.14);
+    border-bottom:1px solid rgba(255,255,255,.09)}
+  /* The two narrow columns are measured, so the slack lands in the description
+     column instead of stretching the mono table list. */
+  .phz col.grp{width:170px} .phz col.n{width:94px} .phz col.tb{width:190px}
+  .phz th,.phz td{padding:.95rem .9rem;text-align:left;vertical-align:top;
+    border-bottom:1px solid rgba(255,255,255,.07)}
+  .phz th:first-child,.phz td:first-child{padding-left:0}
+  .phz th:last-child,.phz td:last-child{padding-right:0}
+  .phz thead th{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);font-weight:500;
+    padding-top:.9rem;padding-bottom:.55rem;border-bottom:1px solid rgba(255,255,255,.14)}
+  .phz tbody tr:last-child th,.phz tbody tr:last-child td{border-bottom:none}
+  .phz-b{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;
+    text-transform:uppercase;font-weight:600;color:var(--red-ink)}
+  .phz-m{font-family:var(--mono);font-size:.7rem;color:var(--ink-soft);line-height:1.7}
+  .phz-d{font-size:var(--t-2);color:var(--ink-soft);line-height:1.55}
+  .phz-n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:var(--t-3);
+    font-weight:600;color:var(--ink);white-space:nowrap}
+  /* td.phz-n, not a bare .phz-n: `.phz th,.phz td{text-align:left}` above is
+     (0,1,1) and would win the tie against a one-class rule, so the count column
+     would stay left-aligned. Same reason the mobile override below is named the
+     same way. */
+  .phz td.phz-n{text-align:right}
+  .phz thead th:last-child{text-align:right}
+  .phz-n span{display:block;font-size:.62rem;font-weight:500;color:var(--muted);margin-top:.2rem}
+  .phz tfoot td{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);border-bottom:none;padding-top:.85rem}
+  .phz tfoot .phz-n{font-size:var(--t-2);color:var(--ink);text-transform:none;letter-spacing:0}
+  @media(max-width:760px){
+    .phz thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+    .phz,.phz tbody,.phz tfoot,.phz tr,.phz th,.phz td{display:block;width:auto}
+    .phz tr{padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+    .phz tbody tr:last-child{border-bottom:none}
+    .phz th,.phz td{border:0;padding:.14rem 0}
+    .phz-n{font-size:var(--t-2)}
+    .phz td.phz-n{text-align:left}
+    .phz-n span{display:inline;margin:0 0 0 .5rem}
+  }
+
+  /* the ERD is a light diagram (white background by design), so its frame
+     stays white rather than forcing it onto the dark surface tone; same
+     white-background convention the shared .pd-embed iframe rule already
+     uses for PDF documents. */
+  .pd-embed img{display:block;width:100%;height:auto;background:#fff}
+
+  /* GLASS ON THE EMBED FRAMES, at Marian's request, Aug 17 2026, the same move
+     datathon's and madrid's chart cards took. This page has no chart cards to
+     put it on: its diagram is an opaque full-bleed image, so a blur behind THAT
+     would never show. The frame is where it reads, on the bands either side of
+     the report poster and along both caption bars.
+
+     It clears the no-glass-over-flat-fill rule for the same reason the other
+     two pages do: the snow canvas drifts behind these frames. Take the snow off
+     and this should go back to the flat --surface2 above.
+
+     MEASURED, not assumed. Sampled off the rendered frames, 10 frames of
+     drifting snow, at the band beside the poster and along the bar:
+       darkest  #0F0808
+       lightest #211112
+       --muted #93807B on the lightest composite: 4.87:1 (floor 4.5, so 0.37 of headroom)
+       --ink #F6ECE7 on the lightest composite:   15.66:1
+     --muted is the number that matters here: the bar label is the smallest
+     text on the surface, and it is the first thing a lower alpha would break.
+     .66/.55 measured 4.76:1, which passes but leaves almost nothing for a
+     bright cluster of flakes, so the alphas are .74/.68 instead. */
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .theme-cinema .pd-embed{background:rgba(16,9,9,.74);
+      -webkit-backdrop-filter:blur(16px) saturate(1.05);
+      backdrop-filter:blur(16px) saturate(1.05)}
+    .theme-cinema .pd-embed-bar{background:rgba(22,12,12,.68)}
+  }
+
+  /* ===== DESIGN-DECISION ACCORDION =====
+     Six decisions as one ruled accordion on the page canvas, one open at a time.
+     Native <details name="dd">, so exclusive opening, keyboard operation and the
+     open state itself are the browser's, not a script's: with JS blocked every
+     row still opens. The answer animates where ::details-content and
+     interpolate-size are supported and simply appears where they are not, which
+     is the same progressive line the hover-drop cards took. */
+  .acc{margin-top:1.6rem;border-top:1px solid rgba(255,255,255,.14);
+    border-bottom:1px solid rgba(255,255,255,.09);interpolate-size:allow-keywords}
+  .acc details + details{border-top:1px solid rgba(255,255,255,.07)}
+  .acc summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;
+    gap:1.2rem;padding:1.05rem 0;cursor:pointer;list-style:none;
+    transition:color .18s var(--ease)}
+  .acc summary::-webkit-details-marker{display:none}
+  .acc summary:hover{color:var(--ink)}
+  .acc summary:focus-visible{outline:2px solid var(--red-ink);outline-offset:3px}
+  /* h3, not a bare div: the accordion is the section's list of subheadings and the
+     page runs h1 -> h2 -> h3 with no skipped level. The mono table name sits
+     inside it as a quieter run, so the heading text stays one line of prose. */
+  .acc h3{margin:0;font-size:var(--t-3);font-weight:600;font-family:var(--sans);
+    letter-spacing:normal;text-transform:none;color:inherit;line-height:1.4}
+  .acc h3 span{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;
+    color:var(--muted);margin-top:.35rem;font-weight:500}
+  .acc-i{flex:none;width:22px;height:22px;position:relative;color:var(--red-ink);
+    transition:transform .28s var(--ease)}
+  .acc-i::before,.acc-i::after{content:'';position:absolute;left:50%;top:50%;
+    width:11px;height:1.5px;background:currentColor;border-radius:2px;
+    transform:translate(-50%,-50%);transition:transform .28s var(--ease)}
+  .acc-i::after{transform:translate(-50%,-50%) rotate(90deg)}
+  .acc details[open] .acc-i::after{transform:translate(-50%,-50%) rotate(0deg)}
+  .acc-c{font-size:var(--t-2);color:var(--ink-soft);line-height:1.6;max-width:52rem;
+    padding:0 3rem 1.15rem 0;margin:0}
+  .acc-c code{font-family:var(--mono);font-size:.92em;color:var(--red-ink)}
+  @supports selector(details::details-content){
+    .acc details::details-content{block-size:0;overflow:hidden;opacity:0;
+      transition:block-size .3s var(--ease),content-visibility .3s allow-discrete,
+                 opacity .24s var(--ease)}
+    .acc details[open]::details-content{block-size:auto;opacity:1}
+  }
+  @media(max-width:560px){ .acc-c{padding-right:0} }
+  @media(prefers-reduced-motion:reduce){
+    .acc-i,.acc-i::before,.acc-i::after{transition:none}
+    @supports selector(details::details-content){
+      .acc details::details-content{transition:none}
+    }
+  }
+
+  /* h3, not h4: the page goes h1 -> h2 -> h3 with no skipped level. */
+  .card h3{font-weight:600;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+</style>
+</head>
+<body class="theme-cinema">
+<!-- Shared PixelSnow background, the same file index and the other project
+     pages load. Coloured with this page's own --red-ink: --red itself is
+     4.45:1 on the canvas and the deep red would sink into #0c0505. The hero
+     paints over it by itself, so the flakes start below the fold. -->
+<canvas id="snowBg" data-color="#ff7a86" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+  <section class="vhero cin-hero">
+    <div class="vhero-bg" aria-hidden="true">
+      <video autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-cinema-poster.webp"></video>
+      <img class="vhero-still" src="assets/hero-cinema-poster.webp" alt=""
+           width="1280" height="720" />
+      <div class="vhero-veil"></div>
+    </div>
+    <div class="vhero-in">
+      <div class="lg cin-panel">
+        <div class="lg-fx" aria-hidden="true">
+          <span class="lg-face"></span>
+          <span class="lg-edge t"></span><span class="lg-edge b"></span>
+          <span class="lg-edge l"></span><span class="lg-edge r"></span>
+        </div>
+        <div class="pd-top">
+          <a href="index.html#projects" class="pd-back">← All projects</a>
+          <div class="cin-badge"><span class="dot"></span>17 tables · 3NF design</div>
+        </div>
+        <div class="pd-cat">SQL · Database Design</div>
+        <h1 class="pd-title" style="view-transition-name:vt-cinema">Cinema Chain Database</h1>
+        <p class="pd-sub">A relational database for a cinema chain across Madrid, Barcelona, and Sevilla. I designed the full schema, populated it, and answered real business questions with SQL.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="pd-belt">
+    <div class="pd-facts">
+      <div class="pd-fact"><div class="k">Role</div><div class="v">Builder (team)</div></div>
+      <div class="pd-fact"><div class="k">Course</div><div class="v">SQL II · IE</div></div>
+      <div class="pd-fact"><div class="k">Year</div><div class="v">2025</div></div>
+      <div class="pd-fact"><div class="k">Stack</div><div class="v">MySQL · 3NF design</div></div>
+    </div>
+    <div class="pd-links">
+      <a href="https://github.com/MarianGarabana/SQL-Cinema-Project" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+      <a class="ghost" href="assets/cinema-ddl.sql" target="_blank" rel="noopener">DDL script <span>↗</span></a>
+      <a class="ghost" href="assets/cinema-dml.sql" target="_blank" rel="noopener">Seed data <span>↗</span></a>
+      <a class="ghost" href="assets/cinema-model.mwb" target="_blank" rel="noopener">Workbench model <span>↗</span></a>
+    </div>
+  </div>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked.
+       Four tabs became four sections, and the old Data tab folded into the
+       schema: one paragraph and two boxes of tag pills, which is the ledger's
+       last column now. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-schema">The schema</a>
+    <a href="#s-design">Design decisions</a>
+    <a href="#s-build">Run it yourself</a>
+  </nav>
+
+  <section id="s-schema" class="case-sec" data-screen-label="Schema">
+  <div class="h-sec">
+    <span class="eyebrow">The schema</span>
+    <h2>17 tables, third normal <em>form</em>.</h2>
+    <p class="lead">The database models a cinema chain with three locations in Spain: Gran Via in Madrid, Diagonal in Barcelona, and Centro in Sevilla. Movie tickets are sold only through the website, so every ticket carries a registered customer, a card payment and a specific seat; concessions accept any payment method and anonymous walk-ins, so they needed their own transaction structure rather than a variant of the first. Below, the seventeen tables in the five functional groups they were designed in, with the seed rows each group carries, and the entity relationship diagram colour-coded by the same groups.</p>
+  </div>
+  <table class="phz">
+    <caption class="sr-only">The seventeen tables in five functional groups, with seed row counts per group. Location and facilities, three tables, 16 rows. Films and scheduling, five tables, 62 rows. Movie ticket sales, three tables, 418 rows. Concessions, four tables, 303 rows. Shared entities, two tables, 18 rows. 817 rows in total.</caption>
+    <colgroup><col class="grp" /><col class="tb" /><col /><col class="n" /></colgroup>
+    <thead>
+      <tr>
+        <th scope="col">Group</th>
+        <th scope="col">Tables</th>
+        <th scope="col">What it holds</th>
+        <th scope="col">Seed rows</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" class="phz-b">Location &amp; facilities</th>
+        <td class="phz-m">location<br />auditorium<br />auditorium_type</td>
+        <td class="phz-d">The physical chain: three sites, eight auditoriums, five auditorium types.</td>
+        <td class="phz-n">16<span>3 tables</span></td>
+      </tr>
+      <tr>
+        <th scope="row" class="phz-b">Films &amp; scheduling</th>
+        <td class="phz-m">film<br />film_genre<br />genre<br />showtime<br />showtime_group</td>
+        <td class="phz-d">The catalogue and the schedule. <code>film_genre</code> is a junction table, so a film can carry several genres.</td>
+        <td class="phz-n">62<span>5 tables</span></td>
+      </tr>
+      <tr>
+        <th scope="row" class="phz-b">Movie ticket sales</th>
+        <td class="phz-m">movie_ticket<br />seat<br />ticket_status</td>
+        <td class="phz-d">Online ticket transactions, one row per seat sold, with 160 seats to sell them against.</td>
+        <td class="phz-n">418<span>3 tables</span></td>
+      </tr>
+      <tr>
+        <th scope="row" class="phz-b">Concessions</th>
+        <td class="phz-m">shop_ticket<br />shop_item<br />product<br />product_category</td>
+        <td class="phz-d">In-store food and drink: 104 orders across 184 line items.</td>
+        <td class="phz-n">303<span>4 tables</span></td>
+      </tr>
+      <tr>
+        <th scope="row" class="phz-b">Shared entities</th>
+        <td class="phz-m">customer<br />payment_method</td>
+        <td class="phz-d">Bridge entities both sales systems read, required for tickets and optional for concessions.</td>
+        <td class="phz-n">18<span>2 tables</span></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3">17 tables · 3NF</td>
+        <td class="phz-n">817 rows</td>
+      </tr>
+    </tfoot>
+  </table>
+  <div class="pd-block">
+    <div class="pd-embed">
+      <img src="assets/cinema-erd.png" alt="Entity relationship diagram of the 17-table cinema database in third normal form" loading="lazy" decoding="async" width="1275" height="858">
+      <div class="pd-embed-bar">
+        <span class="lbl">Entity relationship diagram</span>
+        <a href="assets/cinema-erd.png" target="_blank" rel="noopener">Open full size <span>↗</span></a>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-design" class="case-sec" data-screen-label="Design">
+  <div class="h-sec">
+    <span class="eyebrow">Design decisions</span>
+    <h2>The choices the diagram does not <em>show</em>.</h2>
+    <p class="lead">Most of the work in a relational schema is in decisions a diagram cannot express: where a price lives, which relationship earns its own table, and what is worth storing twice. Six of them below, each with the table it lives in.</p>
+  </div>
+  <div class="acc">
+    <details name="dd">
+      <summary><h3>Auditorium-based pricing<span>auditorium_type.Price_Multiplier</span></h3><span class="acc-i" aria-hidden="true"></span></summary>
+      <p class="acc-c">Prices are set by auditorium type, not by seat, which is how cinemas actually invest. <code>Price_Multiplier</code> gives the final price as base times multiplier, so pricing logic lives in one place.</p>
+    </details>
+    <details name="dd">
+      <summary><h3>Film to genre, many to many<span>film_genre</span></h3><span class="acc-i" aria-hidden="true"></span></summary>
+      <p class="acc-c">Films routinely span several genres. A junction table handles that without the redundancy and integrity problems of a comma-separated column.</p>
+    </details>
+    <details name="dd">
+      <summary><h3>Two separate ticketing systems<span>movie_ticket · shop_ticket</span></h3><span class="acc-i" aria-hidden="true"></span></summary>
+      <p class="acc-c"><code>movie_ticket</code> requires a customer, a seat and a showtime. <code>shop_ticket</code> allows an anonymous purchase with none of them, because in a real foyer people buy snacks without watching a film.</p>
+    </details>
+    <details name="dd">
+      <summary><h3>Location stored on the ticket<span>movie_ticket.Location_ID</span></h3><span class="acc-i" aria-hidden="true"></span></summary>
+      <p class="acc-c">Location is derivable through showtime and auditorium, and stored on the ticket anyway. It keeps revenue-per-location reporting to a single join.</p>
+    </details>
+    <details name="dd">
+      <summary><h3>Showtime groups as time ranges<span>Start_Range · End_Range</span></h3><span class="acc-i" aria-hidden="true"></span></summary>
+      <p class="acc-c">Each daily period carries a start and end time, not just a name. Tickets link to a group by foreign key; concession orders match on purchase time falling inside the range, which is what lets one query count both streams by time of day.</p>
+    </details>
+    <details name="dd">
+      <summary><h3>Shared customer and payment<span>customer · payment_method</span></h3><span class="acc-i" aria-hidden="true"></span></summary>
+      <p class="acc-c">A customer record is required for a ticket and optional for a shop order. The rule that tickets are card-only is a business rule, enforced in the application rather than the schema.</p>
+    </details>
+  </div>
+  </section>
+
+  <section id="s-build" class="case-sec" data-screen-label="Run it yourself">
+  <div class="h-sec">
+    <span class="eyebrow">Run it yourself</span>
+    <h2>Everything you need.</h2>
+    <p class="lead">Built with a team for the SQL II course at IE. Clone the repo, or download the schema script, the seed data and the Workbench model and run the whole database locally. The full eleven-page report is below: the business context, the design decisions, the normalisation check, and all five business questions with their queries and output.</p>
+    <div class="pd-links" style="margin-top:2rem">
+      <a href="https://github.com/MarianGarabana/SQL-Cinema-Project" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+      <a class="ghost" href="assets/cinema-ddl.sql" target="_blank" rel="noopener">DDL script <span>↗</span></a>
+      <a class="ghost" href="assets/cinema-dml.sql" target="_blank" rel="noopener">Seed data <span>↗</span></a>
+      <a class="ghost" href="assets/cinema-model.mwb" target="_blank" rel="noopener">Workbench model <span>↗</span></a>
+    </div>
+  </div>
+  <div class="pd-block">
+    <div class="pd-embed">
+      <iframe src="assets/cinema-report.pdf#view=FitH" title="Cinema Chain Database, full project report, 11 pages" loading="lazy"></iframe>
+      <div class="pd-embed-bar">
+        <span class="lbl">Full project report (11 pages)</span>
+        <a href="assets/cinema-report.pdf" target="_blank" rel="noopener">Open full screen <span>↗</span></a>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="titan.html">Titan Operations Sentinel <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The anchors work without this. It adds which pill is lit, an offset jump that
+   clears the sticky rail, and keeping the lit pill inside the rail's own
+   horizontal scroll on a phone. aria-current, not aria-selected: links, not tabs. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    var a=links[i];
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* Reading position, not intersection ratio: these sections are wildly different
+     heights, so the tallest would hold the marker while a short one owns the
+     screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  /* park() is symmetric: it corrects a section that landed under the rail AND one
+     that landed too far below it. Measured on dicorsa.html, where a one-way guard
+     left the jump 200 to 620px short with the wrong pill lit. Re-asserted on a
+     short ladder because the nav's own 300ms show/hide moves the rail after
+     park() scrolls upward, and because the ERD and the report iframe are lazy and
+     can change the document height mid-travel. */
+  function park(i){
+    var delta=secs[i].getBoundingClientRect().top-(rail.getBoundingClientRect().bottom+12);
+    if(Math.abs(delta)<=2) return;
+    var to=Math.max(0,scrollY+delta);
+    if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+    else window.scrollTo(0,to);
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      [0,140,340,600,900,1200].forEach(function(ms){
+        setTimeout(function(){ park(i); if(ms===1200) light(i); },ms);
+      });
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+<!-- Shader, props and reasoning all live in snow-bg.js; the #snowBg rules are
+     in styles.css, which this page already loads. Delete this tag and the
+     canvas after <body> to revert. -->
+<script src="snow-bg.js" defer></script>
+</body>
+</html>

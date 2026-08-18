@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trading System Automation · Marian Garabana</title>
+<meta name="description" content="An ML trading system predicting next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks, from SimFin data and 22 engineered features to a live Streamlit app." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/trading.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#080b12" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Trading System Automation · Marian Garabana" />
+<meta property="og:description" content="An ML trading system predicting next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks, from SimFin data and 22 engineered features to a live Streamlit app." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/trading.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Trading System Automation · Marian Garabana" />
+<meta name="twitter:description" content="An ML trading system predicting next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks, from SimFin data and 22 engineered features to a live Streamlit app." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="enhance.css" />
+<style>
+  /* ===== dark trading-terminal theme ===== */
+  body.theme-trade{
+    --bg:#080b12; --surface:#111826; --surface2:#0d131f;
+    --ink:#e7edf7; --ink-soft:#c3cede; --muted:#7d8aa0;
+    --up:#22c55e; --down:#ef4444; --hold:#f59e0b; --cyan:#38bdf8;
+    /* text-safe red for small badges on the dark canvas: 4.08:1 -> 5.56:1. P1-3. */
+    --down-ink:#f87171;
+    /* KPI card tokens, measured on the composited card: 8.23:1 and 10.67:1.
+       --cyan rather than --up or --down: the four cards are neutral readings,
+       not signals, and colouring them green would read as a buy. */
+    --kpi-accent:var(--cyan); --kpi-accent-rgb:56,189,248; --kpi-v2:#a8cfe4;
+  }
+  body.theme-trade{background:radial-gradient(1100px 560px at 72% -12%,#0e1a2c 0%,var(--bg) 55%)}
+  .theme-trade .nav{border-color:rgba(255,255,255,.14)}
+  .theme-trade .nav.scrolled{background:rgba(17,24,38,.62)}
+  .theme-trade .nav-ava{background:linear-gradient(135deg,#1f2c45,#141d30);color:#9db4e0}
+  .theme-trade .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-trade ::selection{background:var(--up);color:#04140a}
+  .theme-trade .pd-cat{color:var(--up)}
+  .theme-trade .h-sec .eyebrow{color:var(--up)}
+  .theme-trade .pd-links a{border-color:var(--up);background:var(--up);color:#04140a}
+  .theme-trade .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+  .t-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.28);padding:.4rem .8rem;border-radius:100px;margin-bottom:1.4rem}
+  .t-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 0 3px rgba(34,197,94,.18)}
+
+  /* ===== VIDEO HERO =====
+     Uses the shared .vhero + .lg system in styles.css, not a fork of it. Only
+     the tint and the panel width are per-page. Panel sits on the left, which is
+     the darker side of the source footage, and the shared veil already darkens
+     left over right, so the two agree instead of fighting each other. */
+  .trade-panel{max-width:min(560px,54%);padding:1.7rem 2rem 1.7rem;
+    --lg-tint-1:rgba(9,20,14,.40);--lg-tint-2:rgba(4,9,7,.56);--lg-sat:170%}
+  .trade-panel .lg-fx::after{
+    background:radial-gradient(130% 90% at 6% -8%,rgba(190,255,214,.22),rgba(190,255,214,0) 46%);
+    box-shadow:inset 0 1px 0 rgba(206,255,222,.44),inset 1px 0 0 rgba(206,255,222,.2),
+               inset -1px 0 0 rgba(206,255,222,.13),inset 0 -1px 0 rgba(206,255,222,.22)}
+  .trade-panel .pd-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .trade-panel .pd-back{margin-bottom:0;color:#cdeed9}
+  .trade-panel .pd-back:hover{color:#fff}
+  .trade-panel .t-badge{margin-bottom:0}
+  .trade-panel .pd-cat{margin-bottom:.7rem}
+  .trade-panel .pd-title{font-size:clamp(2rem,3.4vw,2.7rem);color:#fff}
+  .trade-panel .pd-sub{margin-top:.95rem;font-size:var(--t-3);color:#dcebe1;max-width:33rem}
+  /* no backdrop-filter: the shared fallback is neutral black, retint it toward ink-green */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .trade-panel .lg-face{background:rgba(4,9,7,.84)}
+  }
+  @media(max-width:900px){.trade-panel{max-width:100%}}
+  @media(max-width:720px){
+    .trade-panel{padding:1.3rem 1.2rem 1.3rem}
+    .trade-panel .lg-face{background:rgba(4,9,7,.66)}
+    .trade-panel .pd-top{margin-bottom:1.3rem}
+  }
+
+  /* ===== fact belt, below the band ===== */
+  .pd-belt{display:flex;justify-content:space-between;align-items:flex-end;
+    gap:1.5rem 2.5rem;flex-wrap:wrap;margin-bottom:3.4rem}
+  .pd-belt .pd-facts{margin-top:0;gap:2rem}
+  .pd-belt .pd-links{margin-top:0}
+  @media(max-width:720px){
+    .pd-belt{margin-bottom:2.4rem}
+    .pd-belt .pd-facts{gap:1.1rem 1.6rem}
+  }
+
+  /* ===== SECTION RAIL =====
+     Was a tablist that hid three quarters of the case study behind a click. The
+     panels are real sections now and this is a scrollspy over them. Anchors,
+     not buttons, so every label still jumps with the script blocked; the pill
+     styling is the same set of --secnav-* properties the buttons used. */
+  .secnav{--secnav-hover:rgba(255,255,255,.07);--secnav-focus:var(--up);
+          --secnav-on-bg:var(--up);--secnav-on-ink:#04140a;
+          position:sticky;z-index:6;top:calc(var(--nav-h) - 2px);
+          padding-top:.75rem;background:var(--bg);transition:top .3s var(--ease)}
+  /* main.js hides the nav on scroll-down; the rail rides up with it rather than
+     leaving a 76px hole. */
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--muted);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  .secnav a:hover{background:var(--secnav-hover);border-color:var(--border);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--secnav-focus);outline-offset:2px}
+  .secnav a[aria-current="true"]{background:var(--secnav-on-bg);
+    color:var(--secnav-on-ink);border-color:var(--secnav-on-bg)}
+  /* Clears the nav and the rail together, so a jump never lands under the pills. */
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  /* Only the section's OWN opening header tightens up. The h-sec blocks further
+     down inside a section keep the sitewide 5rem, because those are real
+     subsections, not boundaries. */
+  .case-sec > .h-sec:first-child{margin-top:10px}
+  /* Text two thirds, instrument one third. Same move as madrid's .m-split: the
+     figures live in the sentence and the gauge is supporting evidence beside
+     it, not a full-width panel the section has to stop for.
+     align-items:start, NOT center. Centring makes the row's height the taller
+     of the two columns and then pushes the shorter one down, which put the
+     panel's top edge (and its glow) 10px under the previous section's KPI
+     cards and 23px ABOVE this section's own eyebrow: the gauge read as
+     belonging to the section above it. The panel is offset down by hand
+     instead, the same way madrid.html lands its classifier chart. */
+  /* The chart column was a flat third (2fr/1fr, ~273px at the 1180 cap). Wider
+     than a third now: the copy beside it does not need the full two thirds, so
+     the panel gets the room and the bars get a longer track to read against. */
+  .t-split{display:grid;grid-template-columns:minmax(0,1fr) min(430px,40%);
+    gap:2.6rem;align-items:start;margin-top:5rem}
+  /* Opening a section is one boundary, not two: the section's own top already
+     carries the gap, so the first block inside it tightens the same way
+     .case-sec > .h-sec:first-child does. Blocks further down keep the sitewide
+     5rem, because those are real subsections. */
+  .case-sec > .t-split:first-child{margin-top:1.6rem}
+  .t-split > .h-sec{margin-top:0}
+  .t-split .lead{max-width:40rem}
+  .t-split .gz{margin-top:0}
+  /* Drops the panel to the paragraph's own top edge rather than the eyebrow's,
+     so the heading keeps the first read. Only where the two are side by side. */
+  @media(min-width:900.01px){ .t-split .gz{transform:translateY(26px)} }
+  @media(max-width:900px){ .t-split{grid-template-columns:minmax(0,1fr);gap:1.4rem} }
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+
+  /* ===== signal badges (used by the Signal logic cards, p-model) ===== */
+  .badge{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.06em;padding:.3rem .7rem;border-radius:100px}
+  .badge.buy{background:rgba(34,197,94,.15);color:var(--up);border:1px solid rgba(34,197,94,.4)}
+  .badge.sell{background:rgba(239,68,68,.15);color:var(--down-ink);border:1px solid rgba(239,68,68,.4)}
+  .badge.hold{background:rgba(245,158,11,.15);color:var(--hold);border:1px solid rgba(245,158,11,.4)}
+
+  /* ===== sections (reuse hospital-style dark cards) ===== */
+  .h-sec .lead{color:var(--ink-soft);max-width:44rem;margin-top:1rem}
+  /* Figures carried in prose need to be findable without being shouted. Same
+     rule as madrid.html. */
+  .lead strong{font-weight:700;color:var(--ink)}
+  /* KPI cards use the shared .k4/.kc component in styles.css */
+
+  /* One strong ease-out for every instrument on this page, so the gauges, the
+     signal readout and the pipeline all move with the same hand. The built-in
+     CSS easings are too weak to read as intentional at these durations. */
+  body.theme-trade{--eo:cubic-bezier(.23,1,.32,1)}
+
+  /* ===== TERMINAL GLASS =====
+     The page's card was #111826 with a grey hairline, which is the browser
+     default dressed up, and six of them in a row read as six spreadsheets.
+     This is one surface class instead: a dark glass panel lit from the top
+     left in the theme's own green, a faint plot grid so it reads as an
+     instrument face rather than a box, an accent-tinted hairline and a wide
+     soft shadow so it sits above the canvas instead of being drawn onto it.
+     Everything derives from --up, so each project page inherits its own
+     colour by changing one token. */
+  .tg{position:relative;border-radius:18px;
+    background:linear-gradient(180deg,rgba(24,34,52,.82) 0%,rgba(11,17,28,.94) 100%);
+    border:1px solid color-mix(in srgb,var(--up) 22%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(200,255,220,.10),0 1px 2px rgba(0,0,0,.45),
+               0 30px 62px -44px color-mix(in srgb,var(--up) 55%,#000);
+    overflow:hidden}
+  @supports (backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px)){
+    .tg{-webkit-backdrop-filter:blur(14px) saturate(125%);backdrop-filter:blur(14px) saturate(125%)}
+  }
+  /* Grid + top-left glow, drawn under the content rather than over it. The
+     grid is 32px and 2.2% white: visible as texture at a glance, gone by the
+     time you are reading a number on top of it. */
+  .tg::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(120% 90% at 4% -14%,color-mix(in srgb,var(--up) 13%,transparent),transparent 58%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px)}
+  .tg > *{position:relative;z-index:1}
+  .tg-h{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--up);display:flex;align-items:center;gap:.55rem;margin-bottom:1.1rem}
+  .tg-foot{font-size:var(--t-1);color:var(--muted);line-height:1.6;
+    border-top:1px solid rgba(255,255,255,.07);margin-top:1.2rem;padding-top:1rem}
+  .tg-foot b{color:var(--ink-soft);font-weight:600}
+
+  /* ===== GAUGE =====
+     Replaces the two "Model performance" cards and the recall bars. Both were
+     the same defect: a figure printed large with no axis behind it, so 50.1%
+     and 0.61 read as achievements rather than as positions on a scale. Here
+     every figure sits on one declared track with its reference line drawn,
+     which is the argument the copy is already making. */
+  .gz{padding:1.6rem 1.7rem 1.4rem;margin-top:1.4rem}
+  .gz-row{display:grid;grid-template-columns:minmax(116px,172px) minmax(0,1fr) 78px;
+    gap:1.2rem;align-items:center;padding:.9rem 0}
+  .gz-row + .gz-row{border-top:1px solid rgba(255,255,255,.06)}
+  .gz-l .n{font-weight:700;font-size:var(--t-3);letter-spacing:-.01em;line-height:1.25}
+  .gz-l .s{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);margin-top:.25rem;line-height:1.5}
+  .gz-t{position:relative;height:32px;border-radius:9px;background:rgba(255,255,255,.045);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+  /* clip-path, not width and not scaleX: width relayouts every frame and
+     scaleX squashes the 9px radius into an ellipse on the way out. An inset
+     clip with a round argument keeps the corner honest and stays on the GPU. */
+  /* Filled BY DEFAULT. The bar is the data, so it must not depend on a script
+     running: an earlier version started at zero width and was released by an
+     .in class, which meant any failure of the view watcher left two panels of
+     empty tracks under printed values. Now the script ARMS the animation (.arm
+     collapses the bar) and only then releases it, so with no script, a blocked
+     script or a watcher that never fires, the bars are simply drawn. */
+  .gz-t i{position:absolute;inset:0;border-radius:9px;background:var(--c,var(--up));
+    clip-path:inset(0 calc(100% - var(--w)) 0 0 round 9px);
+    transition:clip-path 1.05s var(--eo)}
+  .gz-t i::after{content:'';position:absolute;inset:0;border-radius:9px;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 60%)}
+  .gz.arm .gz-t i{clip-path:inset(0 100% 0 0 round 9px)}
+  .gz.arm.in .gz-t i{clip-path:inset(0 calc(100% - var(--w)) 0 0 round 9px)}
+  .gz-ref{position:absolute;top:-7px;bottom:-7px;left:var(--x);width:1px;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.42) 0 4px,transparent 4px 8px)}
+  .gz-v{font-family:var(--mono);font-weight:700;font-size:var(--t-3);text-align:right;
+    font-variant-numeric:tabular-nums}
+  .gz-axis{display:grid;grid-template-columns:minmax(116px,172px) minmax(0,1fr) 78px;gap:1.2rem;margin-top:.5rem}
+  .gz-scale{grid-column:2;display:flex;justify-content:space-between;
+    font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;color:var(--muted)}
+  .gz-delta{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);
+    font-size:.66rem;letter-spacing:.06em;color:var(--up);
+    background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.32);
+    border-radius:100px;padding:.3rem .7rem}
+  @media(max-width:640px){
+    .gz-row,.gz-axis{grid-template-columns:minmax(0,1fr) 74px}
+    .gz-t{grid-column:1/-1;order:3}
+    .gz-axis .gz-scale{grid-column:1/-1}
+  }
+  /* Compact variant for the one-third column: the label column cannot survive
+     down there, so the track drops to its own row under the name. */
+  .gz-sm{padding:1.1rem 1.35rem .95rem}
+  .gz-sm .gz-row{grid-template-columns:minmax(0,1fr) auto;gap:.45rem .8rem;padding:.6rem 0}
+  .gz-sm .gz-t{grid-column:1/-1;height:22px}
+  .gz-sm .gz-v{font-size:var(--t-2)}
+  .gz-sm .gz-l .n{font-size:var(--t-2)}
+  .gz-sm .gz-l .s{font-size:.54rem}
+  .gz-sm .tg-h{margin-bottom:.75rem}
+  .gz-sm .gz-axis{grid-template-columns:minmax(0,1fr)}
+  .gz-sm .gz-axis .gz-scale{grid-column:1}
+  @media(max-width:640px){
+    .gz-sm .gz-row{grid-template-columns:minmax(0,1fr) auto}
+    .gz-sm .gz-t{order:0}
+  }
+
+  /* ===== SIGNAL INSTRUMENT =====
+     Was three cards each stating one rule. The rules are all still here and
+     all still visible, but they are wired to a control now: drag the model's
+     probability of an up move and the same threshold the app uses decides
+     what comes out. It also shows the thing three static cards could not,
+     which is how narrow the HOLD band actually is. */
+  /* Both halves are inert without the script, so neither ships until it runs:
+     a readout stuck on HOLD would be a claim about the model, not a control. */
+  .sigx{margin-top:1.4rem;display:grid;grid-template-columns:minmax(0,1fr)}
+  .sigx.js{grid-template-columns:minmax(0,380px) minmax(0,1fr)}
+  .sx-out{display:none}
+  .sigx.js .sx-out{display:flex}
+  .sx-lab,.sx-band,.sx-range{display:none}
+  .sigx.js .sx-lab{display:flex}
+  .sigx.js .sx-band{display:block}
+  .sigx.js .sx-range{display:block}
+  @media(max-width:820px){.sigx.js{grid-template-columns:minmax(0,1fr)}}
+  .sx-out{padding:1.4rem 1.5rem;flex-direction:column;justify-content:center;gap:.35rem;
+    border-right:1px solid rgba(255,255,255,.07);
+    background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+  @media(max-width:820px){.sx-out{border-right:0;border-bottom:1px solid rgba(255,255,255,.07)}}
+  /* Not --muted. At .58rem this is the smallest text on the page, and --muted
+     #7d8aa0 measures 4.34:1 on the composited glass card, under the 4.5:1 floor
+     for small text. #94a3b8 is 5.91:1 on the same surface and still reads as a
+     label rather than body copy. Measured Aug 17 2026, not estimated. */
+  .sx-k{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8}
+  .sx-badge{font-family:var(--mono);font-size:2.6rem;font-weight:800;letter-spacing:-.02em;line-height:1.05;
+    color:var(--hold);transition:color .16s ease;margin-bottom:.2rem}
+  .sx-say{font-size:var(--t-2);color:var(--ink-soft);line-height:1.5;margin-top:.35rem;min-height:4.5em}
+  .sx-ctl{padding:1.4rem 1.5rem;display:flex;flex-direction:column;justify-content:center}
+  .sx-lab{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem 1rem;flex-wrap:wrap;margin-bottom:.9rem}
+  .sx-lab .p{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .sx-lab .v{font-family:var(--mono);font-weight:700;font-size:var(--t-4);font-variant-numeric:tabular-nums}
+  /* The band the slider sits in, drawn so the threshold is a place on a track
+     and not a number in a sentence. */
+  /* The band IS the slider's track: the range sits on top of it with its own
+     track made transparent. Two stacked tracks would say there are two things
+     to read, and the earlier version also let the 22px thumb overflow the
+     input's collapsed 2px box and paint straight through the threshold label
+     below it. */
+  .sx-band{position:relative;height:12px;border-radius:6px;margin:0 0 1.9rem;
+    background:linear-gradient(90deg,rgba(239,68,68,.42) 0%,rgba(239,68,68,.18) 44%,
+      rgba(245,158,11,.55) 49%,rgba(245,158,11,.55) 51%,rgba(34,197,94,.18) 56%,rgba(34,197,94,.42) 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .sx-tick{position:absolute;top:-6px;bottom:-6px;left:50%;width:1px;background:rgba(255,255,255,.5)}
+  .sx-tick b{position:absolute;top:calc(100% + 1.05rem);left:50%;transform:translateX(-50%);
+    font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;color:var(--ink-soft);white-space:nowrap;font-weight:500}
+  .sx-range{position:absolute;left:0;top:50%;transform:translateY(-50%);width:100%;height:22px;
+    -webkit-appearance:none;appearance:none;background:transparent;margin:0;cursor:grab;z-index:2}
+  .sx-range:active{cursor:grabbing}
+  .sx-range::-webkit-slider-runnable-track{height:22px;background:transparent}
+  .sx-range::-moz-range-track{height:22px;background:transparent}
+  .sx-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;
+    border-radius:50%;background:var(--ink);border:3px solid var(--bg);margin-top:0;
+    box-shadow:0 2px 10px rgba(0,0,0,.6);transition:transform .16s var(--eo)}
+  .sx-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ink);
+    border:3px solid var(--bg);box-shadow:0 2px 10px rgba(0,0,0,.6);transition:transform .16s var(--eo)}
+  .sx-range:active::-webkit-slider-thumb{transform:scale(1.12)}
+  .sx-range:active::-moz-range-thumb{transform:scale(1.12)}
+  .sx-range:focus-visible{outline:none}
+  .sx-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--up)}
+  .sx-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--up)}
+  /* The three rules were a second list saying what the readout already says
+     live. Gone: the badge is the state and the line under it is that state's
+     rule, filled in with the confidence actually on the dial. */
+  @media(prefers-reduced-motion:reduce){.sx-badge{transition:none}}
+
+  /* ===== FEATURE GROUPS =====
+     Four equal boxes, each holding a handful of chips, made 22 features look
+     like four categories. Four disclosures instead: the groups are the list,
+     and a group's features come up when you reach for it. Open by default in
+     CSS and only collapsed once .js lands, so with the script blocked the
+     reader gets all four groups expanded rather than four dead headers. */
+  .fx{margin-top:1.4rem;padding:1.3rem 1.5rem}
+  .fxg{border-top:1px solid rgba(255,255,255,.07)}
+  .fxg:first-child{border-top:0}
+  .fxg-b{width:100%;display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:.9rem;
+    align-items:center;background:transparent;border:0;padding:.85rem .2rem;cursor:pointer;
+    color:inherit;font:inherit;text-align:left}
+  .fxg-b:focus-visible{outline:2px solid var(--up);outline-offset:-2px;border-radius:8px}
+  .fxg-b i{width:9px;height:9px;border-radius:2px;background:var(--c);
+    transition:box-shadow .18s ease}
+  .fxg-n{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);transition:color .18s ease}
+  .fxg-b:hover .fxg-n,.fxg[data-open="true"] .fxg-n{color:var(--ink)}
+  .fxg[data-open="true"] .fxg-b i{box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 22%,transparent)}
+  .fxg-c{font-family:var(--mono);font-size:.85rem;color:var(--muted);line-height:1;
+    transition:transform .22s var(--eo),color .18s ease}
+  .fxg[data-open="true"] .fxg-c{transform:rotate(90deg);color:var(--ink-soft)}
+  /* 0fr to 1fr, so the panel is measured by its own content and nothing has to
+     be told a pixel height. visibility rides the same timing, delayed on the
+     way out, so a collapsed group leaves the accessibility tree exactly when
+     it leaves the screen instead of being read out as an open panel. */
+  .fxg-p{display:grid;grid-template-rows:1fr}
+  .fx.js .fxg-p{grid-template-rows:0fr;visibility:hidden;
+    transition:grid-template-rows .26s var(--eo),visibility 0s linear .26s}
+  .fx.js .fxg[data-open="true"] .fxg-p{grid-template-rows:1fr;visibility:visible;
+    transition:grid-template-rows .26s var(--eo),visibility 0s}
+  .fxg-in{overflow:hidden;min-height:0}
+  .fx-chips{display:flex;flex-wrap:wrap;gap:.5rem;padding:.15rem 0 1.05rem}
+  .fx-chip{font-family:var(--mono);font-size:.72rem;padding:.45rem .75rem;border-radius:9px;
+    border:1px solid var(--border);border-left:3px solid var(--c);color:var(--ink-soft)}
+  @media(prefers-reduced-motion:reduce){
+    .fx.js .fxg-p,.fx.js .fxg[data-open="true"] .fxg-p{transition-duration:.01ms}
+    .fxg-c{transition:none}
+  }
+
+  /* ===== ASSEMBLY LINE =====
+     The signature graphic, replacing six equal boxes that said "four layers
+     that stay in sync" while looking like four unrelated things. One
+     prediction travels the line and you watch what it BECOMES at each station
+     rather than watching an anonymous dot move. A continuous stream of marks
+     runs the belt underneath it, so the line reads as live between arrivals.
+     The stage descriptions that used to sit under the dots are in the
+     section's own paragraph now. */
+  .pipe{margin-top:1.4rem;padding:1.7rem 1.8rem 1.6rem}
+  /* One positioned wrapper holds the payload, the belt line and the stations,
+     so the line can be laid on the dot row itself rather than floating in a
+     band above it. --rail-y is the dots' measured centre. */
+  .belt-wrap{position:relative}
+  .belt{position:relative;height:62px}
+  .belt-line{position:absolute;top:var(--rail-y,0px);height:1px;background:rgba(255,255,255,.13);
+    left:var(--rail-x0,0px);width:var(--rail-span,0px);display:none}
+  .pipe.js .belt-line{display:block}
+  .belt-stream{position:absolute;top:calc(var(--rail-y,0px) - 1px);left:0;right:0;height:3px;
+    display:none;pointer-events:none}
+  .pipe.js .belt-stream{display:block}
+  .belt-stream i{position:absolute;top:0;left:-4px;width:8px;height:3px;border-radius:2px;
+    background:var(--up);opacity:0;animation:beltRun 4.6s linear infinite}
+  .belt-stream i:nth-child(2){animation-delay:.92s}
+  .belt-stream i:nth-child(3){animation-delay:1.84s}
+  .belt-stream i:nth-child(4){animation-delay:2.76s}
+  .belt-stream i:nth-child(5){animation-delay:3.68s}
+  @keyframes beltRun{
+    0%{transform:translateX(var(--rail-x0,0px));opacity:0}
+    9%{opacity:.6}
+    91%{opacity:.6}
+    100%{transform:translateX(calc(var(--rail-x0,0px) + var(--rail-span,0px)));opacity:0}
+  }
+  /* The payload: a dot riding the belt line, carrying a tooltip. It is the
+     whole animation, and it is not a control — nothing is hidden behind it,
+     the same words are in the paragraph above. */
+  .load{position:absolute;top:var(--rail-y,0px);left:0;width:12px;height:12px;
+    margin:-6px 0 0 -6px;border-radius:50%;display:none;z-index:3;
+    background:var(--c,var(--up));
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--c,var(--up)) 16%,transparent),
+      0 0 16px 3px color-mix(in srgb,var(--c,var(--up)) 55%,transparent);
+    transition:left .85s cubic-bezier(.77,0,.175,1),background-color .3s ease,box-shadow .3s ease}
+  .pipe.js .load{display:block}
+  .tip{position:absolute;bottom:calc(100% + 15px);left:50%;transform:translateX(-50%);
+    width:max-content;max-width:238px;text-align:center;
+    font-family:var(--mono);font-size:.68rem;line-height:1.45;font-weight:500;color:var(--ink);
+    padding:.5rem .7rem;border-radius:9px;
+    border:1px solid color-mix(in srgb,var(--c,var(--up)) 42%,transparent);
+    background:color-mix(in srgb,var(--c,var(--up)) 13%,rgba(8,12,20,.94));
+    box-shadow:0 14px 30px -18px #000;
+    transition:opacity .16s ease,filter .16s ease,border-color .3s ease,background-color .3s ease}
+  /* The stem, so the tooltip belongs to the dot rather than floating over it. */
+  .tip::after{content:'';position:absolute;top:100%;left:calc(50% - var(--tip-shift,0px));width:1px;height:11px;
+    transform:translateX(-50%);background:color-mix(in srgb,var(--c,var(--up)) 42%,transparent)}
+  /* Blur through the swap: two crossfading strings read as two objects, and a
+     little blur bridges them into one thing changing. */
+  .load.blur .tip{opacity:.25;filter:blur(3px)}
+
+  .stations{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:.6rem}
+  .st .dot{display:block;width:16px;height:16px;border-radius:50%;background:var(--surface2);
+    border:1px solid rgba(255,255,255,.22);position:relative;
+    transition:border-color .18s ease,transform .18s var(--eo),box-shadow .18s ease}
+  .st .dot::after{content:'';position:absolute;inset:4px;border-radius:50%;background:transparent;
+    transition:background-color .18s ease}
+  .st.mine .dot{border-color:var(--up)}
+  .st.mine .dot::after{background:var(--up)}
+  .st.on .dot{border-color:var(--c);transform:scale(1.18);
+    box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 15%,transparent)}
+  .st.on .dot::after{background:var(--c)}
+  .st .n{display:block;font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;
+    color:var(--muted);margin-top:.85rem}
+  .st .t{display:block;font-size:var(--t-2);font-weight:600;letter-spacing:-.01em;margin-top:.24rem;
+    color:var(--ink-soft);transition:color .18s ease;overflow-wrap:anywhere}
+  .st.on .t{color:var(--ink)}
+  .st-mine{display:inline-block;margin-top:.4rem;font-family:var(--mono);font-size:.52rem;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--up);
+    background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);
+    border-radius:100px;padding:.15rem .45rem}
+  @media(max-width:900px){
+    .belt{height:0}
+    .pipe.js .belt-line,.pipe.js .belt-stream,.pipe.js .load{display:none}
+    .stations{grid-auto-flow:row;grid-auto-columns:auto;
+      grid-template-columns:repeat(3,minmax(0,1fr));gap:1.2rem .6rem}
+  }
+  @media(max-width:560px){
+    .pipe{padding:1.4rem 1.2rem}
+    .stations{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  /* The stream is ambient motion with no state to report, so it is the first
+     thing to go. The payload still marks the current station, it just stops
+     sliding and stops blurring through the swap. */
+  @media(prefers-reduced-motion:reduce){
+    .pipe.js .belt-stream{display:none}
+    .load,.tip,.st .dot,.st .t,.gz-t i{transition-duration:.01ms}
+  }
+</style>
+</head>
+<body class="theme-trade">
+<!-- PIXEL SNOW BACKGROUND. Shader and props live in snow-bg.js, rules in
+     styles.css. --cyan is this page's own accent (already carrying the KPI
+     cards and the gauge bars), passed explicitly since theme-trade never
+     declares --accent. The video hero hides it on its own: .vhero paints
+     #0c0e11 under the footage. -->
+<canvas id="snowBg" data-color="#38bdf8" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+  <section class="vhero trade-hero">
+    <div class="vhero-bg" aria-hidden="true">
+      <video autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-trading-poster.webp">
+        <source src="assets/hero-trading.mp4" type="video/mp4" />
+      </video>
+      <img class="vhero-still" src="assets/hero-trading-poster.webp" alt=""
+           width="1280" height="720" hidden />
+      <div class="vhero-veil"></div>
+    </div>
+    <div class="vhero-in">
+      <div class="lg trade-panel">
+        <div class="lg-fx" aria-hidden="true">
+          <span class="lg-face"></span>
+          <span class="lg-edge t"></span><span class="lg-edge b"></span>
+          <span class="lg-edge l"></span><span class="lg-edge r"></span>
+        </div>
+        <div class="pd-top">
+          <a href="index.html#projects" class="pd-back">← All projects</a>
+          <div class="t-badge"><span class="dot"></span>Live Streamlit app</div>
+        </div>
+        <div class="pd-cat">Machine Learning · Finance · Automation</div>
+        <h1 class="pd-title" style="view-transition-name:vt-trading">Trading System Automation</h1>
+        <p class="pd-sub">An end-to-end system that predicts next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks. It pulls live financial data, engineers 22 features, trains the models, and serves everything through a Streamlit app with backtesting.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="pd-belt">
+    <div class="pd-facts">
+      <div class="pd-fact"><div class="k">Role</div><div class="v">API wrapper + Streamlit app</div></div>
+      <div class="pd-fact"><div class="k">Course</div><div class="v">Python for Data Analysis II · IE</div></div>
+      <div class="pd-fact"><div class="k">Year</div><div class="v">2026</div></div>
+      <div class="pd-fact"><div class="k">Stack</div><div class="v">Python · scikit-learn · SimFin · Streamlit</div></div>
+    </div>
+    <div class="pd-links">
+      <a href="https://pythongroupassignment.streamlit.app/" target="_blank" rel="noopener">Open live app <span>↗</span></a>
+      <a class="ghost" href="https://github.com/MarianGarabana/TradingSystemAutomation" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+    </div>
+  </div>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-system">The system</a>
+    <a href="#s-model">The model</a>
+    <a href="#s-features">The features</a>
+    <a href="#s-production">In production</a>
+  </nav>
+
+  <section id="s-system" class="case-sec" data-screen-label="System">
+  <!-- ===== KPI ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">At a glance</span>
+    <h2>One pipeline, one <em>definition</em>.</h2>
+    <p class="lead">The whole system, from raw financials to a live signal, runs across 31 tickers with a single shared feature definition so training and serving can never drift apart.</p>
+  </div>
+  <div class="k4" id="kpis">
+    <div class="kc"><div class="k">Tickers</div><div class="v">31</div><div class="s">Large-cap US stocks</div></div>
+    <div class="kc"><div class="k">Features</div><div class="v">22</div><div class="s">Across 4 groups</div></div>
+    <div class="kc"><div class="k">Models</div><div class="v">2</div><div class="s">Standard + fallback</div></div>
+    <div class="kc"><div class="k">Signals</div><div class="v">3</div><div class="s">Buy · Sell · Hold</div></div>
+  </div>
+  </section>
+
+  <section id="s-model" class="case-sec" data-screen-label="Model">
+  <!-- ===== TWO MODELS ===== -->
+  <div class="t-split">
+  <div class="h-sec">
+    <span class="eyebrow">The models</span>
+    <h2>Two models, one <em>problem</em>.</h2>
+    <p class="lead">Most stocks share one model, a <strong>logistic regression</strong> on 26 tickers and 16 features that tests at <strong>50.1 percent</strong>. Banks and payment providers report their financials differently, so they get their own: a <strong>gradient boosting</strong> model on 5 tickers and 11 features, testing at <strong>54.7 percent</strong> and the stronger of the two on the financial-sector stocks, where the standard fundamental ratios do not translate. Neither is far from a coin toss, which is why accuracy is not the number this project is judged on.</p>
+  </div>
+  <!-- Both figures on one track with the coin toss drawn on it. As two cards
+       printing 50.1% and 54.7% at 3rem they read as results; against a 50%
+       reference line they read as what the next section says they are. -->
+  <div class="tg gz gz-sm" id="gzAcc">
+    <div class="tg-h">Accuracy · dashed line is a coin toss</div>
+    <div class="gz-row">
+      <div class="gz-l"><div class="n">Logistic Regression</div><div class="s">Standard · 26 stocks</div></div>
+      <div class="gz-v">50.1%</div>
+      <div class="gz-t"><i style="--w:50.1%;--c:var(--up)"></i><span class="gz-ref" style="--x:50%"></span></div>
+    </div>
+    <div class="gz-row">
+      <div class="gz-l"><div class="n">Gradient Boosting</div><div class="s">Fallback · 5 financial stocks</div></div>
+      <div class="gz-v">54.7%</div>
+      <div class="gz-t"><i style="--w:54.7%;--c:var(--cyan)"></i><span class="gz-ref" style="--x:50%"></span></div>
+    </div>
+    <div class="gz-axis"><div class="gz-scale"><span>0%</span><span>50%</span><span>100%</span></div></div>
+  </div>
+  </div>
+
+  <!-- ===== BALANCING INSIGHT ===== -->
+  <div class="t-split">
+  <div class="h-sec">
+    <span class="eyebrow">The real win</span>
+    <h2>Recall over accuracy.</h2>
+    <p class="lead">Before balancing, the model scored 52 percent by calling "up" almost every day, catching only <strong>35 percent</strong> of down moves. After balancing the classes, it catches <strong>61 percent</strong> of them. That is a genuinely more useful model, even if headline accuracy barely moves.</p>
+  </div>
+  <!-- Same instrument as the accuracy gauge, same declared axis. Bar length is
+       the recall value against a full 1.0 track, so 0.61 fills 61 percent.
+       These read 50 and 87 percent until Aug 10 2026, which put them on an
+       undeclared 0 to 0.7 axis: the ratio between the two bars was right, but
+       both levels were inflated about 1.43x against a track that looks full at
+       the end, so 0.61 read as nearly maxed out. -->
+  <div class="tg gz gz-sm" id="gzRecall">
+    <div class="tg-h">Down-move recall<span class="gz-delta">+0.26</span></div>
+    <div class="gz-row">
+      <div class="gz-l"><div class="n">Before balancing</div><div class="s">Predicts up almost every day</div></div>
+      <div class="gz-v">0.35</div>
+      <div class="gz-t"><i style="--w:35%;--c:var(--down)"></i></div>
+    </div>
+    <div class="gz-row">
+      <div class="gz-l"><div class="n">After balancing</div><div class="s">Balanced class weights</div></div>
+      <div class="gz-v">0.61</div>
+      <div class="gz-t"><i style="--w:61%;--c:var(--up)"></i></div>
+    </div>
+    <div class="gz-axis"><div class="gz-scale"><span>0.0</span><span>0.5</span><span>1.0</span></div></div>
+  </div>
+  </div>
+
+  <!-- ===== SIGNAL LOGIC ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">Signal logic</span>
+    <h2>From a number to a decision.</h2>
+    <p class="lead">The classifier outputs 0 or 1 with a confidence. One shared strategy module turns that into a signal, and both training and the live app import it, so the signal the model learned is exactly the signal the app shows.</p>
+  </div>
+  <!-- The three rules are all still here and all still readable with the
+       script blocked. What the script adds is the control: the same 0.51
+       threshold the strategy module uses, wired to a probability you can
+       drag, which is the one thing three static cards could not show, namely
+       how narrow the HOLD band is. -->
+  <div class="tg sigx" id="sigx">
+    <div class="sx-out">
+      <div class="sx-k">Signal</div>
+      <div class="sx-badge" id="sxBadge">HOLD</div>
+      <p class="sx-say" id="sxSay">Confidence 0.50 is under 0.51, so the model stays out of the trade.</p>
+    </div>
+    <div class="sx-ctl">
+      <div class="sx-lab">
+        <label class="p" for="sxRange">Model probability of an up move</label>
+        <span class="v" id="sxP">0.50</span>
+      </div>
+      <div class="sx-band"><span class="sx-tick"><b>0.51 threshold</b></span>
+        <input class="sx-range" id="sxRange" type="range" min="0" max="1" step="0.01" value="0.5"
+               aria-describedby="sxSay" />
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-features" class="case-sec" data-screen-label="Features">
+  <!-- ===== FEATURES ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">Feature engineering</span>
+    <h2>22 features, 4 groups.</h2>
+    <p class="lead">The ETL pipeline cleans five years of SimFin data, handles stock-split artefacts and missing fields, and engineers 22 columns in four groups. <strong>Sixteen</strong> of them are model inputs; the other six are computed only to draw the app's charts. The financial fallback drops the five fundamental ratios and trains on <strong>eleven</strong>.</p>
+  </div>
+  <!-- Four disclosures, one group each, exactly as the ETL notebook's data
+       dictionary splits them: 6 price-based, 5 volatility-normalised and 5
+       fundamental are the 16 model inputs, and 6 display-only columns make up
+       the 22. Hover, focus or click a group and its features come up; every
+       group is expanded with the script blocked. -->
+  <div class="tg fx" id="fx">
+    <div class="fxg" data-open="true" style="--c:var(--up)">
+      <button class="fxg-b" type="button" aria-expanded="true" aria-controls="fxp1"><i></i><span class="fxg-n">Price-based · 6 inputs</span><span class="fxg-c" aria-hidden="true">›</span></button>
+      <div class="fxg-p" id="fxp1"><div class="fxg-in"><div class="fx-chips">
+        <span class="fx-chip">MA5</span><span class="fx-chip">MA20</span>
+        <span class="fx-chip">Volume_Change</span><span class="fx-chip">Market_Cap</span>
+        <span class="fx-chip">RSI(14)</span><span class="fx-chip">MACD(12/26)</span>
+      </div></div></div>
+    </div>
+    <div class="fxg" data-open="true" style="--c:var(--cyan)">
+      <button class="fxg-b" type="button" aria-expanded="true" aria-controls="fxp2"><i></i><span class="fxg-n">Volatility-normalised · 5 inputs</span><span class="fxg-c" aria-hidden="true">›</span></button>
+      <div class="fxg-p" id="fxp2"><div class="fxg-in"><div class="fx-chips">
+        <span class="fx-chip">Log_Return</span><span class="fx-chip">Volatility_20</span>
+        <span class="fx-chip">Return_norm</span><span class="fx-chip">Return_norm_Lag1</span>
+        <span class="fx-chip">Return_norm_Lag2</span>
+      </div></div></div>
+    </div>
+    <div class="fxg" data-open="true" style="--c:var(--hold)">
+      <button class="fxg-b" type="button" aria-expanded="true" aria-controls="fxp3"><i></i><span class="fxg-n">Fundamental · 5 inputs</span><span class="fxg-c" aria-hidden="true">›</span></button>
+      <div class="fxg-p" id="fxp3"><div class="fxg-in"><div class="fx-chips">
+        <span class="fx-chip">Gross_Margin</span><span class="fx-chip">Operating_Margin</span>
+        <span class="fx-chip">Net_Margin</span><span class="fx-chip">Debt_to_Equity</span>
+        <span class="fx-chip">Operating_CF_Ratio</span>
+      </div></div></div>
+    </div>
+    <div class="fxg" data-open="true" style="--c:var(--muted)">
+      <button class="fxg-b" type="button" aria-expanded="true" aria-controls="fxp4"><i></i><span class="fxg-n">Display only · 6 columns</span><span class="fxg-c" aria-hidden="true">›</span></button>
+      <div class="fxg-p" id="fxp4"><div class="fxg-in"><div class="fx-chips">
+        <span class="fx-chip">Return</span><span class="fx-chip">MACD_Signal</span>
+        <span class="fx-chip">BB_Upper</span><span class="fx-chip">BB_Lower</span>
+        <span class="fx-chip">Return_Lag1</span><span class="fx-chip">Return_Lag2</span>
+      </div></div></div>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-production" class="case-sec" data-screen-label="Production">
+  <!-- ===== HOW IT WORKS ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">How it works</span>
+    <h2>One prediction, end to <em>end</em>.</h2>
+    <p class="lead">One prediction, left to right. The app asks SimFin for live prices through a wrapper that renames every field to match the training schema, the <strong>same</strong> <code>engineer_features()</code> the training script ran turns them into 22 columns, <code>strategy.py</code> routes the ticker to its feature list, the matching model returns a probability, and one shared rule turns that into the signal the app shows. Because training and serving import the same two modules, the signal the model learned is exactly the signal you see. The wrapper and the app are the two pieces I built.</p>
+  </div>
+  <!-- The stations are the content and ship as plain text; the travelling
+       payload above them is the enhancement and only appears once the script
+       can drive it. -->
+  <div class="tg pipe" id="pipe">
+    <div class="belt-wrap" id="beltWrap">
+      <span class="belt-line" aria-hidden="true"></span>
+      <span class="belt-stream" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <div class="belt" aria-hidden="true"></div>
+      <!-- The travelling dot and its tooltip. aria-hidden and non-interactive:
+           every word it shows is in the paragraph above, so it is a way of
+           watching the run, not a control that hides content behind a hover. -->
+      <span class="load" id="load" aria-hidden="true"><span class="tip" id="loadTip">Live prices, renamed to the training schema</span></span>
+      <div class="stations" id="stations">
+        <div class="st mine" style="--c:var(--up)"><span class="dot"></span><span class="n">01</span><span class="t">API wrapper</span><span class="st-mine">My part</span></div>
+        <div class="st" style="--c:var(--cyan)"><span class="dot"></span><span class="n">02</span><span class="t">engineer_features()</span></div>
+        <div class="st" style="--c:var(--cyan)"><span class="dot"></span><span class="n">03</span><span class="t">strategy.py</span></div>
+        <div class="st" style="--c:var(--hold)"><span class="dot"></span><span class="n">04</span><span class="t">Model .pkl</span></div>
+        <div class="st mine" style="--c:var(--up)"><span class="dot"></span><span class="n">05</span><span class="t">Streamlit app</span><span class="st-mine">My part</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="h-sec">
+    <span class="eyebrow">The build</span>
+    <h2>Where I came in.</h2>
+    <p class="lead">On a team of six, I built the SimFin API wrapper and co-built the Streamlit app. The wrapper is what lets the same feature code run on both historical and live data, and the app is where all of it turns into something a person can actually use. We also kept an AI usage log in the repo so the way AI helped build the project is documented alongside the code.</p>
+    <div class="pd-links" style="margin-top:2rem">
+      <a href="https://pythongroupassignment.streamlit.app/" target="_blank" rel="noopener">Open live app <span>↗</span></a>
+      <a class="ghost" href="https://github.com/MarianGarabana/TradingSystemAutomation" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+    </div>
+  </div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="spain.html">Spanish EV Charging Network <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script>
+/* ===== instruments =====
+   Three controls and one gauge animation. Nothing here carries content that is
+   not already in the markup: with this script blocked the page still shows
+   every recall figure, every rule, all 22 features and all six pipeline
+   stages. What it adds is the wiring. */
+(function(){
+  'use strict';
+  var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Fires cb() once, the first time el has been reached, where "reached"
+     includes SCROLLED PAST. Not IntersectionObserver, for the reason
+     madrid.html documents at length: IO only fires on a state CHANGE, and the
+     section rail makes one-step jumps ordinary, so an element that goes from
+     below the fold to above the viewport in a single jump never intersects and
+     never gets a callback. Position is tested on scroll instead. */
+  var WATCH=[], raf=0;
+  function reached(e){
+    var r=e.el.getBoundingClientRect();
+    if(r.width===0 && r.height===0) return false;
+    return r.bottom<=0 || r.top<innerHeight-40;
+  }
+  function sweep(){
+    raf=0;
+    for(var i=WATCH.length-1;i>=0;i--){ if(reached(WATCH[i])){ WATCH.splice(i,1)[0].cb(); } }
+  }
+  function kick(){ if(!raf) raf=requestAnimationFrame(sweep); }
+  function onView(el,cb){
+    if(!el) return;
+    var e={el:el,cb:cb};
+    if(reached(e)){ cb(); return; }
+    WATCH.push(e); kick();
+  }
+  addEventListener('scroll',kick,{passive:true});
+  addEventListener('resize',kick);
+
+  /* ===== gauges: draw the bars when the panel is reached =====
+     The bars are already at their real length in CSS. .arm collapses them so
+     there is something to animate, and it is only added once we know the
+     release is wired: if anything below this line throws, the bars stay drawn.
+     A load-time sweep covers the case where the browser restores a scroll
+     position past the gauges before the first scroll event. */
+  ['gzAcc','gzRecall'].forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    el.classList.add('arm');
+    onView(el, function(){ el.classList.add('in'); });
+  });
+  addEventListener('load', kick);
+
+  /* ===== signal instrument =====
+     The same rule the shared strategy module applies: the classifier's
+     probability of an up move decides the class, the confidence is whichever
+     side of 0.5 it lands on, and 0.51 is the cut. Expressed against P(up)
+     rather than against the raw confidence so the HOLD band is visible as a
+     band instead of a two-step sliver at the bottom of the range. */
+  (function(){
+    var box=document.getElementById('sigx'); if(!box) return;
+    var range=document.getElementById('sxRange'), badge=document.getElementById('sxBadge');
+    var say=document.getElementById('sxSay'), pOut=document.getElementById('sxP');
+    var COL={buy:'var(--up)', sell:'var(--down-ink)', hold:'var(--hold)'};
+    function f(v){ return v.toFixed(2); }
+    function paint(){
+      var p=+range.value, conf=Math.max(p,1-p), sig;
+      if(p>=0.51) sig='buy'; else if(p<=0.49) sig='sell'; else sig='hold';
+      pOut.textContent=f(p);
+      badge.textContent=sig.toUpperCase();
+      badge.style.color=COL[sig];
+      say.textContent = sig==='buy'
+        ? 'Predicts up with confidence '+f(conf)+', at or above the 0.51 threshold.'
+        : sig==='sell'
+        ? 'Predicts down with confidence '+f(conf)+', at or above the 0.51 threshold.'
+        : 'Confidence '+f(conf)+' is under 0.51, so the model stays out of the trade.';
+      range.setAttribute('aria-valuetext','Probability of an up move '+f(p)+', signal '+sig.toUpperCase());
+    }
+    range.addEventListener('input', paint);
+    box.classList.add('js');
+    paint();
+  })();
+
+  /* ===== feature groups =====
+     Hover, focus or click a group to open it; one at a time, and it stays open
+     when the pointer leaves rather than snapping shut under the reader. */
+  (function(){
+    var box=document.getElementById('fx'); if(!box) return;
+    var groups=[].slice.call(box.querySelectorAll('.fxg'));
+    function open(g){
+      groups.forEach(function(o){
+        var on=o===g;
+        o.setAttribute('data-open', String(on));
+        o.querySelector('.fxg-b').setAttribute('aria-expanded', String(on));
+      });
+    }
+    groups.forEach(function(g){
+      var b=g.querySelector('.fxg-b');
+      b.addEventListener('mouseenter', function(){ open(g); });
+      b.addEventListener('focus', function(){ open(g); });
+      b.addEventListener('click', function(){ open(g); });
+    });
+    box.classList.add('js');
+    open(groups[0]);
+  })();
+
+  /* ===== assembly line =====
+     A dot travels the belt and its tooltip says what the prediction has become
+     at that point. Not interactive by design: every word it shows is already
+     in the paragraph above, so nothing is gated behind a hover and there is no
+     control that does nothing when the script is blocked. */
+  (function(){
+    var pipe=document.getElementById('pipe'); if(!pipe) return;
+    var load=document.getElementById('load'), tip=document.getElementById('loadTip');
+    var wrap=document.getElementById('beltWrap');
+    var belt=pipe.querySelector('.belt');
+    var sts=[].slice.call(pipe.querySelectorAll('.st'));
+    var STEPS=[
+      'AAPL \u00b7 live prices, renamed to the training schema',
+      'The same function training ran \u00b7 22 columns',
+      'Routed to its feature list \u00b7 16 model inputs',
+      'The matching model returns p(up) = 0.63',
+      'Above 0.51, so the app shows BUY'
+    ];
+    var i=-1, xs=[], timer=0, swap=0;
+
+    /* Dot centres, measured rather than derived from the grid: the columns are
+       fractional and the dot is not at the column's centre, so any formula for
+       this goes wrong at one breakpoint. The belt line, the stream and the
+       travelling dot all read the same three numbers. */
+    function measure(){
+      /* The belt spacer is sized FIRST. It reserves room for the tooltip above
+         the line, and changing its height moves the whole stations row down:
+         reading the dot geometry before this write measured the pre-resize
+         layout, which put the line and the travelling dot 14px above the
+         station dots on every first paint and only corrected itself if the
+         reader happened to resize the window. Height comes from the tooltip
+         itself, so a string that wraps to two lines at one width cannot end up
+         clipped by the panel's overflow. */
+      if(belt) belt.style.height=(tip.offsetHeight+26)+'px';
+      xs=sts.map(function(s){ var d=s.querySelector('.dot'); return d.offsetLeft+d.offsetWidth/2; });
+      var d0=sts[0].querySelector('.dot');
+      wrap.style.setProperty('--rail-x0', xs[0]+'px');
+      wrap.style.setProperty('--rail-span', (xs[xs.length-1]-xs[0])+'px');
+      wrap.style.setProperty('--rail-y', (d0.offsetTop+d0.offsetHeight/2)+'px');
+    }
+    /* The tooltip is centred on its dot, except at the ends, where it would run
+       past the panel edge and be cut by overflow:hidden. It slides back inside
+       and the stem slides the opposite way, so it still points at the dot. */
+    function placeTip(){
+      if(i<0) return;
+      var half=tip.offsetWidth/2, pad=4;
+      var want=Math.min(Math.max(xs[i], half+pad), wrap.clientWidth-half-pad);
+      var shift=want-xs[i];
+      tip.style.transform='translateX(calc(-50% + '+shift+'px))';
+      tip.style.setProperty('--tip-shift', shift+'px');
+    }
+    function go(n){
+      if(n===i) return;
+      i=n;
+      sts.forEach(function(s,j){ s.classList.toggle('on', j===n); });
+      var c=getComputedStyle(sts[n]).getPropertyValue('--c');
+      load.style.setProperty('--c', c);
+      load.style.left=xs[n]+'px';
+      if(REDUCED){ tip.textContent=STEPS[n]; placeTip(); return; }
+      load.classList.add('blur');
+      clearTimeout(swap);
+      swap=setTimeout(function(){
+        tip.textContent=STEPS[n];
+        load.classList.remove('blur');
+        placeTip();          /* after the swap, so the width is the new one */
+      },170);
+      placeTip();
+    }
+
+    pipe.classList.add('js');
+    measure(); go(0); placeTip();
+    var rz=0;
+    addEventListener('resize', function(){
+      clearTimeout(rz);
+      rz=setTimeout(function(){ measure(); if(i>=0){ load.style.left=xs[i]+'px'; placeTip(); } },120);
+    });
+    if(!REDUCED){
+      onView(pipe, function(){
+        timer=setInterval(function(){
+          if(document.hidden) return;   /* a background tab is not a viewer */
+          go((i+1)%STEPS.length);
+        }, 2400);
+      });
+    }
+  })();
+})();
+</script>
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The anchors work without this. It adds which pill is lit, an offset jump that
+   clears the sticky rail, and keeping the lit pill inside the rail's own
+   horizontal scroll on a phone. aria-current, not aria-selected: links, not
+   tabs. Same script as madrid.html. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    var a=links[i];
+    /* scrollIntoView would scroll the page as well, which fights the reader. */
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* Reading position, not intersection ratio: these sections are wildly
+     different heights, so the tallest would hold the marker while a short one
+     owns the screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  /* Jump target is computed here rather than handed to Lenis as an element plus
+     an offset. Measured: passing {offset:-(navH+70)} landed the section 52px
+     too high, with the eyebrow entirely behind the rail, because Lenis resolves
+     an element target from offsetTop and does not account for this page's
+     sticky chrome the way the CSS scroll-margin path does. An absolute pixel
+     target has no such ambiguity, and the chrome is measured at click time so a
+     hidden nav (scroll-down) and a restored one (scroll-up) both work.
+     fix() re-asserts the landing after the travel, because the nav can change
+     state mid-flight and shift the rail under the heading we just parked. */
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      var top=secs[i].getBoundingClientRect().top;
+      var need=rail.getBoundingClientRect().bottom+12;
+      if(top<need-1){
+        var to=Math.max(0,scrollY-(need-top));
+        if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+        else window.scrollTo(0,to);
+      }
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+<script src="enhance.js" defer></script>
+<!-- Loads after main.js/enhance.js on purpose, same order as index: the shader
+     has nothing to coordinate with either, so it just needs to run once the
+     canvas exists. -->
+<script src="snow-bg.js" defer></script>
+</body>
+</html>

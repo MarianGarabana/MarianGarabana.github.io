@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Beverage Distribution Forecasting · Marian Garabana</title>
+<meta name="description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modelled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/dicorsa.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#0A0828" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Beverage Distribution Forecasting · Marian Garabana" />
+<meta property="og:description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modelled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/dicorsa.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Beverage Distribution Forecasting · Marian Garabana" />
+<meta name="twitter:description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modelled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* ===== palette lifted from the Power BI deliverable: violet on deep indigo ===== */
+  body.theme-dico{
+    --bg:#0A0828; --surface:#171445; --surface2:#100D38;
+    --ink:#F2F0FF; --ink-soft:#C9C5E8; --muted:#8B86B8;
+    --violet:#6B4BFF; --violet-rgb:107,75,255; --indigo:#3302FD; --lilac:#A78BFA; --orange:#FFA44F;
+    /* Text-safe companion to --violet, same pattern as titan's --violet/--violet-ink
+       and madrid's --mag/--mag-ink. --violet on this canvas measures 3.78:1 and on
+       --surface 3.33:1, both under the 4.5:1 floor for the small mono labels that
+       used it; --violet-ink measures 7.16:1 and 6.31:1. Not a new colour: the value
+       already ships as titan's --violet-ink.
+       It is deliberately the same value as --lilac and deliberately a second name.
+       --lilac is a chart hue with 5 consumers in this file; --violet-ink is the
+       text role. If --lilac ever moves for charting reasons the label colour must
+       not move with it. */
+    --violet-ink:#A78BFA;
+    /* Text-safe blue for the second column of the two ruled tables, at Marian's
+       request. Not --indigo (#3302FD): that measures 1.6:1 on this canvas and is
+       a fill colour, not a text one. This is a light sky blue at 9.4:1, far
+       enough from --violet-ink in hue that the two column headings read as two
+       different colours rather than two shades of one. */
+    --blue-ink:#6FB6FF;
+    /* KPI card tokens, measured on the composited card: 6.02:1 and 9.86:1 */
+    --kpi-accent:var(--violet-ink); --kpi-accent-rgb:167,139,250; --kpi-v2:#C9C5E8;
+  }
+  body.theme-dico{background:radial-gradient(1100px 560px at 70% -12%,#211C5E 0%,#0A0828 55%)}
+  .theme-dico .nav{border-color:rgba(255,255,255,.14)}
+  .theme-dico .nav.scrolled{background:rgba(23,20,69,.62)}
+  .theme-dico .nav-ava{background:linear-gradient(135deg,#2C2870,#1B1750);color:#9B86FF}
+  .theme-dico .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-dico ::selection{background:var(--violet);color:#080620}
+  .theme-dico .pd-cat{color:var(--violet-ink)}
+  .theme-dico .h-sec .eyebrow{color:var(--violet-ink)}
+  .theme-dico .pd-links a{border-color:var(--violet);background:var(--violet);color:#fff}
+  .theme-dico .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+  /* Status pill for the glass hero's pd-top row. A badge with this class name
+     shipped here before, read "Client work · anonymised", and was removed Aug 8
+     2026 because that was false: Dicorsa is named in the h1, the prose and the
+     meta tags, so nothing here is anonymised, only not downloadable. This rebuild
+     reintroduces the class in the shared hero's pd-top slot with different,
+     checkable text ("Internship -> capstone"), not a restatement of the removed
+     claim. */
+  .dc-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(var(--violet-rgb),.12);border:1px solid rgba(var(--violet-rgb),.36);padding:.4rem .8rem;border-radius:100px}
+  .dc-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 0 3px rgba(var(--violet-rgb),.20);animation:blink 2s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.3}}
+
+  /* ===== GLASS HERO =====
+     Uses the shared .vhero + .lg system in styles.css, not a fork of it. No hero
+     video exists for this page and no non-stock photography exists to derive a
+     still from (client data, no footage shot). What the hero draws instead: a
+     treated solid built from this page's own accent tokens (the same radial
+     recipe already used for body.theme-dico's canvas, just localised to the
+     hero), with the real monthly-revenue silhouette from the .dhero chart below
+     redrawn faintly across it, at low opacity, aria-hidden, decorative only. Not
+     stock photography and not invented numbers: the same 36 values the .dhero
+     chart plots for real, just abstracted into background texture so the glass
+     panel sits over something with real structure rather than a flat fill. A
+     <video>/<source>/poster set can slot in later by replacing this background
+     rule and adding the markup from styles.css:674; nothing else here would need
+     to change. */
+  .dico-hero .vhero-bg{
+    background:radial-gradient(1100px 560px at 70% -12%,rgba(33,28,94,.9) 0%,rgba(33,28,94,0) 55%),
+               linear-gradient(160deg,#1C1852 0%,#100D38 46%,#0A0828 88%)}
+  .dico-panel{max-width:min(580px,54%);padding:1.7rem 2rem 1.7rem;
+    --lg-tint-1:rgba(20,15,58,.42);--lg-tint-2:rgba(8,6,32,.56);--lg-sat:165%}
+  .dico-panel .lg-fx::after{
+    background:radial-gradient(130% 90% at 6% -8%,rgba(210,196,255,.22),rgba(210,196,255,0) 46%);
+    box-shadow:inset 0 1px 0 rgba(224,214,255,.42),inset 1px 0 0 rgba(224,214,255,.2),
+               inset -1px 0 0 rgba(224,214,255,.13),inset 0 -1px 0 rgba(224,214,255,.22)}
+  .dico-panel .pd-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .dico-panel .pd-back{margin-bottom:0;color:#d9d3ff}
+  .dico-panel .pd-back:hover{color:#fff}
+  .dico-panel .dc-badge{margin-bottom:0}
+  .dico-panel .pd-cat{margin-bottom:.7rem}
+  .dico-panel .pd-title{font-size:clamp(2rem,3.4vw,2.7rem);color:#fff}
+  .dico-panel .pd-sub{margin-top:.95rem;font-size:var(--t-3);color:#e3ddff;max-width:33rem}
+  /* no backdrop-filter: the shared fallback is neutral black, retint it toward ink-violet */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .dico-panel .lg-face{background:rgba(8,6,32,.84)}
+  }
+  @media(max-width:900px){.dico-panel{max-width:100%}}
+  @media(max-width:720px){
+    .dico-panel{padding:1.3rem 1.2rem 1.3rem}
+    .dico-panel .lg-face{background:rgba(8,6,32,.66)}
+    .dico-panel .pd-top{margin-bottom:1.3rem}
+    .dico-panel .dc-badge{font-size:.6rem;letter-spacing:.07em}
+  }
+
+  /* ===== fact belt, below the band ===== */
+  .pd-belt{display:flex;justify-content:space-between;align-items:flex-end;
+    gap:1.5rem 2.5rem;flex-wrap:wrap;margin-bottom:3.4rem}
+  .pd-belt .pd-facts{margin-top:0;gap:2rem}
+  .pd-belt .pd-links{margin-top:0}
+  @media(max-width:720px){
+    .pd-belt{margin-bottom:2.4rem}
+    .pd-belt .pd-facts{gap:1.1rem 1.6rem}
+  }
+
+  /* ===== SECTION RAIL =====
+     Was a tablist that hid five sixths of the case study behind a click. The
+     panels are real sections now and this is a scrollspy over them. Anchors, not
+     buttons, so every label still jumps with the script blocked; the pill styling
+     is the same set of --secnav-* properties the buttons used. Same rail as
+     madrid, trading, titan, datathon, hospital, rl and spain. */
+  .secnav{--secnav-hover:rgba(255,255,255,.07);--secnav-focus:var(--violet-ink);
+          --secnav-on-bg:var(--violet);--secnav-on-ink:#fff;
+          position:sticky;z-index:6;top:calc(var(--nav-h) - 2px);padding-top:.75rem;
+          background:var(--bg);transition:top .3s var(--ease)}
+  /* main.js hides the nav on scroll-down; the rail rides up with it rather than
+     leaving a 76px hole. */
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--ink-soft);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  .secnav a:hover{background:var(--secnav-hover);border-color:var(--border);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--secnav-focus);outline-offset:2px}
+  .secnav a[aria-current="true"]{background:var(--secnav-on-bg);
+    color:var(--secnav-on-ink);border-color:var(--secnav-on-bg)}
+  /* Clears the nav and the rail together, so a jump never lands under the pills. */
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  .case-sec > .h-sec:first-child{margin-top:4rem}
+  /* the first section sits right under the rail and needs less */
+  #s-work > .h-sec:first-child{margin-top:1.75rem}
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+
+  /* ===== main chart: monthly revenue index, moved below the KPI row =====
+     Was a hand-drawn SVG bar+line chart demoted into panel 1's hero slot;
+     now an interactive ApexCharts combo (bar + 3-month trend line), matching
+     the pattern datathon.html's challenge-section chart established: lazy
+     loaded via window.loadApex() (shared with this page's transaction-volume
+     chart, so the 164.6 KB gzipped bundle is fetched once for the whole
+     page), animations off, explicit axis bounds, thinned tick labels, and a
+     figcaption plus sr-only paragraph carrying the finding as text so a
+     reader who cannot see the chart still gets it. */
+  .dhero{padding:1rem 0 2rem}
+  .dstage{margin:0;position:relative;border-radius:20px;overflow:hidden;
+    padding:1.6rem 1.8rem 1.4rem;
+    background:linear-gradient(180deg,#151140,#0A0828);
+    border:1px solid color-mix(in srgb,var(--violet) 26%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(224,214,255,.07),
+               0 30px 62px -46px color-mix(in srgb,var(--violet) 52%,#000)}
+  .dhead{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.6rem}
+  .dhead .dh{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.4rem}
+  .dhead .dh .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:blink 2s ease-in-out infinite}
+  /* .dstage .fig-cap is gone: the chart's description is a paragraph above it. */
+  /* min-width:0 so this grid track can shrink; ApexCharts pins an explicit
+     pixel width on its own inner svg and never shrinks it back on its own
+     (measured on this page's transaction-volume chart earlier today), so the
+     chart's own ResizeObserver (below, in the script) drives every resize. */
+  #revChart{display:block;width:100%;min-width:0;overflow:hidden;min-height:220px}
+  @media(min-width:721px){ #revChart{min-height:290px} }
+  /* .dstats is gone with the strip inside the chart frame: those four figures are
+     the KPI cards under the chart now. */
+
+  /* ===== sections ===== */
+
+  .card h3{font-weight:600;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem}
+
+  /* ===== TERMINAL GLASS =====
+     Rolled forward from titan, hospital, rl and spain. The chart cards were
+     --surface (#171445) with a grey hairline, which is the browser default
+     dressed up. One surface class instead: dark glass lit from the top left in
+     this page's violet, a faint plot grid so each card reads as an instrument
+     face, an accent-tinted hairline and a wide soft shadow. Everything derives
+     from --tg; the two gradient stops are this page's own deep indigo.
+     MUST stay scoped to body.theme-dico: styles.css styles this page's cards
+     through body.theme-dico .card (0,2,1), so a bare .tg (0,1,0) would silently
+     lose background, border and radius and leave the old box with a grid drawn
+     on top. */
+  body.theme-dico{--tg:var(--violet)}
+  /* The top stop was .82 until Aug 17 2026. That was measured against a flat
+     canvas; once the snow started drifting behind these cards, the lilac flakes
+     came through the translucent end and lifted the card's brightest corner
+     from #231D5A to #2E256B, taking --muted there from 4.44:1 to 3.89:1. The
+     other dark pages were re-measured the same way and did not move at all, so
+     this is the one card in the set the snow actually reached. .88 measures 4.37:1, within
+     sampling noise of the 4.44:1 it had before the background existed. Both
+     numbers are the card's single brightest pixel, in the top-left accent glow;
+     the a11y gate measures at the real text nodes and reports no failure at
+     either alpha. This is margin, not a defect. */
+  body.theme-dico .tg{position:relative;border-radius:18px;
+    background:linear-gradient(180deg,rgba(28,24,82,.88) 0%,rgba(10,8,40,.96) 100%);
+    border:1px solid color-mix(in srgb,var(--tg) 26%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(224,214,255,.08),0 1px 2px rgba(0,0,0,.45),
+               0 30px 62px -44px color-mix(in srgb,var(--tg) 55%,#000);
+    overflow:hidden}
+  @supports (backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px)){
+    body.theme-dico .tg{-webkit-backdrop-filter:blur(14px) saturate(125%);
+      backdrop-filter:blur(14px) saturate(125%)}
+  }
+  body.theme-dico .tg::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(120% 90% at 4% -14%,color-mix(in srgb,var(--tg) 15%,transparent),transparent 58%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 32px)}
+  /* :not(.sr-only) so the visually-hidden chart descriptions keep their own
+     absolute positioning and stay out of the flow. */
+  body.theme-dico .tg > *:not(.sr-only){position:relative;z-index:1}
+
+  /* ===== DROP CARDS =====
+     Two cards, one per concentration view, each opening its bars on hover or on
+     keyboard focus. Same animation as the emerging-market cards on spain.html: a
+     max-height on the panel, not the 0fr-to-1fr grid-rows trick, which measured
+     0px on rl.html. The cap is set generously above the tallest panel (measured)
+     and opacity carries the fade. align-items:start so one open card grows on its
+     own instead of stretching the other. Where there is no hover to rely on, and
+     on one column, both panels are simply printed: the bars are real markup, not
+     something a script draws, so nothing here depends on the interaction being
+     possible. */
+  .drops{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;
+    margin-top:1.3rem;align-items:start}
+  .drop{padding:1.4rem 1.5rem;cursor:help}
+  .drop:focus-visible{outline:2px solid var(--violet-ink);outline-offset:2px}
+  .drop-h{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem}
+  .drop-h h3{margin-bottom:0}
+  .drop-m{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);white-space:nowrap}
+  .drop-p{overflow:hidden;max-height:0;opacity:0;
+    transition:max-height .26s var(--ease),opacity .2s var(--ease)}
+  .drop-in{margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid rgba(255,255,255,.09)}
+  .drop-c{font-size:var(--t-1);color:var(--ink-soft);line-height:1.55;margin-top:.9rem}
+  @media(hover:hover) and (pointer:fine){
+    .drop:hover,.drop:focus{border-color:color-mix(in srgb,var(--violet) 45%,var(--border))}
+    .drop:hover .drop-p,.drop:focus .drop-p{max-height:38rem;opacity:1}
+  }
+  @media(hover:none),(pointer:coarse){ .drop-p{max-height:none;opacity:1} }
+  @media(max-width:900px){
+    .drops{grid-template-columns:minmax(0,1fr)}
+    .drop-p{max-height:none;opacity:1}
+  }
+  @media(prefers-reduced-motion:reduce){ .drop-p{transition:opacity .2s linear} }
+
+  /* ===== TWO-COLUMN RULED TABLE =====
+     Copied from titan.html. Bullets, and the only coloured things are the two
+     headings; each column sets its own --c. */
+  .rtab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:1.4rem;
+    border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
+  .rtab > div{padding:0 1.5rem 1.4rem}
+  .rtab > div + div{border-left:1px solid rgba(255,255,255,.09)}
+  .rtab > div:first-child{padding-left:0}
+  .rtab h3{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--c);padding:.95rem 0 1rem;margin-bottom:1.1rem;
+    border-bottom:1px solid color-mix(in srgb,var(--c) 34%,transparent)}
+  .rtab ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
+  .rtab li{position:relative;padding-left:1.1rem;font-size:var(--t-2);
+    color:var(--ink-soft);line-height:1.55}
+  /* marker is a muted hairline dash, not the column's colour: the colour stays on
+     the two headings only */
+  .rtab li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:1px;
+    background:var(--muted)}
+  @media(max-width:820px){
+    .rtab{grid-template-columns:minmax(0,1fr)}
+    .rtab > div,.rtab > div:first-child{padding:0 0 1.2rem}
+    .rtab > div + div{border-left:0}
+  }
+
+  /* horizontal share bars */
+  /* Labels sit LEFT, and the column is measured to the longest of them (about
+     150px for "Latón New Mix 24/473" and "Vinos y Licores Tony") rather than the
+     old 200px. Right-aligned labels in a 200px track left a ragged column of
+     dead space down the left edge of both cards and gave the bars 50px less to
+     work with. It stays a FIXED width, not auto: each row is its own grid, so an
+     auto track would size per row and the bars would no longer start on one line. */
+  .hb{display:grid;grid-template-columns:150px minmax(0,1fr) 56px;gap:.8rem;
+    align-items:center;margin-bottom:.8rem}
+  .hb .hl{font-size:var(--t-1);color:var(--ink-soft);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hb .ht{height:20px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
+  .hb .ht span{display:block;height:100%;width:var(--w,0);border-radius:5px}
+  .hb .hv{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+  @media(max-width:600px){.hb{grid-template-columns:118px minmax(0,1fr) 46px;gap:.6rem}}
+
+  /* The route donut and the two cards it sat in are gone: two facts each, so it
+     is the two-column .rtab, and the donut drew one number (56%) that the row
+     beside it printed anyway. The .big figure treatment goes with them; the two
+     percentages lead their own bullets instead. */
+  .rtab li b{color:var(--ink);font-weight:700}
+
+  /* Two ApexCharts mounts left, the bubble chart and the product-concentration
+     bars. ApexCharts pins a pixel width on its own inner svg and never shrinks
+     it, so each mount carries min-width:0 and a ResizeObserver drives the
+     redraw. min-height reserves the box before the bundle arrives, so the page
+     does not jump when the chart lands. (#volChart and #custChart are gone: one
+     became a sentence, the other CSS bars.) */
+  #buyChart,#concChart{min-width:0;width:100%}
+  #buyChart{min-height:360px}
+  #concChart{min-height:230px}
+  @media(max-width:560px){ #buyChart{min-height:300px} }
+  /* one caption treatment for the charts that live in a .card rather than in
+     the .dstage hero frame */
+  .card .fig-cap{font-size:.78rem;color:var(--ink-soft);margin:.9rem 0 0;line-height:1.5;
+    max-width:none}
+  .card figure{margin:0}
+
+  /* pipeline steps */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.3rem}
+  @media(max-width:820px){.steps{grid-template-columns:1fr 1fr}}
+  .st{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.4rem;transition:opacity .4s var(--ease),transform .4s var(--ease)}
+  /* visible by default; only the JS path hides it pre-reveal (see styles.css .reveal) */
+  html.js-anim .st{opacity:0;transform:translateY(10px)}
+  html.js-anim .st.in{opacity:1;transform:none}
+  /* Number and title on one line: the numbers are two characters and the closed
+     card had a whole row to itself for them. The colour difference stays, violet
+     mono against ink. baseline alignment, so the small number sits on the
+     title's baseline rather than centred against its cap height. */
+  .st-h{display:flex;align-items:baseline;justify-content:center;gap:.8rem}
+  .st .sn{font-family:var(--mono);font-size:1.05rem;color:var(--violet-ink);
+    letter-spacing:.06em;margin-bottom:0;flex:0 0 auto}
+  .st h3{font-size:var(--t-4);font-weight:700;margin-bottom:0}
+  /* the description reads centred under a centred head */
+  .st-p p{text-align:center}
+  .st p{font-size:var(--t-2);color:var(--ink-soft);line-height:1.5;margin:0}
+  /* Each step opens its own description on hover or on keyboard focus, the same
+     max-height panel as the two concentration cards above. Closed, the four cards
+     are the numbered list of the pipeline; open, one of them explains itself. The
+     cap sits above the tallest paragraph measured (step 03, at two columns) and
+     each card grows on its own because .steps aligns to start. Nothing here is
+     drawn by a script, so where there is no hover, and on one column, all four
+     paragraphs are simply printed. */
+  .steps{align-items:start}
+  .st{cursor:help}
+  /* one measure for all four heads, so the closed row is even even if a title
+     wraps at a narrow column */
+  .st-h{min-height:1.7em}
+  .st:focus-visible{outline:2px solid var(--violet-ink);outline-offset:2px}
+  .st-p{overflow:hidden;max-height:0;opacity:0;
+    transition:max-height .26s var(--ease),opacity .2s var(--ease)}
+  .st-p p{margin-top:.85rem;padding-top:.85rem;border-top:1px solid rgba(255,255,255,.09)}
+  @media(hover:hover) and (pointer:fine){
+    .st:hover,.st:focus{border-color:color-mix(in srgb,var(--violet) 45%,var(--border))}
+    .st:hover .st-p,.st:focus .st-p{max-height:24rem;opacity:1}
+  }
+  @media(hover:none),(pointer:coarse){ .st-p{max-height:none;opacity:1} }
+  @media(max-width:560px){ .st-p{max-height:none;opacity:1} }
+  @media(prefers-reduced-motion:reduce){ .st-p{transition:opacity .2s linear} }
+
+  /* ===== OUTCOMES TABLE =====
+     Was two grids of three equal boxes, each a bold line over one sentence,
+     which is a list wearing card chrome. One ruled table per group instead, with
+     a titled column each so it is clear what the rows are: what the work
+     changed, and separately what it recommended. Same treatment as the grid-band
+     table on spain.html; below 620px the head is taken out and each row stacks. */
+  .otab{width:100%;border-collapse:collapse;margin-top:1.3rem;
+    border-top:1px solid rgba(255,255,255,.14);
+    border-bottom:1px solid rgba(255,255,255,.09)}
+  .otab col.what{width:250px}
+  .otab th,.otab td{padding:.95rem .9rem .95rem 0;text-align:left;vertical-align:top;
+    border-bottom:1px solid rgba(255,255,255,.07)}
+  .otab thead th{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);font-weight:500;
+    padding-top:.9rem;padding-bottom:.55rem;border-bottom:1px solid rgba(255,255,255,.14)}
+  .otab tbody th{font-size:var(--t-3);font-weight:700;color:var(--ink);letter-spacing:-.01em;
+    padding-right:1.4rem}
+  .otab tbody td{font-size:var(--t-2);color:var(--ink-soft);line-height:1.55}
+  .otab tbody tr:last-child th,.otab tbody tr:last-child td{border-bottom:none}
+  @media(max-width:620px){
+    .otab thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+    .otab,.otab tbody,.otab tr,.otab th,.otab td{display:block;width:auto}
+    .otab tr{padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+    .otab tbody tr:last-child{border-bottom:none}
+    .otab th,.otab td{border:0;padding:.15rem 0}
+  }
+</style>
+</head>
+<body class="theme-dico">
+<!-- Shared PixelSnow background, see snow-bg.js. --violet-ink (#A78BFA) is this
+     page's brightest accent token, so it reads against the deep-indigo --bg
+     instead of blending into it the way the darker --violet would. -->
+<canvas id="snowBg" data-color="#A78BFA" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+  <section class="vhero dico-hero">
+    <div class="vhero-bg" aria-hidden="true">
+      <!-- hero-dicorsa.mp4 added Aug 10 2026 at Marian's request, replacing an
+           SVG silhouette of this page's own 36 monthly revenue values.
+           Recorded because it is a real tradeoff and not an oversight: the
+           silhouette was her data, the clip is a bright cyan stock illustration
+           that clashes with this page's purple and barely moves. She saw both
+           and chose the clip. The old silhouette is in git history at the
+           commit before this one if it is ever wanted back.
+           The footage is bright edge to edge, so this panel carries a heavier
+           tint than the other pages. Measure it, do not lighten it by eye. -->
+      <video autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-dicorsa-poster.webp">
+        <source src="assets/hero-dicorsa.mp4" type="video/mp4" />
+      </video>
+      <img class="vhero-still" src="assets/hero-dicorsa-poster.webp" alt=""
+           width="1280" height="720" hidden />
+      <div class="vhero-veil"></div>
+    </div>
+    <div class="vhero-in">
+      <div class="lg dico-panel">
+        <div class="lg-fx" aria-hidden="true">
+          <span class="lg-face"></span>
+          <span class="lg-edge t"></span><span class="lg-edge b"></span>
+          <span class="lg-edge l"></span><span class="lg-edge r"></span>
+        </div>
+        <div class="pd-top">
+          <a href="index.html#projects" class="pd-back">← All projects</a>
+          <div class="dc-badge"><span class="dot"></span>Internship → capstone</div>
+        </div>
+        <div class="pd-cat">Predictive Analytics · Business Intelligence</div>
+        <h1 class="pd-title" style="view-transition-name:vt-dicorsa">Beverage Distribution Forecasting</h1>
+        <p class="pd-sub">A sales analytics internship at a beverage distributor in Mexico. The forecasting half became my undergraduate capstone. I built the database and the forecasting model behind more than 600,000 transactions, then turned the results into dashboards and decisions the business could act on.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="pd-belt">
+    <div class="pd-facts">
+      <div class="pd-fact"><div class="k">Role</div><div class="v">BA Intern · Undergrad capstone</div></div>
+      <div class="pd-fact"><div class="k">Where</div><div class="v">Beverage distributor · Mexico</div></div>
+      <div class="pd-fact"><div class="k">Year</div><div class="v">2024–25</div></div>
+      <div class="pd-fact"><div class="k">Stack</div><div class="v">Python · MySQL · Tableau · Power BI</div></div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked.
+       Six panels became four sections: "Who buys" now runs straight into the
+       concentration follow-up it explains, and the build steps sit with the
+       outcomes they produced. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-work">The work</a>
+    <a href="#s-sells">What sells</a>
+    <a href="#s-buyers">Who buys</a>
+    <a href="#s-build">The build</a>
+  </nav>
+
+  <section id="s-work" class="case-sec" data-screen-label="Work">
+  <!-- ===== KPIs ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The work</span>
+    <h2>From raw transactions to a <em>forecast</em>.</h2>
+    <p class="lead">The company had years of sales sitting in spreadsheets and no reliable way to see what was coming. I built the database, the model, and the reporting layer that turned that history into a forward view.</p>
+    <!-- Was the chart's figcaption. Explanation goes above the graphic, not under
+         it, the same move made on every other case study here. -->
+    <p class="lead">Monthly revenue, January 2023 to December 2025, with a least-squares trend line and each year's tallest and shortest month marked. Annual revenue grew 8.6% in 2024 and 7.9% in 2025, and both the peaks and the troughs climb: 17.29m to 18.60m to 19.79m at the top, 10.76m to 11.54m to 12.72m at the bottom. The gap between them never narrows, which is the growth-without-stability problem in one picture.</p>
+  </div>
+
+  <!-- ===== main chart: monthly revenue index, interactive ApexCharts =====
+       Moved here, directly below the KPI row, at Marian's request ("put it
+       below the work section, below the kpis"). Same panel as the KPIs
+       (p-overview, the default-open tab), so this is a reorder within one
+       panel, not a move across panels. No role="img"/aria-label on the host:
+       ApexCharts' own legend items are real, individually-labelled,
+       keyboard-toggleable buttons, and axe treats role="img" on an ancestor
+       of focusable descendants as a nested-interactive violation (confirmed
+       on datathon.html's equivalent chart). The figcaption plus sr-only
+       paragraph below carry the same finding as static text instead. -->
+  <section class="dhero">
+    <figure class="dstage" id="dstage">
+      <div class="dhead">
+        <div class="dh"><span class="dot"></span>Monthly revenue · 2023 to 2025 · real transaction data</div>
+      </div>
+      <div id="revChart"></div>
+      <p class="sr-only">Line chart of monthly revenue from January 2023 to December 2025 with a straight trend line. Annual revenue grew 8.6 percent in 2024 and 7.9 percent in 2025. Yearly peaks rise from 17.29 million to 18.60 million to 19.79 million and yearly troughs rise from 10.76 million to 11.54 million to 12.72 million, so the swing between the best and worst month of each year stays about as wide throughout.</p>
+    </figure>
+  </section>
+
+  <!-- The KPI row sits under the chart now, and it carries the four figures that
+       were the .dstats strip inside the chart frame: the same numbers, read as
+       cards rather than as a footer to the graphic. NOTE for FACTS.md: the 75%
+       card that used to sit here was one of the eight canonical locations of the
+       forecast metric (FACTS.md, "dicorsa.html:178 KPI card"). The metric is
+       still on the page, in build step 03 and in the meta description, but that
+       line of FACTS.md now points at a card that no longer exists. -->
+  <div class="k4" id="kpis">
+    <div class="kc"><div class="k">Transactions</div><div class="v">615,615</div><div class="s">615,595 distinct · 20 exact duplicates</div></div>
+    <div class="kc"><div class="k">Years of history</div><div class="v">3</div><div class="s">2023 to 2025</div></div>
+    <div class="kc"><div class="k">Delivery routes</div><div class="v">74</div><div class="s">20 of them carry 56% of revenue</div></div>
+    <div class="kc"><div class="k">Customers</div><div class="v">11,124</div><div class="s">The top ten take 33%</div></div>
+  </div>
+  </section>
+
+  <section id="s-sells" class="case-sec" data-screen-label="Sells">
+  <!-- ===== WHAT SELLS ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">What the data said</span>
+    <h2>A few products carry the <em>business</em>.</h2>
+    <p class="lead">Revenue is heavily concentrated. The top three products alone account for nearly half of everything sold, which changes how you think about stock, pricing, and which shortages actually hurt.</p>
+  </div>
+  <!-- ===== THE TWO CONCENTRATION VIEWS =====
+       The same question asked of both axes, so they are now the same graphic
+       twice: CSS share bars, one card each, opening on hover or on keyboard
+       focus. The customer view was an ApexCharts horizontal bar; rebuilding it
+       as .hb bars matches the product view exactly and drops one lazy chart
+       mount from the page.
+       Customers are grouped by CustomerID, Marian's call on 2026-08-11: the deck
+       this came from grouped by customer NAME, which fuses 34 unrelated shops
+       all called VINOS Y LICORES into one bar. -->
+  <div class="drops">
+    <div class="drop tg" tabindex="0">
+      <div class="drop-h">
+        <h3>Share of revenue by product</h3>
+        <span class="drop-m">Top 6 of 202</span>
+      </div>
+      <div class="drop-p"><div class="drop-in">
+        <div class="hb"><div class="hl">Caribe Cooler 24/300</div><div class="ht"><span style="background:var(--violet);--w:100%"></span></div><div class="hv">19.7%</div></div>
+        <div class="hb"><div class="hl">Electrolit 12/625</div><div class="ht"><span style="background:var(--indigo);--w:75%"></span></div><div class="hv">14.8%</div></div>
+        <div class="hb"><div class="hl">Latón New Mix 24/473</div><div class="ht"><span style="background:var(--indigo);--w:70%"></span></div><div class="hv">13.8%</div></div>
+        <div class="hb"><div class="hl">Té Arizona</div><div class="ht"><span style="background:var(--lilac);--w:26%"></span></div><div class="hv">5.1%</div></div>
+        <div class="hb"><div class="hl">Amper 24/473</div><div class="ht"><span style="background:var(--lilac);--w:21%"></span></div><div class="hv">4.1%</div></div>
+        <div class="hb"><div class="hl">Volt 15/473</div><div class="ht"><span style="background:var(--lilac);--w:18%"></span></div><div class="hv">3.5%</div></div>
+        <p class="drop-c">The top three products alone are 48.3% of revenue. Bar length is each product's share, scaled to the largest.</p>
+      </div></div>
+    </div>
+    <div class="drop tg" tabindex="0">
+      <div class="drop-h">
+        <h3>The customers behind the revenue</h3>
+        <span class="drop-m">Top 10 of 11,124</span>
+      </div>
+      <div class="drop-p"><div class="drop-in">
+        <div class="hb"><div class="hl">LD</div><div class="ht"><span style="background:var(--violet);--w:100%"></span></div><div class="hv">13.18%</div></div>
+        <div class="hb"><div class="hl">Vinos y Licores Tony</div><div class="ht"><span style="background:var(--indigo);--w:46%"></span></div><div class="hv">6.08%</div></div>
+        <div class="hb"><div class="hl">Maria del Sagrario</div><div class="ht"><span style="background:var(--indigo);--w:25%"></span></div><div class="hv">3.32%</div></div>
+        <div class="hb"><div class="hl">J.J.</div><div class="ht"><span style="background:var(--lilac);--w:18%"></span></div><div class="hv">2.35%</div></div>
+        <div class="hb"><div class="hl">Maria Ramirez</div><div class="ht"><span style="background:var(--lilac);--w:18%"></span></div><div class="hv">2.32%</div></div>
+        <div class="hb"><div class="hl">Huajuapan de Leon</div><div class="ht"><span style="background:var(--lilac);--w:12%"></span></div><div class="hv">1.53%</div></div>
+        <div class="hb"><div class="hl">Hnos Landeta</div><div class="ht"><span style="background:var(--lilac);--w:10%"></span></div><div class="hv">1.38%</div></div>
+        <div class="hb"><div class="hl">PDA</div><div class="ht"><span style="background:var(--lilac);--w:9%"></span></div><div class="hv">1.25%</div></div>
+        <div class="hb"><div class="hl">La 1 Ra</div><div class="ht"><span style="background:var(--lilac);--w:6%"></span></div><div class="hv">0.85%</div></div>
+        <div class="hb"><div class="hl">Deposito Castelan</div><div class="ht"><span style="background:var(--lilac);--w:6%"></span></div><div class="hv">0.76%</div></div>
+        <p class="drop-c">LD alone takes 13.18%, more than the next two together, and the ten together take 33.0%. That is 0.09% of the customer base carrying a third of the business.</p>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- The transactions-by-year bar chart is gone at Marian's request. Three bars
+       about 11% apart on a zero baseline read as the same height anyway,
+       so the printed numbers were already doing all the work: they are in the
+       sentence below instead. -->
+  <div class="h-sec" style="margin-top:2.2rem">
+    <span class="eyebrow">The scale of it</span>
+    <h2>Three years, <em>615,615</em> transactions.</h2>
+    <p class="lead">Transaction volume held close to flat across the three years: <strong>199,300</strong> in 2023, a dip of 1.2% to <strong>196,985</strong> in 2024, then a rise of 11.3% to <strong>219,330</strong> in 2025. About 11% apart at the widest.</p>
+  </div>
+
+  <!-- Was two cards, one of them wrapped around a donut that drew a single
+       number the sentence beside it already printed. One ruled table with a
+       column each, violet for the routes and amber for the growth, the same
+       treatment as the buyer split above. -->
+  <div class="rtab">
+    <div style="--c:var(--violet-ink)">
+      <h3>Route concentration</h3>
+      <ul>
+        <li><b>56%</b> of all revenue comes from just 20 of the 74 delivery routes.</li>
+        <li>The top single route alone carries <b>12%</b>.</li>
+      </ul>
+    </div>
+    <div style="--c:var(--blue-ink)">
+      <h3>Growth over the period</h3>
+      <ul>
+        <li>Revenue grew <b>17.2%</b> from 2023 to 2025.</li>
+        <li>A clear seasonal shape repeats each year, and that seasonality is exactly what makes the sales forecastable in the first place.</li>
+        <li>Figures are shown as an index rather than in currency, since the underlying revenue is the client's.</li>
+      </ul>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-buyers" class="case-sec" data-screen-label="Buyers">
+  <!-- ===== WHO BUYS: bulk against frequent ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">Two kinds of customer</span>
+    <h2>Bulk buyers drive growth, not <em>stability</em>.</h2>
+    <p class="lead">Plotting every large customer by how often they order against how much they take separates them into two groups that behave nothing alike. One group orders rarely and enormously. The other orders constantly and small. Only one of them can be planned around.</p>
+    <!-- was the chart's figcaption -->
+    <p class="lead">Below: the forty customers with the largest share of revenue, positioned by total transactions and total boxes sold across 2023 to 2025, with bubble area their share of revenue. LD sits alone at the top, <strong>202,924</strong> boxes across only <strong>621</strong> orders. The customers further right place four to eight times as many orders and take a fraction of the volume.</p>
+  </div>
+
+  <div class="card tg" style="margin-top:1.3rem" id="buyCard">
+    <h3>Order frequency against order size</h3>
+    <figure>
+      <div id="buyChart"></div>
+      <p class="sr-only">Bubble chart of the forty largest customers by revenue. The horizontal axis is total transactions from 0 to about 900, the vertical axis is total boxes sold from 0 to about 203,000, and bubble area is share of revenue. LD is an outlier at 621 transactions and 202,924 boxes, 13.18 percent of revenue. Vinos y Licores Tony took 95,814 boxes across only 117 transactions. Most other customers cluster below 20,000 boxes, and the highest-frequency customers, at 600 to 900 transactions, sit near the bottom of the volume axis.</p>
+    </figure>
+  </div>
+
+  <!-- Was two cards each holding a paragraph. One ruled table with a column
+       each, bullets rather than prose, and the only coloured things are the two
+       headings: violet for the bulk column, lilac for the frequent one. The body
+       copy stays neutral so the colour means "which column", nothing more.
+       Copied from titan.html's .rtab. -->
+  <div class="rtab">
+    <div style="--c:var(--violet-ink)">
+      <h3>Bulk buyers</h3>
+      <ul>
+        <li>Few transactions, very large order volumes.</li>
+        <li>They move the monthly total on their own.</li>
+        <li>Any forecast is hostage to whether they happen to order that month.</li>
+        <li>High impact, hard to predict.</li>
+      </ul>
+    </div>
+    <div style="--c:var(--blue-ink)">
+      <h3>Frequent buyers</h3>
+      <ul>
+        <li>Many transactions, smaller orders.</li>
+        <li>Individually small, but the pattern repeats.</li>
+        <li>The part of demand you can actually plan around.</li>
+        <li>Lower impact, predictable.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="h-sec" style="margin-top:2.2rem">
+    <p class="lead">This difference in buying behaviour is the reason the monthly revenue line swings the way it does.</p>
+  </div>
+
+  <!-- ===== CONCENTRATION: the same customers, one question further on, so it
+       stays in this section rather than behind another click ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The follow-up</span>
+    <h2>Growth without stability.</h2>
+    <p class="lead">I came back to the same data later for a Power BI and storytelling assignment, and asked a harder question. The business was growing 7 to 9% a year, so on the surface it looked healthy. Underneath, almost all of that revenue rested on a handful of customers and a handful of products.</p>
+  </div>
+  <div class="k4" id="conc2">
+    <div class="kc"><div class="k">Customers</div><div class="v">0.09%</div><div class="s">drive 33% of all revenue</div></div>
+    <div class="kc"><div class="k">Products</div><div class="v">7.4%</div><div class="s">drive nearly 80% of revenue</div></div>
+    <div class="kc"><div class="k">Single-customer risk</div><div class="v">10–15%</div><div class="s">annual revenue lost if one top account leaves</div></div>
+    <div class="kc"><div class="k">Portfolio unused</div><div class="v">90%+</div><div class="s">of products barely contribute</div></div>
+  </div>
+
+  <!-- ===== PRODUCT CONCENTRATION ===== -->
+  <div class="card tg" style="margin-top:1.3rem" id="concCard">
+    <h3>Growth is concentrated in a few products</h3>
+    <figure>
+      <div id="concChart"></div>
+      <figcaption class="fig-cap">The 202-product catalogue split two ways: by how many products there are, and by how much revenue they bring. Fifteen products are 7.43% of the catalogue and 79.5% of revenue. The remaining 187 divide 20.5% between them, and 17 of those never sold at all.</figcaption>
+      <p class="sr-only">Two 100 percent stacked bars comparing the same fifteen products on two measures. By product count they are 7.43 percent of the 202-product catalogue against 92.57 percent for the other 187. By revenue they are 79.5 percent against 20.5 percent. The proportions are close to inverted.</p>
+    </figure>
+  </div>
+
+  <div class="h-sec" style="margin-top:3rem">
+    <p class="lead">The bulk-against-frequent split, and this one, are the whole answer to why revenue kept growing without ever becoming steadier.</p>
+  </div>
+  <!-- The three recommendations that used to close this section are in "What
+       changed" now, with the sentence that introduced them. -->
+  </section>
+
+  <section id="s-build" class="case-sec" data-screen-label="Build">
+  <!-- The "The deliverable" block is gone at Marian's request: the eyebrow, the
+       storytelling-structure sentence and the note about the withheld workbook.
+       It was also the only section header on the page carrying an eyebrow and no
+       h2, so the heading order is cleaner without it. NOTE: the sentence that
+       explained why the source file is not downloadable ("It carries client
+       customer data") left with it, and FACTS.md records the removal of
+       dicorsa-powerbi.pdf and .pbix on Aug 11 2026. The page now shows the
+       analysis with no line saying why the workbook is absent. -->
+
+  <!-- ===== HOW ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">How I built it</span>
+    <h2>Database, model, dashboards.</h2>
+    <p class="lead">The analysis was only useful if the company could keep using it after I left, so each layer had to stand on its own.</p>
+  </div>
+  <div class="steps" id="steps">
+    <div class="st" tabindex="0"><div class="st-h"><div class="sn">01</div><h3>Clean</h3></div><div class="st-p"><p>Consolidated years of transaction, customer, and product records, and fixed the inconsistencies that made them impossible to join.</p></div></div>
+    <div class="st" tabindex="0"><div class="st-h"><div class="sn">02</div><h3>Database</h3></div><div class="st-p"><p>Designed and built a MySQL database so the data had one reliable home instead of living across spreadsheets.</p></div></div>
+    <div class="st" tabindex="0"><div class="st-h"><div class="sn">03</div><h3>Model</h3></div><div class="st-p"><p>Built a weekly forecast of average order size on more than 600,000 sales records. Across 14 weeks of actuals it came within about 25 percent on average, which is 75 percent on a mean absolute percentage error basis.</p></div></div>
+    <div class="st" tabindex="0"><div class="st-h"><div class="sn">04</div><h3>Dashboards</h3></div><div class="st-p"><p>Six Tableau dashboards so the team could read demand by route, product, and period without asking an analyst.</p></div></div>
+  </div>
+
+  <!-- ===== OUTCOMES: what the four steps above actually produced ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">What changed</span>
+    <h2>Analysis that became decisions.</h2>
+    <p class="lead">The part I am proudest of is that this did not stop at a report. The forecast and the route analysis fed directly into how the company planned its operations.</p>
+  </div>
+  <table class="otab">
+    <colgroup><col class="what" /><col /></colgroup>
+    <thead>
+      <tr><th scope="col">What changed</th><th scope="col">How</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">Three cost-saving strategies</th><td>Identified from demand patterns and where the money actually concentrates across products and routes.</td></tr>
+      <tr><th scope="row">Route optimisation</th><td>Delivery planning informed by which routes carry the revenue and how their demand moves through the year.</td></tr>
+      <tr><th scope="row">Self-serve reporting</th><td>The team could answer its own questions in Tableau instead of waiting on a manual export.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Moved here from the concentration follow-up: these three are what the
+       analysis recommended, so they sit with what it changed rather than at the
+       end of the chart that produced them. They are TARGETS, not measured
+       outcomes; the cards above are what actually happened. -->
+  <div class="h-sec" style="margin-top:2.4rem">
+    <p class="lead">The recommendation was not to chase more growth, it was to change where the growth comes from.</p>
+  </div>
+  <table class="otab">
+    <colgroup><col class="what" /><col /></colgroup>
+    <thead>
+      <tr><th scope="col">Recommendation</th><th scope="col">Target</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">Diversify the customer base</th><td>Bring reliance on top accounts below 25% of revenue, by attracting and keeping more mid-size customers.</td></tr>
+      <tr><th scope="row">Grow the frequent buyers</th><td>Push smaller, more regular orders through discounts and deals, so more of the monthly total is the predictable kind.</td></tr>
+      <tr><th scope="row">Expand the product mix</th><td>Lift non-top products to at least 30% of revenue, using the 90% of the catalogue that currently sits idle.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="h-sec">
+    <span class="eyebrow">Looking back</span>
+    <h2>My first real business analytics project.</h2>
+    <p class="lead">This was the project that taught me the analysis is the easy half. Getting messy operational data into a shape people trust, and then handing back something they can use without me, is the part that actually decides whether the work matters. It became my undergraduate capstone and it is still the project I explain most often in interviews.</p>
+  </div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="project.html?id=sql-cinema">Cinema Chain Database <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script>
+/* real monthly revenue in millions, Jan 2023 -> Dec 2025 (from the transaction database) */
+var MONTHLY=[14.04,13.04,17.29,10.76,13.73,13.49,14.09,12.78,12.11,10.98,12.02,12.67,12.25,14.09,15.35,16.82,18.6,12.91,15.14,15.01,11.54,13.61,12.2,13.02,12.83,14.5,16.25,16.87,19.79,12.78,15.78,16.02,16.85,13.85,12.72,15.72];
+
+/* ===== onView: fires when an element is IN VIEW **or HAS BEEN SCROLLED PAST** =====
+   Not IntersectionObserver, for the reason madrid.html documents at length: IO
+   only fires on a state CHANGE, and the section rail makes one-step jumps
+   ordinary, so an element that goes from below the fold to above the viewport in
+   a single jump never intersects and never gets a callback. Its chart would then
+   sit as an empty box forever. Position is tested on scroll instead. */
+var WATCH=[], vraf=0;
+function vReached(e){
+  var r=e.el.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return false;
+  return r.bottom<=0 || r.top<innerHeight-40;
+}
+function vSweep(){
+  vraf=0;
+  for(var i=WATCH.length-1;i>=0;i--){ if(vReached(WATCH[i])){ WATCH.splice(i,1)[0].cb(); } }
+}
+function vKick(){ if(!vraf) vraf=requestAnimationFrame(vSweep); }
+function onView(el,cb){
+  if(!el) return;
+  var e={el:el,cb:cb};
+  if(vReached(e)){ cb(); return; }
+  WATCH.push(e); vKick();
+}
+addEventListener('scroll',vKick,{passive:true});
+addEventListener('resize',vKick);
+addEventListener('load',vKick);
+
+/* ---- main chart: monthly revenue index, interactive ApexCharts (bar + 3-month trend line) ----
+   Was a hand-drawn SVG chart; converted to match how datathon.html's
+   challenge-section chart (fcBg) works, and reuses window.loadApex() so the
+   164.6 KB gzipped bundle is fetched once for this page, not twice (this
+   page's transaction-volume chart, further down, also calls it).
+
+   Seven ApexCharts defects were measured before writing this config:
+   1. Default centred data labels fail AA (measured 3.79:1 on a dark bar).
+      Not applicable here: with 36 monthly points, per-bar numeric labels
+      would be unreadable regardless of colour, so dataLabels stay off and
+      the finding lives in the figcaption and sr-only paragraph instead.
+   2. Native axis labels truncate at narrow widths regardless of maxWidth.
+      36 monthly categories on a 390px screen is exactly that case, so the
+      tick set is thinned to one label per year (January) via a formatter
+      rather than letting Apex truncate 36 of them.
+   3. Neither render() nor updateOptions() resolving proves Apex finished
+      drawing. Not needed here: nothing reads Apex's own post-render DOM.
+   4. Apex's entrance animation tweens a width attribute, ignores
+      prefers-reduced-motion, and violates this project's opacity/transform-
+      only rule. animations:{enabled:false} below is mandatory, not a
+      preference.
+   5. Apex auto-scales to negative ticks when yaxis.min is unset. A negative
+      revenue index would be absurd, so both bounds are fixed explicitly.
+   6. Apex pins an explicit pixel width on its inner svg and never shrinks it
+      back. #revChart carries min-width:0 (CSS above) and the ResizeObserver
+      below forces a width/height update against the container's real size,
+      the same pattern as datathon.html's fcBg.
+   7. chart.windowResize() does not exist in this vendored v5.16.0 and
+      throws. updateOptions({chart:{width,height}}, false, false) is used
+      instead, exactly as fcBg does.
+
+   Observing #revChart directly (not the panel's hidden attribute) also
+   covers a reader who deep-links straight to a different tab: p-overview
+   starts hidden, #revChart measures zero width, and nothing loads until the
+   reader switches back here and the box genuinely resizes. That is the same
+   fix already proven in this repo for a chart living in a tab panel. */
+(function(){
+  var host=document.getElementById('revChart'); if(!host) return;
+
+  var MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var CATS=MONTHLY.map(function(v,i){ return MONTH_NAMES[i%12]+' '+(2023+Math.floor(i/12)); });
+
+  var BAR_COL='#6B4BFF';   // --violet, the revenue line
+  var LINE_COL='#A78BFA';  // --lilac / --violet-ink, the trend
+
+  var barData=CATS.map(function(c,i){ return {x:c,y:MONTHLY[i]}; });
+
+  /* Least-squares trend across all 36 months, computed here rather than typed in,
+     so the line cannot drift away from the series it describes. Straight, not a
+     moving average: the finding is that the floor and the ceiling both rise while
+     the month-to-month swing stays as wide as ever, and a 3-month average
+     flattens exactly the swing that is the point. */
+  var n=MONTHLY.length, mx=(n-1)/2, my=MONTHLY.reduce(function(a,b){return a+b;},0)/n;
+  var num=0, den=0;
+  for(var i=0;i<n;i++){ num+=(i-mx)*(MONTHLY[i]-my); den+=(i-mx)*(i-mx); }
+  var slope=num/den, intercept=my-slope*mx;
+  var lineData=CATS.map(function(cat,i){ return {x:cat,y:+(intercept+slope*i).toFixed(2)}; });
+
+  /* The six turning points the analysis calls out: each year's tallest and
+     shortest month. Indices are derived, not hardcoded, so they follow the data. */
+  var MARKS=[];
+  for(var y=0;y<3;y++){
+    var lo=y*12, hi=lo+12, top=lo, bot=lo;
+    for(var k=lo;k<hi;k++){ if(MONTHLY[k]>MONTHLY[top]) top=k; if(MONTHLY[k]<MONTHLY[bot]) bot=k; }
+    MARKS.push({i:top,hi:true},{i:bot,hi:false});
+  }
+  /* Point annotations were tried first and every one of them resolved to x=0,
+     stacking all six labels on the left edge: on a category axis Apex does not
+     match an annotation's x against the category string. Discrete markers plus a
+     formatter that returns a label for those six indices and an empty string for
+     the other thirty is positioned by Apex itself, so it cannot drift. */
+  var MARKED={}; MARKS.forEach(function(m){ MARKED[m.i]=true; });
+  var DISCRETE=MARKS.map(function(m){
+    return { seriesIndex:0, dataPointIndex:m.i, size:4.5,
+             fillColor:'#0A0828', strokeColor:BAR_COL, strokeWidth:2 };
+  });
+
+  function buildOptions(w,h){
+    return {
+      chart:{ type:'line', width:w, height:h, fontFamily:'inherit',
+        toolbar:{show:false}, zoom:{enabled:false},
+        animations:{enabled:false} },
+      series:[
+        {name:'Monthly revenue', type:'line', data:barData},
+        {name:'Trend',           type:'line', data:lineData}
+      ],
+      colors:[BAR_COL, LINE_COL],
+      fill:{ opacity:1 },
+      stroke:{ width:[2.2,2], curve:'straight', dashArray:[0,6] },
+      markers:{ size:[0,0], hover:{size:5}, strokeColors:'#0A0828', discrete:DISCRETE },
+      dataLabels:{ enabled:true, enabledOnSeries:[0], offsetY:-9,
+        formatter:function(v,o){ return MARKED[o.dataPointIndex] ? '$'+v.toFixed(2)+'m' : ''; },
+        background:{ enabled:true, foreColor:'#0A0828', borderWidth:0,
+                     borderRadius:3, padding:4, opacity:0.9 },
+        style:{ fontSize:'10px', fontWeight:600, colors:['#F2F0FF'] } },
+      xaxis:{
+        type:'category', categories:CATS, tickPlacement:'on',
+        labels:{ rotate:0, style:{fontSize:'9px', colors:'#8B86B8'},
+          formatter:function(v){ return v && v.indexOf('Jan')===0 ? v.slice(4) : ''; } },
+        axisBorder:{show:false}, axisTicks:{show:false}
+      },
+      /* 10 to 20, not 0 to 20. A truncated baseline would be dishonest under bars,
+         where length is the encoding; this is a line, where position is, and the
+         whole finding lives in a swing of about 9m that a zero baseline squashes
+         into the top half of the box. Bounds are still set explicitly because
+         Apex auto-scales to negative ticks when min is unset. */
+      yaxis:{
+        min:10, max:20, tickAmount:5,
+        labels:{ style:{fontSize:'9px', colors:'#8B86B8'},
+                 formatter:function(v){ return '$'+Math.round(v)+'m'; } }
+      },
+      /* the December 2025 trough label is the last thing drawn and runs off the
+         plot at 390px, so the narrow layout buys it room on the right */
+      grid:{ borderColor:'rgba(255,255,255,.06)', strokeDashArray:0,
+             padding:{ right:(w && w<560) ? 26 : 8, left:4 } },
+      legend:{ position:'top', horizontalAlign:'left', fontSize:'11px', markers:{size:5},
+        labels:{colors:'#C9C5E8'}, itemMargin:{horizontal:10, vertical:4} },
+      tooltip:{ theme:'dark', shared:true, y:{ formatter:function(v){ return v.toFixed(2); } } }
+    };
+  }
+
+  var chart=null, loading=false, ready=false, armed=false;
+  var pendingW=0, pendingH=0, lastW=0, lastH=0, renderedW=0, renderedH=0;
+
+  function ensureChart(){
+    if(loading||ready) return;
+    loading=true;
+    window.loadApex().then(function(ApexCharts){
+      chart=new ApexCharts(host, buildOptions(pendingW,pendingH));
+      renderedW=pendingW; renderedH=pendingH;
+      return chart.render();
+    }).then(function(){
+      ready=true;
+      if(pendingW && (pendingW!==renderedW || pendingH!==renderedH)){
+        renderedW=pendingW; renderedH=pendingH;
+        chart.updateOptions({chart:{width:pendingW,height:pendingH}}, false, false);
+      }
+    }).catch(function(err){
+      loading=false;
+      console.error('revChart: ApexCharts failed to load or render', err);
+      host.textContent='Monthly revenue index chart failed to load; the finding is in the caption above.';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var ro=new ResizeObserver(function(entries){
+      var w=Math.round(entries[0].contentRect.width);
+      if(w<=0) return; // panel hidden, e.g. a deep link that opened a different tab first
+      var h=w<720?220:290;
+      pendingW=w; pendingH=h;
+      if(w===lastW && h===lastH) return;
+      lastW=w; lastH=h;
+      if(ready){
+        renderedW=w; renderedH=h;
+        chart.updateOptions({chart:{width:w,height:h}}, false, false);
+      } else if(!armed){
+        /* There is no hidden panel to wait for any more, so without this the
+           164.6 KB bundle would be fetched on page load, racing the hero video.
+           onView() holds it until this frame is actually approached; the
+           ResizeObserver keeps doing the measuring either way. */
+        armed=true; onView(host, ensureChart);
+      }
+    });
+    ro.observe(host);
+  });
+})();
+
+/* ---- the step cards' staggered reveal ---- */
+(function(){ var s=document.getElementById('steps'); if(s) onView(s,function(){ s.querySelectorAll('.st').forEach(function(c,i){ setTimeout(function(){c.classList.add('in');},i*130); }); },0.2); })();
+
+/* The transactions-by-year builder is gone with its chart; the three yearly
+   counts are in the section's prose. */
+
+/* ===================================================================
+   THE POWER BI CHARTS
+   Every figure below was recomputed on 2026-08-11 from DICORSA_DATABASE.xlsx,
+   sheet TRANSACTIONS23-25, 615,615 rows, the sheet FACTS.md names as canon.
+   Customers are grouped by CustomerID, which is Marian's decision: the source
+   deck grouped by customer NAME, and 34 unrelated shops share the name VINOS Y
+   LICORES, 72 share MISC. JUQUILITA. Name grouping is what stretched that
+   deck's transaction axis to 4,000; by ID the busiest customer placed 895
+   orders.
+
+   The same seven measured ApexCharts defects apply to all three:
+   1. Default data labels fail AA. Every label below is set explicitly against
+      the mark it lands on, and #FFFFFF is used where a label can fall either on
+      a violet bar (5.15:1) or on the card behind it (15:1+).
+   2. Axis labels truncate at narrow widths. The customer chart is the exposure,
+      so its category font drops and the chart grows taller under 560px rather
+      than letting ten names be cut.
+   3. render()/updateOptions() resolving does not prove Apex has drawn. Nothing
+      here reads Apex's post-render DOM.
+   4. The entrance animation tweens a width attribute and ignores
+      prefers-reduced-motion. animations:{enabled:false} is mandatory.
+   5. Apex auto-scales to negative ticks when min is unset. All bounds explicit.
+   6. Apex pins a pixel width on its inner svg and never shrinks it. Every mount
+      carries min-width:0 and a ResizeObserver redraw.
+   7. A custom xaxis formatter silently disables forceNiceScale. Both charts
+      that use one also set min/max/tickAmount explicitly, so nothing depends
+      on it.
+   =================================================================== */
+
+/* Shared mount: load the bundle only once the chart is really approached, then
+   keep it sized. One helper instead of the same 20 lines three times. The panel
+   watching is gone with the tabs; onView() is a scroll-position test, so a rail
+   jump that lands past a chart still mounts it. */
+function dicoMount(id, build){
+  var el=document.getElementById(id); if(!el) return;
+  var inst=null;
+  function draw(){
+    if(inst) return;
+    inst=new window.ApexCharts(el, build());
+    inst.render();
+    if(window.ResizeObserver){
+      var ro=new ResizeObserver(function(){
+        if(inst) inst.updateOptions({}, false, false);   // windowResize() throws in this build
+      });
+      ro.observe(el);
+    }
+  }
+  onView(el, function(){
+    window.loadApex().then(draw).catch(function(err){
+      console.error(id+': ApexCharts failed to load or render', err);
+      el.textContent='This chart failed to load; the finding is in the caption below.';
+    });
+  });
+}
+
+var VIOLET='#6B4BFF', LILAC='#A78BFA', SURFACE='#171445', INK_SOFT='#C9C5E8', MUTED='#8B86B8';
+
+/* The top-customers builder is gone: that view is CSS share bars in the markup
+   now, matching the product bars beside it, so it needs no library and no mount. */
+
+/* ---- bulk against frequent buyers ---- */
+(function(){
+  var BUYERS=[
+    {n:'LD',tx:621,bx:202924,s:13.18},
+    {n:'Vinos y Licores Tony',tx:117,bx:95814,s:6.08},
+    {n:'Maria del Sagrario',tx:176,bx:61748,s:3.32},
+    {n:'J.J.',tx:143,bx:40870,s:2.35},
+    {n:'Maria Ramirez',tx:36,bx:32724,s:2.32},
+    {n:'Huajuapan de Leon',tx:246,bx:31719,s:1.53},
+    {n:'Hnos Landeta',tx:146,bx:18416,s:1.38},
+    {n:'PDA',tx:176,bx:19032,s:1.25},
+    {n:'La 1 Ra',tx:124,bx:11050,s:0.85},
+    {n:'Deposito Castelan',tx:88,bx:8040,s:0.76},
+    {n:'Deposito Elenita',tx:87,bx:11194,s:0.72},
+    {n:'Deposito Dani',tx:67,bx:8106,s:0.70},
+    {n:'El Cheskito III',tx:42,bx:8348,s:0.70},
+    {n:'Misc. El Puma',tx:94,bx:9381,s:0.59},
+    {n:'Casa Victoria',tx:98,bx:13768,s:0.56},
+    {n:'Casa Corona',tx:121,bx:5982,s:0.44},
+    {n:'Mi Tiendita',tx:759,bx:11130,s:0.40},
+    {n:'Gonzalo Castelan',tx:243,bx:6394,s:0.40},
+    {n:'Deposito Doña',tx:111,bx:7984,s:0.38},
+    {n:'Deposito Alpez',tx:6,bx:4812,s:0.37},
+    {n:'Super 8',tx:164,bx:4030,s:0.26},
+    {n:'Parque España 2',tx:594,bx:6959,s:0.24},
+    {n:'Vinos y Licores',tx:467,bx:3696,s:0.21},
+    {n:'Deposito',tx:59,bx:3266,s:0.21},
+    {n:'Deposito Sagrero',tx:23,bx:2625,s:0.20},
+    {n:'Deposito La',tx:52,bx:3913,s:0.20},
+    {n:'Contry Club La',tx:106,bx:4775,s:0.20},
+    {n:'Super Zas',tx:280,bx:2864,s:0.19},
+    {n:'Magadan',tx:26,bx:2115,s:0.18},
+    {n:'Punto Express El',tx:646,bx:3808,s:0.18},
+    {n:'Mini Market Parque',tx:559,bx:2844,s:0.18},
+    {n:'Refresco Corina',tx:62,bx:2585,s:0.17},
+    {n:'Mi Tiendita',tx:895,bx:4798,s:0.17},
+    {n:'Tiendas De',tx:3,bx:3495,s:0.16},
+    {n:'Minisuper San',tx:309,bx:1802,s:0.15},
+    {n:'Misc. San Frncisco',tx:78,bx:2458,s:0.15},
+    {n:'Deposito Corona',tx:122,bx:2570,s:0.15},
+    {n:'Deposito Fer',tx:52,bx:2234,s:0.15},
+    {n:'Ado Puebla',tx:14,bx:3360,s:0.15},
+    {n:'Abarrotes Don',tx:81,bx:2133,s:0.14}
+  ];
+  /* z is the SQUARE ROOT of the revenue share, not the share. Apex maps z to
+     radius linearly, and share spans 0.14 to 13.18, a 94x range: mapped to
+     radius directly, the small customers vanish and LD reads 94x too strong,
+     because a circle's area goes as the square of its radius. Taking the root
+     first makes AREA proportional to share, which is the encoding a reader
+     actually decodes. The true percentage is in the tooltip. */
+  var PTS=BUYERS.map(function(b){ return {x:b.tx, y:b.bx, z:+Math.sqrt(b.s).toFixed(3)}; });
+
+  function callout(name, dx, dy){
+    var b=null; for(var i=0;i<BUYERS.length;i++){ if(BUYERS[i].n===name){ b=BUYERS[i]; break; } }
+    return { x:b.tx, y:b.bx, marker:{size:0},
+      label:{ text:b.n, offsetX:dx, offsetY:dy, borderWidth:0,
+        style:{ fontSize:'10px', fontWeight:600, color:'#F2F0FF',
+                background:'rgba(10,8,40,.86)', padding:{left:5,right:5,top:2,bottom:2} } } };
+  }
+
+  dicoMount('buyChart', function(){
+    var narrow=window.innerWidth<560;
+    return {
+      chart:{ type:'bubble', height:narrow?310:360, width:'100%', fontFamily:'inherit',
+        toolbar:{show:false}, zoom:{enabled:false}, animations:{enabled:false} },
+      series:[{ name:'Customer', data:PTS }],
+      colors:[VIOLET],
+      /* a 2px ring in the card colour keeps overlapping bubbles readable as
+         separate marks in the crowded bottom-left corner */
+      fill:{ opacity:0.55 },
+      stroke:{ width:2, colors:[SURFACE] },
+      plotOptions:{ bubble:{ minBubbleRadius:4, maxBubbleRadius:narrow?20:28 } },
+      dataLabels:{ enabled:false },
+      annotations:{ points: narrow ? [] : [
+        callout('LD', 34, 4),
+        callout('Vinos y Licores Tony', 74, 4),
+        callout('Maria del Sagrario', 66, 4)
+      ] },
+      xaxis:{ type:'numeric', min:0, max:950, tickAmount:narrow?4:5,
+        title:{ text:'Total transactions', style:{fontSize:'10px', color:MUTED, fontWeight:400} },
+        labels:{ formatter:function(v){ return Math.round(v); },
+                 style:{fontSize:'10px', colors:MUTED} },
+        axisBorder:{show:false}, axisTicks:{show:false} },
+      /* 250k rather than a tight 210k: tickAmount on 210000 produced 53k / 105k /
+         158k, and round 50k steps are worth the headroom above LD's 202,924. */
+      yaxis:{ min:0, max:250000, tickAmount:5,
+        title:{ text:'Total boxes sold', style:{fontSize:'10px', color:MUTED, fontWeight:400} },
+        labels:{ formatter:function(v){ return v>=1000 ? Math.round(v/1000)+'k' : Math.round(v); },
+                 style:{fontSize:'10px', colors:MUTED} } },
+      grid:{ borderColor:'rgba(255,255,255,.06)', strokeDashArray:0 },
+      legend:{ show:false },   // one series; bubble area is explained in the caption
+      tooltip:{ theme:'dark', custom:function(o){
+        var b=BUYERS[o.dataPointIndex];
+        return '<div style="padding:.5rem .6rem;font-size:.72rem;line-height:1.5">'
+          +'<b>'+b.n+'</b><br>'+b.tx.toLocaleString('en-US')+' transactions<br>'
+          +b.bx.toLocaleString('en-US')+' boxes<br>'+b.s.toFixed(2)+'% of revenue</div>';
+      } }
+    };
+  });
+})();
+
+/* ---- product concentration ---- */
+(function(){
+  /* 202 products in the catalogue, 15 of them take 79.46% of revenue.
+     The count denominator is the catalogue, not the 185 products that actually
+     sold; 17 never sold at all across the three years. */
+  var TOP15_COUNT=7.43, TOP15_REV=79.46;
+
+  dicoMount('concChart', function(){
+    var narrow=window.innerWidth<560;
+    return {
+      chart:{ type:'bar', height:230, width:'100%', fontFamily:'inherit', stacked:true,
+        stackType:'100%', toolbar:{show:false}, animations:{enabled:false} },
+      series:[
+        { name:'Top 15 products', data:[TOP15_COUNT, TOP15_REV] },
+        { name:'The other 187',   data:[100-TOP15_COUNT, 100-TOP15_REV] }
+      ],
+      colors:[VIOLET, LILAC],
+      plotOptions:{ bar:{ horizontal:true, barHeight:'46%', borderRadius:3 } },
+      /* 2px of card colour between the two segments, so the boundary is a real
+         edge rather than two fills touching */
+      stroke:{ width:2, colors:[SURFACE] },
+      /* white on the violet segment (5.15:1), near-black on the lilac one
+         (11.4:1). One shared label colour would fail on one of the two. */
+      dataLabels:{ enabled:true,
+        formatter:function(v){ return (narrow && v<15) ? '' : v.toFixed(1)+'%'; },
+        style:{ fontSize:'11px', fontWeight:700, colors:['#FFFFFF','#0A0828'] } },
+      xaxis:{ categories:['Product count','Revenue'], max:100,
+        labels:{ formatter:function(v){ return Math.round(v)+'%'; },
+                 style:{fontSize:'10px', colors:MUTED} },
+        axisBorder:{show:false}, axisTicks:{show:false} },
+      yaxis:{ labels:{ style:{fontSize:'11px', colors:INK_SOFT} } },
+      grid:{ borderColor:'rgba(255,255,255,.06)', strokeDashArray:0,
+             yaxis:{lines:{show:false}} },
+      legend:{ position:'top', horizontalAlign:'left', fontSize:'11px', markers:{size:5},
+        labels:{colors:INK_SOFT}, itemMargin:{horizontal:10, vertical:4} },
+      tooltip:{ theme:'dark', y:{ formatter:function(v){ return v.toFixed(2)+'%'; } } }
+    };
+  });
+})();
+</script>
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The anchors work without this. It adds which pill is lit, an offset jump that
+   clears the sticky rail, and keeping the lit pill inside the rail's own
+   horizontal scroll on a phone. aria-current, not aria-selected: links, not tabs.
+   Same script as madrid, trading, titan, datathon, hospital, rl and spain. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    var a=links[i];
+    /* scrollIntoView would scroll the page as well, which fights the reader. */
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* Reading position, not intersection ratio: these sections are wildly different
+     heights, so the tallest would hold the marker while a short one owns the
+     screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  /* Jump target is computed here rather than handed to Lenis as an element plus an
+     offset. Measured on trading.html: passing {offset:-(navH+70)} landed the
+     section 52px too high, with the eyebrow entirely behind the rail, because
+     Lenis resolves an element target from offsetTop and does not account for this
+     page's sticky chrome the way the CSS scroll-margin path does. An absolute
+     pixel target has no such ambiguity, and the chrome is measured at click time
+     so a hidden nav (scroll-down) and a restored one (scroll-up) both work. fix()
+     re-asserts the landing after the travel, because the nav can change state
+     mid-flight and shift the rail under the heading we just parked. */
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  /* park() is SYMMETRIC, and that is the whole fix. The earlier version only
+     corrected a section that ended up hidden UNDER the rail (if(top < need)),
+     which is the wrong half of the problem on this page: five ApexCharts mount
+     lazily above #s-build and resize DURING the travel, the document grows by
+     about 415px measured, and the section slides down past a target that was
+     computed from the rect at click time. A one-way guard cannot pull it back
+     up, so "The build" landed 200 to 620px short and the scrollspy went on
+     lighting "Who buys". Correcting in both directions, from the rail's real
+     bottom edge, lands it either way. */
+  function park(i){
+    var delta=secs[i].getBoundingClientRect().top-(rail.getBoundingClientRect().bottom+12);
+    if(Math.abs(delta)<=2) return;
+    var to=Math.max(0,scrollY+delta);
+    if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+    else window.scrollTo(0,to);
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      /* Five passes, not one. Two things keep moving after the travel ends and
+         they move in opposite directions: ApexCharts' ResizeObserver redraw is
+         async, so a chart that mounted on the way here can still change height
+         under us; and park() scrolling upward restores the nav main.js had
+         hidden, which drops the rail 74px and puts the target back under it.
+         Measured drifts of 51px and 69px with a single correction. Re-asserting
+         on a short ladder converges on the 12px landing whichever way it drifts,
+         and each pass is a no-op once it is within 2px. */
+      var passes=[0,140,340,600,900,1200];
+      passes.forEach(function(ms){
+        setTimeout(function(){ park(i); if(ms===1200) light(i); },ms);
+      });
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<!-- Draws and animates the canvas above; see snow-bg.js for the shader and the
+     reduced-motion path (it removes the canvas outright, no frozen frame). -->
+<script src="snow-bg.js" defer></script>
+<script src="main.js" defer></script>
+</body>
+</html>

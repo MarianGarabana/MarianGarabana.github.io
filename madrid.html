@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Madrid Rental ML Dashboard · Marian Garabana</title>
+<meta name="description" content="A live Streamlit app running a full ML pipeline on ~2,085 Madrid rental listings: clustering, rent prediction, and a high-rent classifier with a 0.94 test AUC." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/madrid.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#110710" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Madrid Rental ML Dashboard · Marian Garabana" />
+<meta property="og:description" content="A live Streamlit app running a full ML pipeline on ~2,085 Madrid rental listings: clustering, rent prediction, and a high-rent classifier with a 0.94 test AUC." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/madrid.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Madrid Rental ML Dashboard · Marian Garabana" />
+<meta name="twitter:description" content="A live Streamlit app running a full ML pipeline on ~2,085 Madrid rental listings: clustering, rent prediction, and a high-rent classifier with a 0.94 test AUC." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="enhance.css" />
+<style>
+  /* ===== Madrid theme: dark canvas, lime + magenta (matches the Streamlit app) =====
+     Converted from the cream base Aug 17 2026. Same skeleton as the other project
+     pages (rl, dicorsa, trading): one shared dark canvas, one accent hue, token
+     swap only. --bg is a near-black with a magenta cast, derived from this page's
+     own hue rather than borrowed from another page's.
+
+     --border and --border2 are declared HERE, not inherited. styles.css declares
+     the dark pair on a selector list that does not name theme-madrid, so without
+     these two lines the page would keep cream-ink hairlines on a dark canvas and
+     every border would vanish. This inline block comes after styles.css, so it wins.
+
+     THE ACCENTS ARE RE-DERIVED, not carried over. The old values were tuned for
+     cream and sat at the wrong end of the ramp here: #d1198a measured 4.44:1 on
+     cream but only 3.48:1 on --surface, and #c01280 measured 5.15:1 on cream but
+     3.00:1 on --surface, i.e. both fall through the 4.5:1 text floor on this
+     canvas. The ramp flips: the LIGHT pinks are the text-safe ones now.
+     Measured on --bg / --surface / the tinted low end of .m-card's wash:
+       --mag     #E8479B  5.47 / 4.79 / 4.37  (graphics accent, 3:1 bar)
+       --mag-ink #EF7FB8  7.91 / 6.93 / 6.32  (small text, 4.5:1 bar)
+       --muted   #A28E9C  6.49 / 5.68 / 5.18
+       --ink-soft#DBC5D3 12.19 /10.68 / 9.74
+       --ink     #F8EDF4 17.34 /15.19 /13.86 */
+  body.theme-madrid{
+    --bg:#110710; --surface:#241621; --surface2:#1A0F17;
+    --ink:#F8EDF4; --ink-soft:#DBC5D3; --muted:#A28E9C;
+    --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.18);
+    --mag:#E8479B; --mag-ink:#EF7FB8; --pink:#e84c9a; --lime:#c3d92f;
+    --lime2:#d6e84e; --green:#7cb342;
+    /* unused as a CSS token, kept in step with the segment-chart hue it names:
+       the old #9c1a6c measured 2.29:1 on --surface and had to go, see SEGMENTS. */
+    --dm:#AB36D8;
+  }
+  body.theme-madrid{background:radial-gradient(1100px 560px at 70% -12%,#3A1233 0%,var(--bg) 55%)}
+  .theme-madrid .nav{border-color:rgba(255,255,255,.14)}
+  .theme-madrid .nav.scrolled{background:rgba(36,22,33,.62)}
+  .theme-madrid .nav-ava{background:linear-gradient(135deg,#3C2136,#261322);color:#F2A8CD}
+  .theme-madrid .float-pill{border-color:rgba(255,255,255,.14)}
+  .theme-madrid ::selection{background:var(--mag);color:#110710}
+  .theme-madrid .pd-cat{color:var(--mag-ink)}
+  .theme-madrid .h-sec .eyebrow{color:var(--mag-ink)}
+  /* dark ink on the pink button, not white: #fff on --mag measures 3.62:1 and
+     fails the 4.5:1 text floor, --bg on --mag measures 5.47:1. Same call rl and
+     dicorsa make on their own accent buttons. */
+  .theme-madrid .pd-links a{border-color:var(--mag);background:var(--mag);color:#110710}
+  .theme-madrid .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
+  .m-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);background:rgba(232,71,155,.10);border:1px solid rgba(232,71,155,.34);padding:.4rem .8rem;border-radius:100px;margin-bottom:1.4rem}
+  .m-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--mag);box-shadow:0 0 0 3px rgba(232,71,155,.20)}
+
+  /* ===== VIDEO HERO =====
+     Uses the shared .vhero + .lg system in styles.css, not a fork of it. The
+     FOOTAGE REPLACED. The old clip was abstract magenta and green hexagons
+     with no connection to Madrid or the rental data, and the veil here was
+     near-opaque precisely to bury it. The new clip is an aerial of suburban
+     housing, which is the subject of the page, so the veil now works against
+     it: the same .66/.82 tint and 55% saturation cut turned real houses into
+     grey mush.
+
+     Lightened again on request: .42/.62 with saturation at 92%. The scrim is
+     now light enough to read the houses through the panel; if the white h1
+     ever stops holding AA over the sunlit field on the right of the frame,
+     these two alphas are the dial. */
+  .madrid-panel{max-width:min(560px,54%);padding:1.7rem 2rem 1.7rem;
+    --lg-tint-1:rgba(10,7,10,.42);--lg-tint-2:rgba(4,3,4,.62);--lg-sat:92%}
+  .madrid-panel .lg-fx::after{
+    background:radial-gradient(130% 90% at 6% -8%,rgba(255,235,244,.14),rgba(255,235,244,0) 46%);
+    box-shadow:inset 0 1px 0 rgba(255,235,244,.30),inset 1px 0 0 rgba(255,235,244,.14),
+               inset -1px 0 0 rgba(255,235,244,.09),inset 0 -1px 0 rgba(255,235,244,.16)}
+  .madrid-panel .pd-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .madrid-panel .pd-back{margin-bottom:0;color:#e9d6e2}
+  .madrid-panel .pd-back:hover{color:#fff}
+  .madrid-panel .m-badge{margin-bottom:0;color:#fbe6f1;background:rgba(232,76,154,.18);border-color:rgba(232,76,154,.42)}
+  .madrid-panel .m-badge .dot{background:var(--pink);box-shadow:0 0 0 3px rgba(232,76,154,.24)}
+  .madrid-panel .pd-cat{margin-bottom:.7rem;color:#f3c7e0}
+  .madrid-panel .pd-title{font-size:clamp(2rem,3.4vw,2.7rem);color:#fff}
+  .madrid-panel .pd-sub{margin-top:.95rem;font-size:var(--t-3);color:#f1e3ec;max-width:33rem}
+  /* no backdrop-filter: the shared fallback is neutral black, retint it toward ink-magenta */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .madrid-panel .lg-face{background:rgba(4,3,4,.9)}
+  }
+  @media(max-width:900px){.madrid-panel{max-width:100%}}
+  @media(max-width:720px){
+    .madrid-panel{padding:1.3rem 1.2rem 1.3rem}
+    .madrid-panel .lg-face{background:rgba(4,3,4,.78)}
+    .madrid-panel .pd-top{margin-bottom:1.3rem}
+  }
+
+  /* ===== fact belt, below the band ===== */
+  /* margin-top: the belt used to start flush against the bottom edge of the
+     hero video, so the labels read as part of the footage rather than as the
+     first row of the page. */
+  .pd-belt{display:flex;justify-content:space-between;align-items:flex-end;
+    gap:1.5rem 2.5rem;flex-wrap:wrap;margin-top:2.2rem;margin-bottom:3.4rem}
+  .pd-belt .pd-facts{margin-top:0;gap:2rem}
+  .pd-belt .pd-links{margin-top:0}
+  @media(max-width:720px){
+    .pd-belt{margin-top:1.5rem;margin-bottom:2.4rem}
+    .pd-belt .pd-facts{gap:1.1rem 1.6rem}
+  }
+
+  /* section tabs: shared rules live in styles.css, this page only recolours the
+     focus ring. The light-page defaults (hover tint, selected pill) already
+     match the rest of this theme, so nothing else needs overriding. */
+  /* ===== SECTION RAIL =====
+     This was a tablist hiding four fifths of the case study behind a click.
+     The panels are real sections now and this is a scrollspy over them.
+     Anchors rather than buttons, so every label still jumps with JS blocked;
+     the declarations are copied from styles.css's .secnav button so the pills
+     are pixel-identical to the ones they replace. */
+  .secnav{--secnav-focus:var(--mag-ink);position:sticky;z-index:6;
+    top:calc(var(--nav-h) - 2px);padding-top:.75rem;background:var(--bg);
+    transition:top .3s var(--ease)}
+  /* main.js hides the nav on scroll-down. The rail rides up with it instead of
+     leaving a 76px hole where the nav used to be. */
+  body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
+  .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
+    font-size:.8rem;line-height:1;white-space:nowrap;padding:.55rem .9rem;
+    border-radius:100px;border:1px solid transparent;background:transparent;
+    color:var(--muted);
+    transition:background .18s var(--ease),color .18s var(--ease),
+               border-color .18s var(--ease)}
+  /* dark canvas: the hover tint and the selected pill both invert. A white-ink
+     hover wash instead of the cream page's black one, and the selected pill takes
+     --bg for its label, because on this theme --ink IS near-white and the old
+     literal #fff would have painted white text on a white pill. */
+  .secnav a:hover{background:rgba(255,255,255,.07);border-color:var(--border2);color:var(--ink)}
+  .secnav a:focus-visible{outline:2px solid var(--mag-ink);outline-offset:2px}
+  .secnav a[aria-current="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  /* Clears the nav AND the rail, so a jump never lands under the pills. */
+  /* No margin between sections: every one of them opens with an .h-sec, which
+     already carries --sp-section as its top margin. A rule here stacked a
+     second 5rem on top of it, so each boundary was 160px of empty page. One
+     boundary is one unit, which is the rule styles.css sets for the rest of
+     the site. */
+  /* THE section gap. styles.css gives every <section> padding-top:var(--sp-section),
+     and that 80px is what was actually showing; the .h-sec margin under it is a
+     second, much smaller term, which is why changing it alone did nothing. */
+  .case-sec{scroll-margin-top:calc(var(--nav-h) + 88px);padding-top:0}
+  /* Tighter than the sitewide 5rem: with the tabs gone the page is one
+     continuous read, and 30px is enough of a boundary when every section opens
+     with its own eyebrow and heading. */
+  .case-sec .h-sec{margin-top:10px}
+  @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
+
+  /* Text left, chart right. Replaces the two-equal-white-boxes pattern the
+     model sections used: the numbers are in the sentence now, so the chart is
+     the only card and the section stops looking like a dashboard. */
+  /* Landscape chart card: wider than it is tall, centred against the text
+     rather than stretched to its full height. The column is ~1.8:1 against the
+     copy, which puts the card near 390x300 at the 1180px cap. */
+  .m-split{display:grid;grid-template-columns:minmax(0,1fr) min(400px,38%);
+    gap:2.6rem;align-items:center;margin-top:10px}
+  /* 1.1rem, not the card default 1.6rem: at 300px wide the padding was taking
+     a third of the box away from the chart. */
+  .m-split .m-card{padding:1.1rem}
+  /* The chart is supporting evidence in the right third, not the subject, so it
+     also loses the 260px floor .apex-host sets for full-width mounts. */
+  .m-split .apex-host{min-height:125px}
+  .m-split #fxChart{min-height:150px}
+  .m-split .h-sec{margin-top:0}
+  .m-split .lead{max-width:38rem}
+  @media(max-width:900px){ .m-split{grid-template-columns:minmax(0,1fr);gap:1.4rem} }
+  /* The row centres the chart against the WHOLE text block, eyebrow and
+     heading included, so it sits high against the paragraph. This drops it by
+     roughly half the height of the eyebrow-plus-heading above the paragraph,
+     which lands it on the paragraph's own centre. Only above 900px, where the
+     two are actually side by side. */
+  @media(min-width:900.01px){ #s-classifier .m-split .m-card{transform:translateY(28px)} }
+  /* Figures carried in prose need to be findable without being shouted. */
+  .lead strong{font-weight:700;color:var(--ink)}
+  .fig-cap-s{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;
+    color:var(--muted);line-height:1.6;margin:.6rem 0 0}
+
+  /* ===== FLOW HERO (light) ===== */
+  .flow{padding:1rem 0 2rem}
+  /* ---- district heat map hero ---- */
+  /* The map is the section's ground, not a picture sitting on it: the svg fills
+     the whole stage and the basemap bleeds to all four edges. */
+  .map-svg{position:absolute;inset:0;width:100%;height:100%}
+  /* fill-opacity is deliberately NOT transitioned: the loupe drives it every
+     frame and does its own easing, so a .9s CSS transition on top would smear
+     the whole map along behind the cursor. */
+  /* The separator between districts is the GROUND colour, which is the rule the
+     cream version followed too: there it was white on a cream basemap, so the
+     borders read only where a fill was up and the resting map was just streets.
+     On the darkened basemap the same rule means a near-black plum, not #fff.
+     Left as #fff it drew a bright white wireframe of all 21 districts across the
+     resting state, which is a different design, not a port of this one. */
+  .map-dpath{stroke:#1A0F18;stroke-width:.8;stroke-opacity:.6;cursor:pointer;transition:fill .9s ease}
+  .map-dpath:hover{stroke-width:2.2;stroke-opacity:1}
+  /* keyboard focus has to be as obvious as hover, on any fill in the ramp */
+  .map-dpath:focus{outline:none}
+  /* white, not the cream page's #111110: focus lands on a district that is still
+     unlit at the moment it lands, so the ring is read against the dark ground
+     first, where white measures 19.21:1 and #111110 measures 1.06:1.
+     It is honest about the trade: once the loupe lights the district under it,
+     white measures 5.27:1 on Salamanca's magenta but only 2.44:1 on Centro's
+     pale composite, so on the palest fills the ring is carrying less contrast
+     than the cream page's dark ring did. No single colour wins both states, the
+     best balanced mid-tone tested worse (2.6:1 floor against 2.44:1), and there
+     is no AA ratio gate on a focus indicator, so the width goes from 3 to 3.4 to
+     make the geometric change carry the weaker case. */
+  .map-dpath:focus-visible{stroke:#FFFFFF;stroke-width:3.4;stroke-opacity:1;outline:none}
+  .map-ring{transform-box:fill-box;transform-origin:center;animation:mapPulse 2.6s ease-out infinite}
+  @keyframes mapPulse{0%{transform:scale(.5);opacity:.75}75%{transform:scale(3);opacity:0}100%{opacity:0}}
+  /* Frosted panel over the map. CLAUDE.md allows glass only over real imagery
+     with a scrim that holds AA, which is the case here: the backdrop is the
+     rendered basemap. Re-measured for the dark canvas. The scrim is 0.90, not
+     the cream page's 0.86, because the worst backdrop changed: on cream it was
+     the basemap's darkest tone, here it is a lit district fill at the pale lime
+     end of the ramp. --muted over that composite lands at 5.07:1 at 0.90 and
+     4.58:1 at 0.86, so the thinner glass is inside the noise of the floor. */
+  .map-panel{position:absolute;right:2.5%;top:50%;transform:translateY(-50%);width:40%;display:none;
+    background:rgba(24,14,22,.90);border:1px solid rgba(255,255,255,.12);border-radius:16px;
+    padding:1.35rem 1.45rem;box-shadow:0 20px 48px -28px rgba(0,0,0,.7)}
+  @supports (backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px)){
+    .map-panel{-webkit-backdrop-filter:blur(14px) saturate(1.04);backdrop-filter:blur(14px) saturate(1.04)}
+  }
+  @media(min-width:920px){.map-panel{display:block}}
+  /* Under 920px the panel used to be hidden outright, which was fine when the
+     only thing it carried was a static legend. It now carries the live district
+     readout, so hiding it would leave a phone with a loupe and nothing to read.
+     It sits below the map instead of over it, and drops the glass, since there
+     is no imagery behind it down here to justify one. */
+  @media(max-width:919.98px){
+    .map-panel{display:block;position:static;transform:none;width:auto;margin-top:.9rem;
+      background:rgba(24,14,22,.96);-webkit-backdrop-filter:none;backdrop-filter:none}
+  }
+  .map-panel .mp-h{font-weight:700;font-size:var(--t-3);letter-spacing:-.01em}
+  /* Live readout of whichever district the loupe is over. Replaces the static
+     priciest-districts bar list, which said the same five things every time. */
+  .mp-read{margin-top:.15rem}
+  .mr-name{font-weight:700;font-size:var(--t-2);letter-spacing:-.01em;line-height:1.2;min-height:1.2em}
+  .mr-row{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-top:.45rem}
+  .mr-k{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .mr-v{font-weight:700;font-size:var(--t-1);font-variant-numeric:tabular-nums}
+  .mr-track{height:8px;border-radius:4px;background:rgba(255,255,255,.12);margin-top:.8rem;overflow:hidden}
+  /* scaleX, not width: animating width lays the bar out again every frame. */
+  .mr-fill{height:100%;width:100%;border-radius:4px;background:#c81e86;
+    transform-origin:left center;transform:scaleX(1);
+    transition:transform .18s ease-out,background-color .18s ease-out}
+  .mr-scale{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;color:var(--muted);margin-top:.35rem}
+  /* Inverted for the dark canvas: the hairline and the pressed state were ink on
+     cream, which on this page is a near-black button carrying near-black text. */
+  .mp-toggle{margin-top:1.1rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+    text-transform:uppercase;padding:.5rem .85rem;border-radius:100px;cursor:pointer;
+    border:1px solid rgba(255,255,255,.28);background:transparent;color:var(--ink)}
+  .mp-toggle:hover{border-color:rgba(255,255,255,.6)}
+  .mp-toggle:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .mp-toggle[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  @media (prefers-reduced-motion: reduce){ .mr-fill{transition:none} }
+  .map-panel .mp-s{font-size:var(--t-1);color:var(--ink-soft);margin:.2rem 0 1.1rem;line-height:1.4}
+  .map-legend{height:12px;border-radius:6px;background:linear-gradient(90deg,#cfe06a,#e8879b,#c81e86)}
+  .map-legend-l{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.35rem}
+  .map-nodata{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.5rem}
+  /* Matches Villaverde's own fill below. #d5d8cc was a pale grey that read as
+     "quieter than the data" on cream; on this canvas it was the single brightest
+     patch on the map, i.e. the loudest thing on it, which is the opposite of what
+     a no-data state should be. #847b8a is a desaturated plum-grey: 4.72:1 on the
+     basemap's dominant tone, so it is still legible, and far enough off the
+     lime/pink ramp in chroma that it cannot be misread as a rent value. */
+  .map-nodata i{width:10px;height:10px;border-radius:3px;background:#847b8a;border:1px solid rgba(255,255,255,.45);flex:0 0 auto}
+  /* Basemap and drawn map context. Sizes are SVG user units, so they scale with
+     the viewBox; the narrow-width bump exists because the map is letterboxed to a
+     smaller box on mobile, which would otherwise render these at about 7px. */
+  .map-ctx{pointer-events:none}
+  /* Every one of these inverts with the basemap. The ring roads were a 22% ink
+     wash on cream (1.55:1 against it, decorative and aria-hidden); a 22% white
+     wash on the dark basemap measures 1.81:1, so the same quiet line, slightly
+     better than the cream original rather than worse. */
+  .map-ring-road{fill:none;stroke:rgba(255,255,255,.22);stroke-width:2.4}
+  .map-river{fill:none;stroke:#7FA3B4;stroke-opacity:.7;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+  /* Label and halo swap roles. On cream the glyph was ink and the white halo only
+     had to rescue it over the dark magenta end of the ramp. Here the glyph is
+     light, because at rest every label sits on the dark basemap, and the halo is
+     the near-black that rescues it when the loupe lights a pale lime district
+     underneath. That makes the halo the primary separator now, not the backup,
+     so it is thicker and more opaque than the cream version's. */
+  .map-flabel,.map-dlabel{font-family:'JetBrains Mono',monospace;fill:#F6ECF2;
+    paint-order:stroke;stroke:rgba(8,4,7,.85);stroke-width:3.5;stroke-linejoin:round;
+    text-transform:uppercase;pointer-events:none}
+  .map-flabel{font-size:20px;letter-spacing:.12em;dominant-baseline:middle}
+  /* The water label takes the water's own colour so it is not read as one more
+     district name. Re-measured against the darkened basemap it sits on, not
+     against the page: #A9C6D4 is 10.71:1 on the basemap's dominant tone and
+     9.92:1 on the lighter of its two tones, so it holds AA wherever along the
+     river it lands. The cream value #354249 measures 1.36:1 here. */
+  .map-flabel-riv{font-size:19px;fill:#A9C6D4}
+  .map-dlabel{font-size:21px;letter-spacing:.05em;text-anchor:middle;dominant-baseline:middle}
+  @media(max-width:920px){
+    .map-flabel{font-size:28px} .map-flabel-riv{font-size:26px} .map-dlabel{font-size:29px}
+    .map-ring-road{stroke-width:3.2} .map-river{stroke-width:4.4}
+    /* Label positions are fixed in user units but the narrow layout draws them
+       larger, so the nine that fit side by side on desktop start overlapping.
+       is-narrow marks the subset that still clears its neighbours at 29px,
+       measured at that size rather than assumed. */
+    .map-dlabel:not(.is-narrow){display:none}
+  }
+  .map-confidence{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.06em;color:var(--muted);margin-top:.4rem;line-height:1.4}
+  .mp-tag{font-family:var(--mono);font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border2);border-radius:100px;padding:.15rem .45rem;margin-left:.4rem;vertical-align:middle}
+  .mp-sub{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:1.3rem 0 .55rem}
+  /* padding-bottom leaves room for the caption, which is absolutely positioned
+     and now runs to three lines here because it carries the data credits. At
+     1rem it sat on top of the southern districts. */
+  @media(max-width:920px){
+    .map-svg{position:static;width:100%;height:340px}
+    /* With slice the scale is set by height, so the visible slice of the viewBox
+       works out to exactly aspect-ratio x 996 user units, whatever the screen is
+       wide. Pinning the ratio therefore pins how much map is in frame: 1.15 gives
+       1,145 units, and Madrid needs 850 of them, so it can no longer be clipped on
+       a narrow phone the way a fixed pixel height clipped Barajas at 390px and
+       would have cut far more at 320px. Fixed height stays as the fallback. */
+    @supports (aspect-ratio:1/1){ .map-svg{height:auto;aspect-ratio:1.15} }
+    /* No padding-bottom any more: that gutter existed to hold the credit line,
+       which now sits below the stage, and leaving it would show a strip of bare
+       stage under a map that is supposed to reach the edges. */
+    .flow-stage.map-stage{height:auto;padding-bottom:0}
+  }
+  .flow-stage{position:relative;height:440px;border:1px solid var(--border);border-radius:20px;background:linear-gradient(180deg,#1D1119,#150D13);overflow:hidden}
+  /* The map viewBox is portrait (850x996) inside a landscape slot, so with
+     preserveAspectRatio=meet the drawing is limited by the stage HEIGHT, not by
+     its 64% width: at 440px tall it rendered only ~375px wide and left half its
+     own column empty. Taller stage, bigger map, and the district labels now have
+     somewhere to go. Scoped to min-width 920px so the mobile height:auto rule
+     above is untouched. */
+  /* The map's drawn size is set by the stage HEIGHT (slice scales to cover, and
+     the stage is height-limited at every width here), so a fixed height means a
+     fixed map width while the stage itself narrows. At 1024px that pushed Madrid
+     under the panel. Solving for it: the map's right edge lands at 1.024 x height,
+     the panel's left edge at 0.575 x stage width, and the stage is 100vw - 64px
+     below the 1180px cap, which gives height <= 56.15vw - 59px for a 24px gap.
+     Capped at 580 so it stops growing once the container stops. */
+  @media(min-width:920px){ .flow-stage.map-stage{height:clamp(400px,calc(56.15vw - 59px),580px)} }
+  .flow-zone-label{position:absolute;bottom:14px;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  /* Only the map's caption carries the data credits, so only it needs to wrap.
+     Scoped to .map-stage so the flow diagram's single-line labels are untouched.
+     It now sits on the basemap rather than on the panel background, and --muted
+     on the basemap's darkest tone is 3.5:1, so it gets the same 0.86 scrim the
+     panel uses and clears AA at 4.68:1. */
+  /* The credit line sits UNDER the stage now. As an overlay it had nowhere safe
+     to go once the map bled to the edges: bottom left is Villaverde and Villa de
+     Vallecas, bottom right collided with them again as soon as the stage got
+     narrower than 1180px. Below the map it cannot cover anything, needs no
+     scrim, and reads as what it is. */
+  .map-cap{display:block;margin-top:.7rem;font-family:var(--mono);font-size:.6rem;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1.7}
+  /* Whatever the map does not cover (the caption band under it at narrow widths)
+     takes a tone matched to the basemap's own base, so there is no seam where the
+     still stops. Taken from the darkened basemap's OWN measured tones, weighted
+     by how much of the frame each covers (rgb 16,15,7 and rgb 33,21,19), not
+     from the page palette: below 720px .flow-stage keeps a 1.4rem pad, so this
+     colour draws a frame around the still and any hue difference shows up as a
+     rectangle. A plum-cast near-black at the same luminance still read as one. */
+  .flow-stage.map-stage{background:#15110B}
+
+  /* ===== BASEMAP DARKENING =====
+     The still is a two-tone CREAM raster (measured: 87% of its pixels sit in two
+     modes, rgb 234,236,224 and 221,226,210). Dropped unchanged onto this canvas
+     it is a 1180x580 sheet of near-white, which is the single loudest thing on
+     the page and reads as a bug, not as a map. The asset cannot be re-rendered
+     from here, so the page darkens it at paint time.
+
+     It DARKENS, it does not invert. An inversion would turn the road network
+     black and the blocks light, which is backwards for a dark map; #mapDark keeps
+     the original ordering (lighter input stays lighter output) and only compresses
+     the whole range down, which is the relationship CARTO's own dark basemap has.
+
+     feComponentTransfer with a 21-entry table, not CSS contrast()/brightness():
+     this image's usable range is 193..243 out of 255, so a multiplicative filter
+     has almost nothing to work with and collapses the two tones into one (measured
+     on this site before, 0.244 spread down to 0.023). A table is a levels stretch:
+     it can spend most of its resolution on the 0.85..0.95 input band where all the
+     data actually is. color-interpolation-filters is pinned to sRGB, because the
+     SVG default is linearRGB and every number below was solved in sRGB.
+
+     Outputs SAMPLED from the rendered page, not predicted: each channel is
+     transferred against its own input value, so the two source tones do not land
+     where a luminance-only reading of the histogram says they will.
+       rgb(234,236,224) -> rgb(33,21,19)   the lighter of the two source tones
+       rgb(221,226,210) -> rgb(16,15,7)    the darker, and the map's median pixel
+     Measured over the drawn map, 99% of basemap pixels sit at Y 0.003..0.010;
+     everything above that in a screenshot is the ring-road stroke or a label,
+     both of which are drawn ON TOP of the fills, not behind them.
+
+     That is what the choropleth's 3:1 floor was then checked against, every
+     district at its own confidence opacity, composited: worst case is
+     Moncloa-Aravaca at 3.06:1 against rgb(33,21,19), and every other district
+     is above it. On cream the same check ran at 1.06:1 worst case, because the
+     pale end of the ramp at 0.55 opacity was compositing INTO a cream ground.
+     The dark canvas is a real improvement here, not a cost. */
+  .map-base{filter:url(#mapDark)}
+  .flow-particles{position:absolute;inset:0;z-index:1}
+  .fp{position:absolute;border-radius:50%;opacity:0;animation:drift linear infinite}
+  @keyframes drift{0%{opacity:0;transform:translateX(0) translateY(0)}12%{opacity:.95}80%{opacity:.7}100%{opacity:0;transform:translateX(var(--dx)) translateY(var(--dy))}}
+  .fp-label{position:absolute;font-family:var(--mono);font-size:.62rem;color:#8a8f7a;opacity:0;animation:driftLabel linear infinite;white-space:nowrap}
+  @keyframes driftLabel{0%{opacity:0;transform:translateX(0)}15%{opacity:.8}85%{opacity:.4}100%{opacity:0;transform:translateX(var(--dx))}}
+
+  .flow-engine{position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center}
+  .flow-core{width:118px;height:118px;border-radius:26px;background:#fff;border:1px solid rgba(209,25,138,.4);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 18px 40px -18px rgba(209,25,138,.35)}
+  .flow-core svg{width:50px;height:50px;stroke:var(--mag);fill:none;stroke-width:1.7}
+  .flow-core::before,.flow-core::after{content:'';position:absolute;inset:-1px;border-radius:26px;border:1px solid rgba(195,217,47,.6);animation:ring 3s ease-out infinite}
+  .flow-core::after{animation-delay:1.5s}
+  @keyframes ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.55);opacity:0}}
+  .flow-engine .en{margin-top:.7rem;font-weight:700;font-size:var(--t-3);letter-spacing:.01em}
+  .flow-engine .es{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:.15rem}
+
+  .flow-links{position:absolute;inset:0;z-index:2;pointer-events:none}
+  .flow-links path{fill:none;stroke:rgba(209,25,138,.5);stroke-width:1.4;stroke-dasharray:5 7;animation:flowdash 1.2s linear infinite}
+  .flow-links path.tolink{stroke:rgba(124,179,66,.6)}
+  @keyframes flowdash{to{stroke-dashoffset:-24}}
+
+  .flow-outputs{position:absolute;right:31%;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:.55rem}
+  .flow-out{display:flex;align-items:center;gap:.55rem;background:#fff;border:1px solid var(--border);border-radius:9px;padding:.5rem .8rem;font-size:var(--t-1);font-weight:500;white-space:nowrap;opacity:0;transform:translateX(10px);transition:opacity .5s var(--ease),transform .5s var(--ease);box-shadow:0 6px 16px -12px rgba(17,17,16,.3)}
+  .flow-stage.in .flow-out{opacity:1;transform:none}
+  .flow-out .od{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+
+  .flow-dash{position:absolute;right:2%;top:50%;transform:translateY(-50%);z-index:3;width:210px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem;display:none;box-shadow:0 18px 44px -22px rgba(17,17,16,.28)}
+  .flow-dash .fdh{font-family:var(--mono);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mag);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+  .flow-dash .fdh .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.35}}
+  .fd-sub{font-family:var(--mono);font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:.75rem 0 .45rem}
+  .fd-donut{display:flex;align-items:center;gap:.7rem}
+  .fd-donut svg{width:62px;height:62px;flex:0 0 auto}
+  .fd-donut circle{fill:none;stroke-width:4}
+  .fd-leg{font-size:.56rem;color:var(--muted);line-height:1.55}
+  .fd-leg b{color:var(--ink-soft)}
+  .fd-leg i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px;vertical-align:0}
+  .fd-area{width:100%;height:40px;overflow:hidden;display:block}
+  .fd-area .wav{animation:wave 7s linear infinite}
+  @keyframes wave{to{transform:translateX(-200px)}}
+  .fd-area .wl{fill:none;stroke:var(--mag);stroke-width:2}
+  .fd-area .wf{fill:rgba(209,25,138,.12)}
+  .fd-bars .fdb{margin-bottom:.5rem}
+  .fd-bars .fdb .l{display:flex;justify-content:space-between;font-size:.58rem;color:var(--muted);margin-bottom:.22rem}
+  .fd-bars .fdb .l b{color:var(--ink-soft)}
+  .fd-bars .track{height:5px;border-radius:3px;background:rgba(17,17,16,.06);overflow:hidden}
+  .fd-bars .track span{display:block;height:100%;width:var(--w,0)}
+  @media(min-width:1080px){ .flow-dash{display:block} }
+  @media(max-width:720px){
+    .flow-stage{height:auto;padding:1.4rem;display:flex;flex-direction:column;gap:1rem}
+    .flow-particles,.flow-links{display:none}
+    .flow-engine,.flow-outputs{position:static;transform:none} .flow-outputs{right:auto}
+  }
+  .flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.2rem}
+  .flow-step .sn{font-family:var(--mono);font-size:.62rem;color:var(--mag-ink);letter-spacing:.12em}
+  .flow-step .st{font-size:var(--t-2);font-weight:600;margin-top:.25rem}
+  .flow-step .sp{font-size:var(--t-1);color:var(--ink-soft);margin-top:.2rem;line-height:1.45}
+  @media(max-width:720px){.flow-steps{grid-template-columns:1fr 1fr}}
+
+  /* ===== KPI =====
+     Copy on the left, the four figures as a 2x2 block on the right. They are
+     smaller than they were: at four-across full width they were competing with
+     the h2 for first read, and up here they are supporting evidence for it. */
+  .m-intro{margin-top:1.75rem;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+    gap:2.4rem;align-items:center}
+  .m-intro .h-sec{margin-top:0}
+  .m-kpis{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-top:0}
+  .m-kpi{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--mag);border-radius:10px;padding:.9rem 1rem}
+  .m-kpi .k{font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .m-kpi .v{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-top:.3rem;line-height:1}
+  /* One column below 820px, but the figures stay 2x2 rather than becoming a
+     four-high stack that pushes the map off the first screen. */
+  @media(max-width:820px){ .m-intro{grid-template-columns:1fr;gap:1.5rem} }
+
+  /* ===== cards / two-col ===== */
+  .m-two{display:grid;grid-template-columns:1fr 1fr;gap:1.3rem;margin-top:1.3rem}
+  @media(max-width:820px){.m-two{grid-template-columns:1fr}}
+  .m-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.6rem}
+  /* h3, not h4: the card title sits under the section h2, so the level must not skip.
+     Same declarations as before, so the look is unchanged. P1-9. */
+  .m-card h3{font-weight:600;font-size:.72rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem}
+
+  /* ===== CHART SURFACES =====
+     Same construction as the cream version, re-pointed at the dark tokens: a
+     top-lit wash from --surface into a faintly magenta-tinted --surface, a 1px
+     inner highlight on the top edge, an accent-tinted hairline in place of the
+     neutral one, and a wide soft shadow so the card sits above the page rather
+     than being drawn onto it. The literal #FFFFFF stops are gone; the wash is
+     built from the token, so it moves with the canvas.
+
+     The mix is 8%, not the cream page's 4%: a 4% tint on a near-black surface is
+     under a single step of 8-bit precision and simply does not show. 8% lands the
+     bottom of the wash on #341A2B, which is the surface every chart colour and
+     every label colour in this file was measured against.
+
+     MUST STAY BELOW the two .m-card rules above: all three are 0-1-0, so the
+     first version of this block sat earlier in the file and lost background,
+     border and the h3 colour to them, keeping only the box-shadow they do not
+     declare. */
+  .m-card{
+    background:linear-gradient(180deg,var(--surface) 0%,var(--surface) 42%,
+      color-mix(in srgb,var(--mag) 8%,var(--surface)) 100%);
+    border-color:color-mix(in srgb,var(--mag) 26%,var(--border));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),
+      0 1px 2px rgba(0,0,0,.35),
+      0 22px 44px -34px rgba(0,0,0,.9)}
+
+  /* GLASS, at Marian's request, Aug 17 2026, the same move datathon's chart
+     cards took. The wash and the magenta hairline above are what is being
+     replaced: an accent-tinted rim on a tinted panel is most of what made the
+     card read magenta rather than dark. They stay as the no-backdrop-filter
+     fallback, which is why this is additive and not an edit of that rule.
+
+     The project rule is that frosted panels go over real imagery, never a flat
+     fill. What clears it here is the snow canvas drifting behind these cards.
+     Take the snow off this page and this should go back to the wash.
+
+     THE NUMBER TO DEFEND IS #341A2B. Every chart colour and every label colour
+     in this file was measured against the light end of that wash, so the glass
+     has to composite no lighter than it. Harder than datathon's case: these
+     flakes are #EF7FB8, far brighter than that page's green, and the radial
+     runs up to #3A1233 behind the top card. SAMPLED off the rendered cards,
+     10 frames of drifting snow, in the padding band where a label can sit:
+       darkest  #0E090E
+       lightest #1B1018  (darker than #341A2B, so every ratio improved)
+       card title #EF7FB8 on the lightest composite: 7.41:1, was 6.32:1
+       --ink #F8EDF4 on the lightest composite:      16.24:1
+     Lowering the alpha is what breaks this, because pink flakes reach the
+     labels before green ones would. */
+  @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .m-card{background:rgba(14,10,14,.68);
+      border-color:var(--border2);
+      -webkit-backdrop-filter:blur(16px) saturate(1.05);
+      backdrop-filter:blur(16px) saturate(1.05)}
+  }
+  /* #EF7FB8 is the theme's text-safe magenta on this canvas, 6.93:1 on --surface
+     and 6.32:1 on the tinted end of the wash. The cream page's #c01280 measures
+     3.00:1 here and --mag itself 4.37:1, so neither clears 4.5:1 any more. */
+  .m-card h3{color:var(--mag-ink)}
+
+  /* feature-effects legend (kept: sits under the ApexCharts diverging bar,
+     the values on the bars stay unprinted on purpose, direction only) */
+  .fx-legend{display:flex;gap:.9rem;font-size:.64rem;color:var(--muted);margin-top:.7rem}
+  .fx-legend b{color:var(--ink-soft)}
+  .fx-legend .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:.35rem;vertical-align:-1px}
+
+  /* metric list (regression stats, and now classifier stats too, replacing the gauge) */
+  .metric-list .m{display:flex;align-items:center;justify-content:space-between;padding:.8rem 0;border-bottom:1px solid var(--border)}
+  .metric-list .m:last-child{border-bottom:none}
+  .metric-list .mk{font-size:var(--t-2);color:var(--ink-soft)}
+  .metric-list .mv{font-size:var(--t-5);font-weight:700;letter-spacing:-.02em}
+
+  /* ===== ApexCharts mount points =====
+     min-width:0 so the grid track can still shrink it: Apex pins an explicit
+     pixel width on its own inner svg and does not shrink it back on its own
+     (measured defect), a ResizeObserver in the page script drives the actual
+     redraw. min-height holds the card roughly steady before the lazy-loaded
+     chart paints, so opening a tab does not visibly jump. */
+  .apex-host{display:block;width:100%;min-width:0;overflow:hidden;min-height:260px}
+
+  .h-sec .lead{color:var(--ink-soft);max-width:44rem;margin-top:1rem}
+</style>
+</head>
+<body class="theme-madrid">
+<canvas id="snowBg" data-color="#EF7FB8" aria-hidden="true"></canvas>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- NAV -->
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand"><div class="nav-ava" id="navAva">MG</div><span class="nav-name">Marian Garabana</span></div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a><a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a><a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+  <section class="vhero madrid-hero">
+    <div class="vhero-bg" aria-hidden="true">
+      <video autoplay muted loop playsinline preload="metadata"
+             poster="assets/hero-madrid-poster.webp">
+        <source src="assets/hero-madrid.mp4" type="video/mp4" />
+      </video>
+      <img class="vhero-still" src="assets/hero-madrid-poster.webp" alt=""
+           width="1280" height="720" hidden />
+      <div class="vhero-veil"></div>
+    </div>
+    <div class="vhero-in">
+      <div class="lg madrid-panel">
+        <div class="lg-fx" aria-hidden="true">
+          <span class="lg-face"></span>
+          <span class="lg-edge t"></span><span class="lg-edge b"></span>
+          <span class="lg-edge l"></span><span class="lg-edge r"></span>
+        </div>
+        <div class="pd-top">
+          <a href="index.html#projects" class="pd-back">← All projects</a>
+          <div class="m-badge"><span class="dot"></span>Live Streamlit app</div>
+        </div>
+        <div class="pd-cat">Machine Learning · Streamlit · Full pipeline</div>
+        <h1 class="pd-title" style="view-transition-name:vt-madrid">Madrid Rental ML Dashboard</h1>
+        <p class="pd-sub">One live app that takes about 2,085 Madrid rental listings and runs the full machine learning story: exploring the market, clustering into segments, predicting rent, and classifying high-rent homes. Everything trains live when the app starts.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="pd-belt">
+    <div class="pd-facts">
+      <div class="pd-fact"><div class="k">Role</div><div class="v">Solo build</div></div>
+      <div class="pd-fact"><div class="k">Course</div><div class="v">Machine Learning I · IE</div></div>
+      <div class="pd-fact"><div class="k">Year</div><div class="v">2026</div></div>
+      <div class="pd-fact"><div class="k">Stack</div><div class="v">Python · scikit-learn · Streamlit</div></div>
+    </div>
+    <div class="pd-links">
+      <a href="https://madridrentalanalysisapp-mariangarabana.streamlit.app/" target="_blank" rel="noopener">Open live app <span>↗</span></a>
+      <a class="ghost" href="https://github.com/MarianGarabana/Madrid_Rental_Analysis_StreamlitApp" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+    </div>
+  </div>
+
+  <!-- ===== SECTION RAIL =====
+       Scrollspy, not tabs: the whole case study is on the page and this says
+       where in it you are. Real anchors, so it works with the script blocked. -->
+  <nav class="secnav" id="secnav" aria-label="Sections of this project">
+    <a href="#s-market">The market</a>
+    <a href="#s-segments">The segments</a>
+    <a href="#s-regression">The regression</a>
+    <a href="#s-classifier">The classifier</a>
+    <a href="#s-build">The build</a>
+  </nav>
+
+  <section id="s-market" class="case-sec" data-screen-label="Market">
+  <!-- The four headline figures were four KPI cards here. They are in the
+       sentence now, bolded, so the section opens with a line you read instead
+       of a dashboard you scan. Same four numbers, same order. -->
+  <div class="h-sec">
+    <span class="eyebrow">The market</span>
+    <h2>Madrid, in <em>numbers</em>.</h2>
+    <p class="lead">The dataset is about <strong>2,085</strong> rental listings scraped from Idealista. The median asking rent is <strong>&euro;1,400</strong> a month, the average home is <strong>129 m&sup2;</strong>, and that works out to <strong>&euro;16.51</strong> per square metre.</p>
+  </div>
+
+  <!-- ===== DISTRICT HEAT MAP HERO ===== -->
+  <section class="flow">
+    <div class="flow-stage map-stage" id="mapStage">
+      <!-- viewBox is wider than Madrid on purpose. The municipality occupies user
+           x 75..925; the box runs -95..1905 so the basemap has real ground either
+           side of it and can cover the whole stage. preserveAspectRatio is
+           xMinYMid slice, not meet: slice scales to COVER the stage instead of
+           letterboxing inside it, and xMin pins the left edge so Madrid keeps the
+           left of the frame and leaves the right for the panel. Because the stage
+           is height-limited at every width the site reaches, the scale works out
+           the same as the old meet fit, so the district labels are still laid out
+           at the size they were measured at. -->
+      <svg class="map-svg" id="mapSvg" viewBox="-95 2 2000 996" preserveAspectRatio="xMinYMid slice"
+           role="group" aria-label="Map of Madrid's 21 districts shaded by median asking rent, from 700 euros in Carabanchel and Puente de Vallecas to 2,500 euros in Salamanca. Villaverde has no listings in the dataset and is left unshaded. Each district is focusable and states its own median and listing count.">
+      <!-- Geometry is inline, not fetched. Derived offline from the districts GeoJSON with
+           mapshaper -simplify 6% keep-shapes (topology preserved, so borders stay shared and
+           gapless), projected into this viewBox and rounded to integers, which is sub-pixel at
+           the rendered width. Fills are the real medians, baked in, so the choropleth is correct
+           from first paint with no network request and no JS. -->
+      <!-- Basemap. One self-hosted still, rendered offline from OpenStreetMap data
+           (CARTO light_nolabels tiles, z12) for exactly this viewBox's geographic
+           rect, lon -3.965837..-3.084296 by lat 40.310798..40.644568, then
+           flattened to a two-tone cream ramp so it carries street texture without
+           introducing a hue that competes with the rent ramp.
+           Placement is exact, not eyeballed: the district geometry above fits
+           x = 2268.7308*lon + 8902.4005, y = -2984.0928*lat + 121289.1642 with
+           0.26px RMS error over all 21 centroids, and the tiles are cropped to
+           that same rect. Web Mercator vs this equirectangular fit diverges by
+           at most 0.62 user units over the frame, which is sub-pixel here.
+           No fade mask any more: the still is meant to reach the edges, and the
+           stage's own border-radius with overflow:hidden does the trimming. -->
+      <!-- The levels stretch that takes the cream still down onto the dark canvas.
+           See the .map-base note in the stylesheet above for how the numbers were
+           solved and what they measure out to. -->
+      <defs>
+        <filter id="mapDark" color-interpolation-filters="sRGB"
+                x="0%" y="0%" width="100%" height="100%">
+          <feComponentTransfer>
+            <feFuncR type="table" tableValues="0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.026 0.030 0.034 0.0412 0.1148 0.1569 0.1569"/>
+            <feFuncG type="table" tableValues="0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.014 0.017 0.020 0.0227 0.0732 0.0941 0.0941"/>
+            <feFuncB type="table" tableValues="0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.019 0.024 0.029 0.0331 0.1070 0.1490 0.1490"/>
+          </feComponentTransfer>
+        </filter>
+      </defs>
+      <image class="map-base" href="assets/madrid-basemap.webp" x="-95" y="2" width="2000" height="996"
+             preserveAspectRatio="none" aria-hidden="true"/>
+
+      <!-- The rent fills. Grouped so the loupe has one thing to address; the
+           ring roads, the river and the district names stay OUTSIDE this group,
+           because they are what keeps the resting state reading as Madrid once
+           the colours are down. -->
+      <g id="mapFills">
+      <path class="map-dpath" d="M602 676L597 638L601 616L598 599L587 604L576 612L559 620L529 618L534 633L530 656L524 674L554 667L579 668L602 676Z" fill="#c81e86" data-district="Salamanca" data-rent="2500" data-n="313" tabindex="0" role="img" aria-label="Salamanca, median rent 2,500 euros, 313 listings"/>
+      <path class="map-dpath" d="M478 527L476 524L445 514L437 515L417 510L401 510L392 514L391 498L378 494L376 513L364 515L357 511L324 509L294 522L281 525L198 494L199 508L195 520L194 530L203 540L211 535L247 541L258 540L272 544L284 555L291 559L301 584L304 605L316 599L332 601L347 600L348 644L329 659L323 679L330 707L339 731L362 733L373 720L393 707L413 704L422 697L457 680L462 671L473 671L483 662L471 640L466 628L468 612L463 601L467 592L475 595L489 591L482 576L479 566L489 545L478 527Z" fill="#cf358b" data-district="Moncloa-Aravaca" data-rent="2300" data-n="161" tabindex="0" role="img" aria-label="Moncloa-Aravaca, median rent 2,300 euros, 161 listings"/>
+      <path class="map-dpath" d="M598 599L594 585L590 562L580 533L569 514L566 505L568 481L555 482L542 488L537 510L532 535L528 594L527 609L529 618L559 620L576 612L587 604L598 599Z" fill="#e47898" data-district="Chamartin" data-rent="1725" data-n="215" tabindex="0" role="img" aria-label="Chamartin, median rent 1,725 euros, 215 listings"/>
+      <path class="map-dpath" d="M587 713L602 676L579 668L554 667L524 674L523 683L527 707L543 722L556 729L563 737L568 749L580 733L587 713Z" fill="#e47b99" data-district="Retiro" data-rent="1700" data-n="80" tabindex="0" role="img" aria-label="Retiro, median rent 1,700 euros, 80 listings"/>
+      <path class="map-dpath" d="M528 594L489 591L475 595L467 592L463 601L468 612L466 628L471 640L495 643L518 649L530 656L534 633L529 618L527 609L528 594Z" fill="#e47b99" data-district="Chamberi" data-rent="1699" data-n="195" tabindex="0" role="img" aria-label="Chamberi, median rent 1,699 euros, 195 listings"/>
+      <path class="map-dpath" d="M728 428L721 417L701 401L659 410L634 409L624 401L608 394L604 398L603 419L592 437L576 455L570 466L568 481L583 481L596 487L588 498L587 509L593 541L607 554L626 584L631 583L653 586L665 584L727 583L724 572L707 567L689 553L682 545L672 527L680 527L678 515L675 508L695 492L704 469L707 466L723 460L734 448L728 428Z" fill="#e8879b" data-district="Hortaleza" data-rent="1600" data-n="118" tabindex="0" role="img" aria-label="Hortaleza, median rent 1,600 euros, 118 listings"/>
+      <path class="map-dpath" d="M456 690L470 690L467 699L470 706L481 712L502 717L527 707L523 683L524 674L530 656L518 649L495 643L471 640L483 662L473 671L462 671L457 680L456 690Z" fill="#e49693" data-district="Centro" data-rent="1450" data-n="280" tabindex="0" role="img" aria-label="Centro, median rent 1,450 euros, 280 listings"/>
+      <path class="map-dpath" d="M604 398L592 374L585 370L585 360L572 361L565 357L563 349L578 331L567 320L558 305L556 293L550 285L548 273L540 255L532 229L508 200L529 192L583 159L598 160L607 168L615 192L623 203L638 205L645 209L664 210L678 214L698 193L708 189L720 179L728 168L731 158L724 152L723 146L698 131L697 114L684 88L671 82L667 51L660 44L647 21L634 21L624 12L609 6L595 18L586 33L580 49L580 58L583 77L566 86L555 102L541 110L537 115L529 131L527 142L517 165L496 181L489 184L464 188L441 180L422 175L416 163L396 157L390 152L353 136L331 130L319 130L304 138L289 135L283 140L273 138L281 121L265 108L258 115L268 135L245 150L230 152L219 151L206 154L196 161L187 157L170 162L157 171L149 171L137 166L128 158L114 161L109 167L92 179L91 197L87 212L79 222L84 235L91 243L89 249L95 255L110 258L114 262L116 274L132 304L138 330L148 343L150 350L159 361L158 370L165 381L159 398L163 405L197 416L192 435L203 451L206 475L198 494L281 525L294 522L324 509L357 511L364 515L376 513L378 494L391 498L392 514L401 510L417 510L437 515L445 514L476 524L478 527L484 519L497 517L508 508L537 510L542 488L555 482L568 481L570 466L576 455L592 437L603 419L604 398Z" fill="#e0a28c" data-district="Fuencarral-El Pardo" data-rent="1325" data-n="112" tabindex="0" role="img" aria-label="Fuencarral-El Pardo, median rent 1,325 euros, 112 listings"/>
+      <path class="map-dpath" d="M527 707L502 717L481 712L470 706L467 699L470 690L456 690L459 706L457 718L459 729L463 732L476 734L484 741L498 746L531 785L547 778L555 762L568 749L563 737L556 729L543 722L527 707Z" fill="#e0a58b" data-district="Arganzuela" data-rent="1300" data-n="55" tabindex="0" role="img" aria-label="Arganzuela, median rent 1,300 euros, 55 listings"/>
+      <path class="map-dpath" d="M689 693L680 675L649 619L655 617L643 598L630 589L626 584L607 554L593 541L587 509L588 498L596 487L583 481L568 481L566 505L569 514L580 533L590 562L594 585L598 599L601 616L597 638L602 676L630 687L642 689L664 686L689 693Z" fill="#dfa68a" data-district="Ciudad Lineal" data-rent="1287" data-n="100" tabindex="0" role="img" aria-label="Ciudad Lineal, median rent 1,287 euros, 100 listings"/>
+      <path class="map-dpath" d="M890 591L884 575L888 569L902 565L896 558L897 542L905 532L901 522L886 519L884 514L883 492L877 480L878 473L869 468L867 452L862 446L848 440L841 433L837 424L839 400L822 400L814 397L798 396L790 402L774 408L765 417L747 430L728 428L734 448L723 460L707 466L704 469L695 492L675 508L678 515L680 527L672 527L682 545L689 553L707 567L724 572L727 583L733 582L822 584L841 585L877 591L890 591Z" fill="#dcb482" data-district="Barajas" data-rent="1150" data-n="22" tabindex="0" role="img" aria-label="Barajas, median rent 1,150 euros, 22 listings"/>
+      <path class="map-dpath" d="M537 510L508 508L497 517L484 519L478 527L489 545L479 566L482 576L489 591L528 594L532 535L537 510Z" fill="#d9bb7e" data-district="Tetuan" data-rent="1070" data-n="146" tabindex="0" role="img" aria-label="Tetuan, median rent 1,070 euros, 146 listings"/>
+      <path class="map-dpath" d="M890 591L877 591L841 585L822 584L733 582L727 583L665 584L653 586L631 583L626 584L630 589L643 598L655 617L649 619L680 675L689 693L694 686L711 678L712 691L757 708L772 688L775 674L786 654L789 643L782 631L792 630L795 619L806 624L816 618L823 618L841 609L881 598L890 591Z" fill="#d6c778" data-district="San Blas" data-rent="950" data-n="60" tabindex="0" role="img" aria-label="San Blas, median rent 950 euros, 60 listings"/>
+      <path class="map-dpath" d="M457 718L459 706L456 690L457 680L422 697L413 704L393 707L373 720L362 733L339 731L332 734L323 749L311 753L307 750L295 751L289 755L272 755L257 753L237 742L215 743L205 745L208 753L223 777L231 792L251 822L257 840L266 832L275 841L294 846L309 855L326 845L346 852L357 839L368 830L365 824L368 808L377 805L381 796L375 779L388 781L407 767L411 757L424 741L450 716L457 718Z" fill="#d3d371" data-district="Latina" data-rent="832" data-n="38" tabindex="0" role="img" aria-label="Latina, median rent 832 euros, 38 listings"/>
+      <path class="map-dpath" d="M689 693L664 686L642 689L630 687L602 676L587 713L606 715L613 718L633 742L639 746L668 754L677 723L689 693Z" fill="#d2d66f" data-district="Moratalaz" data-rent="800" data-n="15" tabindex="0" role="img" aria-label="Moratalaz, median rent 800 euros, 15 listings"/>
+      <path class="map-dpath" d="M549 847L546 838L549 831L547 820L539 814L537 802L531 785L498 746L490 756L477 765L468 776L465 790L461 834L461 837L502 840L522 837L533 840L549 847Z" fill="#d1d86e" data-district="Usera" data-rent="780" data-n="22" tabindex="0" role="img" aria-label="Usera, median rent 780 euros, 22 listings"/>
+      <path class="map-dpath" d="M841 863L838 859L812 851L802 846L785 831L771 829L739 809L733 801L740 792L730 773L720 773L712 767L685 759L678 782L679 785L641 797L616 803L609 822L589 839L576 846L556 849L549 847L560 861L562 869L570 880L576 883L578 896L588 899L597 923L601 929L604 944L624 930L653 955L665 967L676 973L679 969L699 977L710 987L739 994L764 992L781 989L782 983L772 983L769 969L775 952L782 947L797 930L807 908L814 898L828 880L831 873L841 863Z" fill="#d0db6d" data-district="Villa de Vallecas" data-rent="750" data-n="29" tabindex="0" role="img" aria-label="Villa de Vallecas, median rent 750 euros, 29 listings"/>
+      <path class="map-dpath" d="M841 863L836 853L836 839L842 833L846 818L847 806L851 799L850 791L862 766L866 752L877 758L887 756L896 763L916 755L921 725L918 705L915 697L905 683L891 672L893 688L882 689L872 701L850 695L841 697L828 692L815 691L797 697L786 691L782 680L791 655L786 654L775 674L772 688L757 708L712 691L711 678L694 686L689 693L677 723L668 754L685 759L712 767L720 773L730 773L740 792L733 801L739 809L771 829L785 831L802 846L812 851L838 859L841 863Z" fill="#cfdf6b" data-district="Vicalvaro" data-rent="712" data-n="28" tabindex="0" role="img" aria-label="Vicalvaro, median rent 712 euros, 28 listings"/>
+      <path class="map-dpath" d="M457 718L450 716L424 741L411 757L407 767L388 781L375 779L381 796L377 805L368 808L365 824L368 830L357 839L346 852L377 859L461 834L465 790L468 776L477 765L490 756L498 746L484 741L476 734L463 732L459 729L457 718Z" fill="#cfe06a" data-district="Carabanchel" data-rent="700" data-n="53" tabindex="0" role="img" aria-label="Carabanchel, median rent 700 euros, 53 listings"/>
+      <path class="map-dpath" d="M549 847L556 849L576 846L589 839L609 822L616 803L641 797L679 785L678 782L685 759L668 754L639 746L633 742L613 718L606 715L587 713L580 733L568 749L555 762L547 778L531 785L537 802L539 814L547 820L549 831L546 838L549 847Z" fill="#cfe06a" data-district="Puente de Vallecas" data-rent="700" data-n="43" tabindex="0" role="img" aria-label="Puente de Vallecas, median rent 700 euros, 43 listings"/>
+      <path class="map-dpath" d="M549 847L533 840L522 837L502 840L461 837L452 926L462 938L475 946L480 960L501 964L517 964L524 970L543 964L555 951L577 955L591 943L596 947L604 944L601 929L597 923L588 899L578 896L576 883L570 880L562 869L560 861L549 847Z" fill="#847b8a" data-district="Villaverde" tabindex="0" role="img" aria-label="Villaverde, no listings"/>
+      </g>
+
+      <!-- Context drawn ON TOP of the fills, so the shape reads as Madrid and not
+           as an abstract blob: the two ring roads and the Manzanares. Geometry is
+           real, pulled from the same OSM extract and projected with the transform
+           above. The ring lines are the angular median radius of each motorway's
+           node cloud, which collapses the dual carriageway and its slip roads into
+           the single centreline a reader actually wants at this size. Decorative,
+           so aria-hidden: the district paths carry the data and the labels. -->
+      <g class="map-ctx" aria-hidden="true">
+        <path class="map-ring-road" d="M736 656L730.3 663.4L723.2 670.2L716 676.6L708.5 682.4L701.3 687.9L694.6 693.1L689.5 698.3L685.5 703.5L683 709.1L680.9 714.9L678.9 720.7L677 726.5L675.1 732.5L673.1 738.4L671.1 744.4L668.9 750.4L666.4 756.4L663.6 762.2L660.5 767.9L657.1 773.5L653.3 778.7L649 783.6L644.1 787.8L638.7 791.5L633.3 795L628.2 799L623.5 803.3L618.7 807.8L614 812.6L609.4 817.8L604.9 823.5L600.1 829.1L594.8 833.9L588.9 837.9L582.7 841.3L576.3 844.1L569.5 845.9L562.6 846.8L555.4 846.5L548.2 845.5L541.2 844.1L534.3 842.6L527.5 841.2L520.9 840.4L514.4 839.8L507.8 839.6L501.2 839.6L494.6 839.7L488 839.6L481.3 839.1L474.6 838.8L467.7 838.6L460.5 839.2L453 840L445.1 841.2L436.9 842.5L428.1 844.2L418.7 846.3L408.7 848.8L398.5 850.4L388 851.8L377.2 852.7L366.3 853L355.5 852.5L344.4 851.5L333.6 849.6L323.2 846.6L313.5 842.6L304.3 837.7L295.3 832.3L286.6 826.3L279.4 819.1L272.9 811.1L265.4 803.8L256.5 797L247.6 789.8L238.9 782.2L230.6 774.1L226.6 763.9L225.2 752.9L226.7 741.2L230.9 729L236.3 717.2L242.6 705.7L249.6 694.7L252.7 684.7L253.9 675.3L254.4 666L254.6 656.8L254.9 647.6L255.3 638.5L256 629.3L257 620.2L258.3 611.1L259.9 602.1L261.8 593.2L264 584.3L266.6 575.5L270.1 567L274.5 558.9L279.7 551.2L285.5 544L291.7 537.1L298.4 530.7L305.7 524.9L313.9 519.9L323.2 516.1L333.5 513.5L343.7 511.3L353.6 509.6L363.1 508.1L372.1 506.6L379.9 504.5L386.5 501.4L391.8 496.9L396.7 491.7L401.4 486.2L406.2 480.6L411.1 474.8L416.1 469.1L421.4 463.4L427.1 458.1L433.1 453L439.2 447.9L445.5 442.7L452.1 437.7L458.5 431.6L465.2 425.1L472.2 418.6L479.7 412.6L487.5 407L495.7 400.9L504.1 394.6L513.1 389.4L522.3 385.2L531.8 381.8L541.5 379.4L551.2 378.9L560.6 381.1L569.6 384.9L578.3 389.3L586.8 393.9L595.1 398.8L602.9 404.5L610.2 411.2L616.8 418.6L622.8 426.7L627.7 436.2L631.1 447.5L633.8 459L636.1 469.8L638.7 479.3L641.8 487.5L645.1 494.8L648.9 501.2L653.5 506.5L658.3 511.6L662.9 516.8L667.2 522.2L671.3 527.8L675.3 533.4L679.5 538.9L683.8 544.3L688.6 549.5L693.8 554.6L700 559.3L706.3 564.2L712.2 569.6L717.8 575.4L723.8 581.2L729.7 587.4L735.3 593.9L739.1 601.1L742 608.6L744.2 616.3L745.5 624.2L745.4 632.3L743.8 640.4L740.7 648.3Z"/>
+        <path class="map-ring-road" d="M600.2 620.6L599.9 623.3L599.3 626L598.9 628.7L598.5 631.4L598.2 634.2L598.1 636.9L598 639.8L598 642.7L598.2 645.7L598.7 648.9L599.1 652.3L599.7 655.8L600.3 659.5L600.9 663.4L601.3 667.3L601.4 671.3L601.2 675.2L600.5 679L599.7 682.8L598.4 686.3L596.9 689.9L595.5 693.5L593.9 697.2L592.3 701L590.7 705.1L589 709.2L587.4 713.8L585.7 718.6L583.7 723.4L581.6 728.3L579.2 733.1L576.4 737.8L573.4 742.3L570 746.5L566.5 750.8L562.8 755.5L559 760.4L554.9 765.3L550.4 769.8L545.7 774L540.5 776.9L535 777.8L529.4 776.8L523.8 774L518.5 769.8L513.5 764.9L508.9 759.5L504.5 754.5L500.3 750.7L496.2 747.3L492.2 744.3L488.3 741.8L484.3 739.7L480.3 737.8L476.2 736.2L472.2 734.4L468.5 732.1L465 729.3L462.2 725.6L459.8 721.2L458.2 716.2L457 710.7L456.6 704.9L456.3 699.3L456.5 693.5L456.5 688.5L456.6 683.7L456.3 679.6L455.9 675.9L455 672.7L454 669.8L451.9 667.6L449.5 665.7L446.6 664L443.6 662.1L440.7 660.2L437.9 658L435.3 655.6L432.8 653.1L430.3 650.4L428.3 647.6L426.6 644.5L425.1 641.3L423.8 638.1L422.8 634.7L422.2 631.3L421.8 627.9L421.5 624.4L421 620.9L420.7 617.4L420.4 613.9L420 610.3L419.3 606.7L418.5 602.9L417.6 599L416.6 595L415.2 590.8L413.8 586.3L412.4 581.7L410.7 576.8L409.1 571.6L407.5 566.2L405.1 560.1L403.1 553.7L400.6 546.8L398.3 539.4L396.9 532.2L396.6 525.4L398.1 519.6L401.4 515.1L406.6 512.3L413 511.1L420.2 510.9L427.3 511.3L434.2 511.8L440.2 511.8L445.8 511.6L450.3 510.1L454.4 508.1L458.2 505.6L462 503L465.7 500.3L469.6 497.8L473.6 495.5L477.8 493.4L482.1 491.5L486.5 490L491 488.4L495.4 486.8L499.9 485L504.4 483.1L509.1 481.4L513.9 480.3L518.7 479.7L523.6 479.6L528.4 480.3L533.2 481L538 481.8L542.8 482.4L547.7 482.4L552.7 482.3L557.2 484.7L561.1 488.3L564.6 493L567.5 498.5L569.8 504.5L571.5 511.1L572.7 518.1L574.5 522.9L576.6 526.8L578.7 530.6L580.6 534.2L582.4 537.9L584 541.5L585.5 545.2L586.9 548.7L588.1 552.2L589.1 555.8L590 559.4L590.6 562.9L591.2 566.4L591.7 569.8L592 573.1L592.4 576.4L592.9 579.4L593.5 582.3L594.1 585.2L594.6 588L595.5 590.6L596.3 593.3L597.1 596L597.8 598.6L598.6 601.3L599.4 604L600.1 606.7L600.5 609.4L600.6 612.2L600.6 615L600.4 617.8Z"/>
+        <path class="map-river" d="M239.2 -181L237 -178.7L235.6 -175.1L236 -172.1L237.7 -168.2L236.9 -165.3L234.9 -161.3L234.8 -158.1L235.3 -154.7L235.3 -151.2L236.2 -147.7L237.1 -143L235.6 -139.3L232.3 -136.6L229.4 -134.5L227.2 -132.5L227.3 -129.2L227.1 -126L228.1 -123.1L227.8 -119.6L227.8 -116.4L227 -113.2L225.5 -110.3L227.4 -107.9L227.4 -104.7L225.1 -102.6L224.7 -99.6L229 -98.5L232.6 -97.2L234.1 -94.5L235.8 -92.1L237.1 -88.5L239.1 -86L240.7 -83.2L243.5 -80.4L245.1 -77.1L245.7 -73.6L243.5 -70.7L245.4 -68.3L247.4 -65.8L249.2 -63.1L248.7 -59.4L248.4 -56.1L248.8 -52.3L249 -48.9L251.1 -46.3L253.7 -44.3L256.8 -43.6L257.8 -46.4L260 -44.4L262.7 -42.3L264.3 -39.7L266.8 -37.1L269.2 -34.8L271.1 -32.1L271.6 -28.7L270.6 -25.5L267.6 -22.9L266 -20.1L265.8 -17.1L264.6 -14.3L263.3 -11.6L261.5 -8.2L261.6 -5.1L263.6 -2.6L264 0.5L264.4 3.6L265.8 6.5L265.2 10.5L265.2 13.6L267.9 15.3L270.3 17.1L273.7 19.6L276.7 21L278.7 25.1L281.8 27.6L280.4 30.8L281 33.9L283.2 36L286.4 36.3L289.1 37.5L291.9 38.9L289.4 42.2L286.2 44.3L282.8 42.8L278.8 43L275.7 44.4L276.3 47.9L274.6 51.8L273.8 54.8L274.2 57.8L275 61.1L272.3 63.5L269 63.5L266.1 64.2L267.5 68L268.2 71.2L267.1 74.4L265.6 77.1L263.1 80.3L261.5 83.2L260 86.1L259.4 89.4L261.6 91.8L262.1 94.8L261.3 98.6L257.9 101.3L255.1 103.3L257.3 106.5L257.9 109.8L259.4 113.2L262.3 116.9L263.9 119.5L267.5 121.6L271 123.6L273.3 126.1L273.5 129.5L271.7 131.9L269.1 137.9L268.8 141.6L270.6 144.7L274.8 144.5L277.8 145L280.8 144.6L283.6 146.8L284.8 149.8L280.7 154L276.7 154.6L274.3 157.9L277.6 159.2L280 161.6L282.7 164.7L284.1 168.7L283.1 171.8L283.2 174.9L282.1 178.2L282.9 182.9L288.3 184.5L290.3 188.2L286.5 190.7L288.2 194.9L293.7 195.7L297.6 196.7L302 199.6L302 205.4L301.9 210.1L302.3 220.1L305.2 224.3L306.6 228.8L306.1 233.3L302 236.4L294.6 239.7L294.2 243.7L298 247.9L300.5 252.4L301.1 259.4L298.7 266L300.4 279.8L311.6 292.3L310.3 300.2L307.9 304.7L307.3 310.2L310.3 317.9L309.5 321L308 324.1L305.6 327.1L305.7 330.2L303.3 334.5L300.8 337L300.8 340.1L301.2 343.3L305.6 344.8L309.6 343.4L313.5 342.3L316.3 341.1L319.3 342.9L319.7 346.4L320.4 350.4L322 353.2L322.8 356.3L323.7 359.2L324.6 362.7L325.7 366.4L326.8 369.5L327.6 372.5L328.7 375.3L329.4 378.8L330.7 381.9L332.7 385.3L334.2 389.2L336.6 391.7L340 393.1L342.2 395.5L342.8 398.9L343.7 401.8L344.5 405.4L346.4 408.6L347 412.9L346.6 416.4L348 419.8L350.7 422.8L353.2 426.5L355.6 429.4L356.7 432.8L359.3 435.4L362.5 437L365.8 436.3L368.9 437.7L371 441.7L373.1 444.3L374.6 447.3L375.1 450.5L374.6 453.6L375 456.7L374.3 460.8L376.1 464L378.3 466.5L380.6 468.5L382.8 471.8L383.2 476.2L383.2 479.5L383.9 483.4L383.5 487.1L384.6 490L384.8 493.9L384.7 497.2L384.9 500.3L385 504L385.1 507.1L384.3 510.4L385.4 514.2L385.8 517.5L387.1 520.5L386.9 524.9L386.1 527.9L385.7 532.4L386.6 535.6L387.8 538.6L389.3 541.7L391.6 543.8L394.2 546.2L396.3 548.8L399 551.5L400.2 554.2L401.5 557.1L401.5 561.3L401.8 564.3L401.8 567.6L402.7 571.7L402.6 574.9L402.3 578.4L402.9 581.7L404.7 585L410.4 589.3L412.1 591.9L413 594.8L413.5 597.9L413.6 601L415.2 604.7L415.8 608.4L416.8 611.4L417.6 614.6L418.5 618.4L423 627.1L426.3 630.4L427.9 634.3L428.6 637.5L430.7 640.5L439.5 649.8L443.5 654L448.3 658.5L450.6 660.9L452.5 663.8L455.4 666.4L457.1 669.2L458.2 672L458.3 676.3L457.6 680.1L456.8 683.8L456.1 690.7L456.9 697.6L458.1 701.8L458.6 706.6L458.1 710L457 713.2L456.5 717.5L456.9 721.4L457.4 724.8L458.6 727.9L460.3 731L463 732.4L466.4 732.5L470.1 732L473.9 732.7L477.5 735L480.5 738.1L483 740.3L486.6 742.2L492 744.6L496.9 746.1L501.5 749.4L503.7 752.2L508.4 759.3L512.3 764.4L516.2 768.9L520.1 772.8L523.8 776.8L528.4 781.5L531.1 784.1L532.6 787L533.4 789.9L533.9 793.3L535.9 797.2L536.8 800.3L536.4 804.8L536 808.3L537.8 811.2L539 814.8L542.2 816.8L545.1 818.1L547.6 820L548.2 823.8L548.8 827.2L549.5 831.3L547 834.9L546.6 839.1L548 843.3L548.9 846.9L550.3 851L552.9 853.7L555.3 856.8L558.3 858.3L560.1 861.9L560.8 865L562 868.8L564.9 870.2L567.6 872.5L568.1 875.7L569 878.7L574 881.8L576.9 883.3L577.9 886.5L578.4 891.1L577.5 894.1L581.4 897.1L584.4 898L588 899.2L589.8 903.1L591.6 907.2L592 910.9L593 914.4L595.2 916.9L595.5 919.9L597.1 923.9L599.7 926.9L602 930.8L602.3 934.2L603.8 938.5L604.6 943.2L603.3 946.3L605.8 949.1L609.9 949.7L614.4 949.7L617.7 948.7L622.1 948.7L626 948.7L629 949.4L634.1 950.8L637.9 953L642.1 956.3L646.4 957.6L650 958.7L653 962L654.5 966.6L656.5 969.2L659.6 969.4L663.2 968.8L666 970.3L666 970.3"/>
+        <text class="map-flabel" x="744" y="587" text-anchor="start">M-40</text>
+        <text class="map-flabel" x="585" y="604" text-anchor="end">M-30</text>
+        <text class="map-flabel map-flabel-riv" x="298" y="169" text-anchor="start">Manzanares</text>
+      </g>
+
+      <!-- District names, on the outer districts only. The central ring
+           (Centro, Chamberí, Salamanca, Retiro, Chamartín, Tetuán, Arganzuela)
+           is deliberately unlabelled: at the width this map actually renders,
+           a label does not fit inside those shapes without covering the fill it
+           is meant to describe. The loupe and keyboard focus already name every
+           district in the panel readout, this one included. Anchors are
+           each polygon's pole of inaccessibility, not its centroid, so no label
+           lands outside its own concave shape. -->
+      <g class="map-dlabels" aria-hidden="true">
+        <text class="map-dlabel is-narrow"><tspan x="343" y="314">Fuencarral</tspan><tspan x="343" y="340">El Pardo</tspan></text>
+        <text class="map-dlabel is-narrow"><tspan x="706" y="875">Villa de</tspan><tspan x="706" y="901">Vallecas</tspan></text>
+        <text class="map-dlabel is-narrow"><tspan x="795" y="502">Barajas</tspan></text>
+        <text class="map-dlabel is-narrow"><tspan x="795" y="760">Vicálvaro</tspan></text>
+        <text class="map-dlabel"><tspan x="644" y="463">Hortaleza</tspan></text>
+        <text class="map-dlabel is-narrow"><tspan x="308" y="801">Latina</tspan></text>
+        <text class="map-dlabel"><tspan x="732" y="633">San Blas</tspan></text>
+        <text class="map-dlabel"><tspan x="513" y="902">Villaverde</tspan></text>
+        <text class="map-dlabel"><tspan x="500" y="804">Usera</tspan></text>
+      </g>
+      </svg>
+      <div class="map-panel">
+        <div class="mp-h">Madrid rental heat</div>
+        <div class="mp-s">Median asking rent by district, from the same 2,085 listings, running €700 in Carabanchel and Puente de Vallecas to €2,500 in Salamanca. Hover or tab a district for its median and how many listings it rests on.</div>
+        <div class="map-legend"></div>
+        <div class="map-legend-l"><span>€700</span><span>€2,500</span></div>
+        <div class="map-nodata"><i></i>Villaverde · no listings</div>
+        <div class="map-confidence">Fainter fill means fewer listings behind that median.</div>
+        <div class="mp-sub" id="mrLabel">Under the loupe</div>
+        <!-- aria-hidden: every district path already carries its own name,
+             median and listing count in its aria-label and announces them on
+             focus, so an announced readout here would say all of it twice. -->
+        <div class="mp-read" aria-hidden="true">
+          <div class="mr-name" id="mrName">Salamanca</div>
+          <div class="mr-row"><span class="mr-k">Median rent</span><span class="mr-v" id="mrRent">&euro;2,500</span></div>
+          <div class="mr-row"><span class="mr-k">Listings</span><span class="mr-v" id="mrN">313</span></div>
+          <div class="mr-track"><div class="mr-fill" id="mrBar"></div></div>
+          <div class="mr-scale"><span>&euro;0</span><span>&euro;1,250</span><span>&euro;2,500</span></div>
+        </div>
+        <button class="mp-toggle" id="mapPeel" type="button" aria-pressed="false">Show every district</button>
+      </div>
+    </div>
+    <!-- The OSM data is ODbL, which requires the credit, and CARTO asks for the
+         style credit on the tiles the still was rendered from. Both belong on
+         the map they describe, not in a file only I read. Outside the stage, so
+         it can never sit on a district. -->
+    <span class="map-cap">Idealista listings · real Madrid district boundaries · basemap and ring roads © OpenStreetMap contributors, © CARTO</span>
+  </section>
+
+  </section>
+
+  <section id="s-segments" class="case-sec" data-screen-label="Segments">
+  <!-- ===== SEGMENTS ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">Unsupervised</span>
+    <h2>Five <em>segments</em> of the market.</h2>
+    <p class="lead">A K-Means model groups the listings into five segments. Most homes fall into Standard Exterior Living, while a small Grand Estate segment carries by far the highest rents.</p>
+  </div>
+  <div class="m-two">
+    <div class="m-card">
+      <h3>Share of listings per segment</h3>
+      <div id="segDonut" class="apex-host"></div>
+      <p class="sr-only">Donut chart, share of listings per segment: Standard Exterior Living 58%, Entry-Level Interior 12%, High-Rise Exterior 11.4%, Urban Premium 10.7%, Grand Estate 7.8%.</p>
+    </div>
+    <div class="m-card">
+      <h3>Median rent by segment</h3>
+      <div id="segRentBars" class="apex-host"></div>
+      <p class="sr-only">Horizontal bar chart, median rent by segment: Grand Estate €4,500, Urban Premium €2,100, High-Rise Exterior €1,600, Standard Exterior €1,300, Entry-Level Interior €1,075.</p>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-regression" class="case-sec" data-screen-label="Regression">
+  <!-- ===== RENT PREDICTOR ===== -->
+  <div class="m-split">
+    <div class="h-sec">
+      <span class="eyebrow">Regression</span>
+      <h2>Predicting rent.</h2>
+      <p class="lead">An OLS regression with VIF filtering and RFECV feature selection estimates monthly rent. On the held-out test set it explains <strong>78 percent</strong> of the variance, misses a typical listing by <strong>&euro;469</strong>, and carries an RMSE of <strong>&euro;733</strong>, which weights the large misses more heavily. Durbin-Watson sits at <strong>2.05</strong>, so the residuals are not autocorrelated.</p>
+    </div>
+    <div class="m-card">
+      <h3>Feature effects on rent</h3>
+      <!-- direction and rank only, no role="img" on the mount: Apex's own legend
+           and tooltip are real focusable controls, and role="img" on an ancestor
+           of focusable descendants is a nested-interactive violation (measured
+           on the datathon rebuild). The sr-only paragraph below carries the
+           finding as static text instead. The bar lengths are relative effect
+           sizes with no printed values, so neither the chart nor its text
+           alternative invents numbers for them. -->
+      <div id="fxChart" class="apex-host"></div>
+      <div class="fx-legend"><span><span class="sw" style="background:var(--lime)"></span><b>Increases</b> rent</span><span><span class="sw" style="background:var(--mag)"></span><b>Decreases</b> rent</span></div>
+      <p class="sr-only">Feature effects on predicted rent, ordered by size of effect. Central location raises rent the most, then size in square metres, then floor level. Being a special listing lowers rent, and being a studio lowers it the most.</p>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-classifier" class="case-sec" data-screen-label="Classifier">
+  <!-- ===== CLASSIFIER ===== -->
+  <div class="m-split">
+    <div class="h-sec">
+      <span class="eyebrow">Classification</span>
+      <h2>Spotting high-rent homes.</h2>
+      <p class="lead">A logistic regression flags whether a listing is high-rent, with an adjustable probability threshold. It reaches <strong>87 percent</strong> accuracy and a test AUC of <strong>0.94</strong>, with almost no gap between train and test.</p>
+    </div>
+    <div class="m-card">
+      <h3>ROC curve · AUC 0.94</h3>
+      <!-- no role="img" on the mount: see the feature-effects card above for why. -->
+      <div id="rocChart" class="apex-host"></div>
+      <p class="fig-cap-s">True positive rate against false positive rate. Dashed line is a coin toss.</p>
+      <p class="sr-only">ROC curve for the high-rent classifier: area under the curve 0.94, well above the random-classifier diagonal, at 87 percent accuracy on the test set.</p>
+    </div>
+  </div>
+  </section>
+
+  <section id="s-build" class="case-sec" data-screen-label="Build">
+  <!-- ===== WHAT IS INSIDE ===== -->
+  <div class="h-sec">
+    <span class="eyebrow">The build</span>
+    <h2>One app, the whole pipeline.</h2>
+    <p class="lead">The app covers exploratory analysis, five K-Means segments, Apriori association rules, the OLS rent predictor with a 95 percent prediction interval, and the logistic high-rent classifier with a ROC curve and odds ratios. I wanted anyone to be able to read the market and test a property in a few clicks, not just look at a finished chart.</p>
+    <div class="pd-links" style="margin-top:2rem">
+      <a href="https://madridrentalanalysisapp-mariangarabana.streamlit.app/" target="_blank" rel="noopener">Open live app <span>↗</span></a>
+      <a class="ghost" href="https://github.com/MarianGarabana/Madrid_Rental_Analysis_StreamlitApp" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+    </div>
+  </div>
+  </section>
+
+  <div class="pd-next">
+    <span class="lbl">Next project</span>
+    <a href="trading.html">Trading System Automation <span>→</span></a>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script>
+/* ===== data ===== */
+var FX=[ {f:'Central location',v:0.90},{f:'Size (m²)',v:0.55},{f:'Floor level',v:0.30},{f:'Special listing',v:-0.42},{f:'Studio',v:-0.78} ];
+var AUC=0.94;
+/* Charts draw themselves in on first view. Off under reduce (Apex will not
+   check for itself, defect 4 in the note further down). */
+var ANIM=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+var ANIMOPT={enabled:ANIM,easing:'easeout',speed:900,animateGradually:{enabled:false},dynamicAnimation:{enabled:false}};
+
+/* Fires cb() once, the first time el has been reached, where "reached"
+   includes SCROLLED PAST.
+
+   NOT IntersectionObserver, and that is the whole point. IO only invokes its
+   callback when the intersection STATE changes. An element that goes from
+   below the fold to above the viewport in one scroll is not intersecting at
+   either end, so IO delivers no entry at all and any "did we pass it" test
+   inside the callback is unreachable in exactly the case it was written for.
+   Measured: a one-step jump to #s-build left all four charts as empty 260px
+   boxes, and two of them stayed empty for the rest of the session.
+
+   The rail makes those jumps ordinary: a pill click, a #s-build deep link, or
+   a reload that restores scroll all move several charts from below the fold to
+   above it at once. So position is tested directly on scroll instead, which no
+   jump size can defeat. Four elements, one rAF-throttled listener, and each
+   one drops out of the list as it fires. */
+var VIEW_WATCH=[];
+function onView(el,cb){
+  var e={el:el,cb:cb};
+  if(viewReached(e)) { cb(); return; }
+  VIEW_WATCH.push(e);
+  viewKick();
+}
+function viewReached(e){
+  var r=e.el.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return false;   /* not laid out yet */
+  return r.bottom<=0 || r.top<innerHeight;
+}
+var viewRaf=0;
+function viewSweep(){
+  viewRaf=0;
+  for(var i=VIEW_WATCH.length-1;i>=0;i--){
+    if(viewReached(VIEW_WATCH[i])){ var e=VIEW_WATCH.splice(i,1)[0]; e.cb(); }
+  }
+  if(!VIEW_WATCH.length){
+    removeEventListener('scroll',viewKick);
+    removeEventListener('resize',viewKick);
+  }
+}
+function viewKick(){ if(!viewRaf) viewRaf=requestAnimationFrame(viewSweep); }
+addEventListener('scroll',viewKick,{passive:true});
+addEventListener('resize',viewKick);
+
+/* ===== district heat map hero =====
+   The geometry and the colours are in the markup. This script adds the loupe and
+   the panel's live readout. Nothing here is required for the map to be correct:
+   if it never runs, every district paints at its confidence opacity and the map
+   is the full choropleth it has always been. */
+(function(){
+  var svg=document.getElementById('mapSvg'); if(!svg) return;
+  var stage=document.getElementById('mapStage');
+  function eur(v){ return '\u20ac'+Math.round(v).toLocaleString('en-US'); }
+
+  /* ===== district data: source of truth for the map's confidence encoding =====
+     FACTS.md lines 108-115, twenty districts, counts summing to 2,085. Asserted
+     before anything renders, because twenty hand-copied records is where a
+     silent typo hides. Villaverde has no listings and is excluded on purpose. */
+  var DISTRICTS=[
+    {name:'Salamanca',n:313},{name:'Moncloa-Aravaca',n:161},{name:'Chamartin',n:215},
+    {name:'Retiro',n:80},{name:'Chamberi',n:195},{name:'Hortaleza',n:118},
+    {name:'Centro',n:280},{name:'Fuencarral-El Pardo',n:112},{name:'Arganzuela',n:55},
+    {name:'Ciudad Lineal',n:100},{name:'Barajas',n:22},{name:'Tetuan',n:146},
+    {name:'San Blas',n:60},{name:'Latina',n:38},{name:'Moratalaz',n:15},
+    {name:'Usera',n:22},{name:'Villa de Vallecas',n:29},{name:'Vicalvaro',n:28},
+    {name:'Carabanchel',n:53},{name:'Puente de Vallecas',n:43}
+  ];
+  if(DISTRICTS.length!==20) throw new Error('Madrid district data: expected 20 districts, found '+DISTRICTS.length);
+  var nSum=DISTRICTS.reduce(function(s,d){ return s+d.n; },0);
+  if(nSum!==2085) throw new Error('Madrid district data: listing counts sum to '+nSum+', expected 2085');
+
+  /* Confidence encoding: a district's fill lightens toward the page background
+     as its sample size shrinks, so Moratalaz's 15-listing median reads as less
+     certain than Salamanca's 313-listing one even though both get a colour
+     from the same rent ramp. Square-root spacing keeps that wide count range
+     from collapsing into two or three visible steps. */
+  var ns=DISTRICTS.map(function(d){ return d.n; });
+  var nMin=Math.min.apply(null,ns), nMax=Math.max.apply(null,ns);
+  var OP_MIN=0.55, OP_MAX=1;
+  // conf[] keeps each district's confidence opacity. The loupe multiplies by it
+  // rather than overwriting it, so Moratalaz's 15-listing median still reads as
+  // fainter than Salamanca's 313-listing one when the loupe brings both up.
+  var conf={};
+  DISTRICTS.forEach(function(d){
+    var path=svg.querySelector('[data-district="'+d.name+'"]');
+    if(!path) throw new Error('Madrid district data: no map path for "'+d.name+'"');
+    var t=(Math.sqrt(d.n)-Math.sqrt(nMin))/(Math.sqrt(nMax)-Math.sqrt(nMin));
+    conf[d.name]=+(OP_MIN+t*(OP_MAX-OP_MIN)).toFixed(2);
+    path.style.fillOpacity=conf[d.name];
+  });
+  // Villaverde has no listings in the dataset. It must stay unshaded and must
+  // never be given a default value: verify that is still true after render.
+  var villaverde=svg.querySelector('[data-district="Villaverde"]');
+  if(!villaverde) throw new Error('Madrid district data: Villaverde path missing from the map');
+  if(villaverde.hasAttribute('data-rent')) throw new Error('Madrid district data: Villaverde must not carry a rent value');
+
+  /* ===== the loupe =====
+     The basemap is the resting state and the rent colours are what the loupe
+     brings up. The colours are NOT clipped to a circle: a circular clip cuts
+     arcs through Fuencarral and Barajas and leaves slices of fill floating
+     against bare basemap wherever the loupe crosses the edge of the
+     municipality. The loupe drives per-district opacity instead, so a district
+     is either coloured or it is not and no shape is ever cut.
+
+     Hiding the districts happens HERE rather than in the stylesheet on purpose:
+     a browser that never runs this still paints the full choropleth above. */
+  var paths=Array.prototype.slice.call(svg.querySelectorAll('.map-dpath'));
+  var peel=document.getElementById('mapPeel');
+  var elName=document.getElementById('mrName'), elRent=document.getElementById('mrRent');
+  var elN=document.getElementById('mrN'), elBar=document.getElementById('mrBar');
+  var MAX_RENT=2500;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* A loupe is a hover affordance. On a touch screen there is no hover, so
+     dimming the districts would leave a phone looking at a blank grey map and
+     hoping the reader thinks to drag across it. On (hover: none) the map stays
+     the full choropleth it has always been and only the readout is wired up. */
+  var coarse=matchMedia('(hover: none)').matches;
+
+  var geo=paths.map(function(p){
+    var c=conf[p.getAttribute('data-district')];
+    if(!coarse) p.style.fillOpacity=0;
+    return { el:p, conf:(c===undefined?1:c), o:coarse?1:0, mx:0, my:0, box:false };
+  });
+  // bboxes are read on first use, not at load: this section sits inside a tab
+  // panel, and getBBox on a display:none subtree returns zeros.
+  function measure(g){ if(!g.box){ var b=g.el.getBBox(); g.mx=b.x+b.width/2; g.my=b.y+b.height/2; g.box=true; } }
+
+  // CSS pixels -> viewBox user units. Required: the svg is xMinYMid slice, so
+  // the two spaces differ by scale and offset, differently at every width.
+  var pt=svg.createSVGPoint(), hitPt=svg.createSVGPoint();
+  function toUser(x,y){ pt.x=x; pt.y=y; var m=svg.getScreenCTM(); return m?pt.matrixTransform(m.inverse()):null; }
+
+  if(coarse){
+    peel.hidden=true;                            // nothing to toggle: it is all showing
+    // there is no loupe on this device, so the caption should not claim one.
+    // Only the caption changes; every figure under it is in the DOM already.
+    document.getElementById('mrLabel').textContent='Selected district';
+    stage.addEventListener('pointerdown', function(e){
+      var u=toUser(e.clientX,e.clientY); if(u) readout(districtAt(u.x,u.y));
+    });
+    paths.forEach(function(p){ p.addEventListener('focus', function(){ readout(p); }); });
+    return;
+  }
+
+  // R is the loupe radius in user units. A district the cursor is inside counts
+  // as distance 0 however large it is, so Fuencarral lights from anywhere within
+  // its own border rather than only near its centre.
+  var R=200, NEAR=R*0.5, FAR=R*1.3, LERP=0.18;
+  var tx=-9999, ty=-9999, cx=-9999, cy=-9999, active=false, raf=0, current=null;
+
+  /* Returns true while any district is still moving toward its target. The
+     opacities ease separately from the loupe's position because the distance
+     term is discontinuous: it drops to 0 the instant the cursor crosses a
+     border, so a district the size of Fuencarral would snap from faint to full
+     in a single frame without this. */
+  function draw(){
+    if(stage.classList.contains('map-peel')) return false;
+    hitPt.x=cx; hitPt.y=cy;
+    var off=cx<-9000, k=reduce?1:LERP, moving=false;
+    for(var i=0;i<geo.length;i++){
+      var g=geo[i], t=0;
+      if(!off){
+        measure(g);
+        var d=g.el.isPointInFill(hitPt)?0:Math.hypot(cx-g.mx, cy-g.my);
+        t=(FAR-d)/(FAR-NEAR); t=t<0?0:(t>1?1:t);
+      }
+      g.o+=(t-g.o)*k;
+      if(Math.abs(t-g.o)>0.002) moving=true; else g.o=t;
+      g.el.style.fillOpacity=(g.o*g.conf).toFixed(3);
+    }
+    return moving;
+  }
+  function tick(){
+    var k=reduce?1:LERP;
+    cx+=(tx-cx)*k; cy+=(ty-cy)*k;
+    var fading=draw();
+    var sliding=Math.abs(tx-cx)>0.3||Math.abs(ty-cy)>0.3;
+    raf=(fading||(active&&sliding))?requestAnimationFrame(tick):0;
+  }
+  function kick(){ if(!raf) raf=requestAnimationFrame(tick); }
+
+  function readout(p){
+    if(p===current||!p) return;
+    current=p;
+    var rent=p.getAttribute('data-rent');
+    elName.textContent=p.getAttribute('data-district');
+    if(rent){
+      // sample size is part of the fact: Moratalaz's median rests on 15 listings, Salamanca's on 313
+      elRent.textContent=eur(+rent);
+      elN.textContent=(+p.getAttribute('data-n')).toLocaleString('en-US');
+      elBar.style.transform='scaleX('+(+rent/MAX_RENT).toFixed(3)+')';
+      elBar.style.backgroundColor=p.getAttribute('fill');
+    } else {
+      elRent.textContent='No listings';
+      elN.textContent='0';
+      elBar.style.transform='scaleX(0)';
+    }
+  }
+  // Hit test in user space. isPointInFill reads the geometry, so it still works
+  // at fill-opacity 0, which pointer events on the paths would not.
+  function districtAt(ux,uy){
+    hitPt.x=ux; hitPt.y=uy;
+    for(var i=0;i<paths.length;i++){ if(paths[i].isPointInFill(hitPt)) return paths[i]; }
+    return null;
+  }
+
+  function move(e){
+    if(stage.classList.contains('map-peel')) return;
+    var p=toUser(e.clientX,e.clientY); if(!p) return;
+    if(!active){ active=true; cx=p.x; cy=p.y; }   // no swoop in from off-screen
+    tx=p.x; ty=p.y;
+    readout(districtAt(p.x,p.y));
+    kick();
+  }
+  function leave(){ active=false; tx=ty=cx=cy=-9999; kick(); }
+
+  stage.addEventListener('pointermove', move);
+  stage.addEventListener('pointerdown', move);
+  stage.addEventListener('pointerleave', leave);
+  stage.addEventListener('pointercancel', leave);
+
+  // Keyboard parity: tabbing a district moves the loupe onto it and reads it
+  // out, so the colours are reachable with no pointer at all.
+  paths.forEach(function(p,i){
+    p.addEventListener('focus', function(){
+      readout(p);
+      if(stage.classList.contains('map-peel')) return;
+      measure(geo[i]);
+      active=true; tx=geo[i].mx; ty=geo[i].my;
+      if(cx<-9000){ cx=tx; cy=ty; }
+      kick();
+    });
+  });
+  svg.addEventListener('keydown', function(e){ if(e.key==='Escape'){ e.target.blur(); leave(); } });
+
+  // The route to the colours that needs no pointer, so nothing is gated behind hover.
+  peel.addEventListener('click', function(){
+    var on=peel.getAttribute('aria-pressed')!=='true';
+    peel.setAttribute('aria-pressed', String(on));
+    stage.classList.toggle('map-peel', on);
+    peel.textContent = on ? 'Back to the loupe' : 'Show every district';
+    if(on){ leave(); geo.forEach(function(g){ g.o=1; g.el.style.fillOpacity=g.conf; }); }
+    else { kick(); }
+  });
+})();
+
+/* ===== ApexCharts: segment donut, segment rent bars, feature effects, ROC =====
+   The four charts below replace the page's hand-rolled donut/bar/gauge SVGs
+   with ApexCharts, same treatment as datathon.html's flight-demand chart.
+   apexcharts.min.js is 164.6 KB gzipped and none of these four charts live on
+   the default-open tab ("The market" has none), so window.loadApex() (main.js)
+   is only called from inside a panel-open callback: a reader who stays on
+   the market tab never fetches it, and it is fetched once total no matter
+   how many of the four panels get opened, since loadApex() memoises its
+   promise. Every array below is copied verbatim from the markup/JS this file
+   already had (SEGMENTS from the old donut circles and hb rows, FX and AUC
+   already declared above), not re-derived.
+
+   Seven ApexCharts defects measured in this site's chart lab, applied here:
+   1. Default data-label colours fail AA on some marks (measured 3.79:1 on a
+      dark one). Every dataLabels colour below is checked against the real
+      mark behind it, and every axis, legend and grid colour against this
+      page's actual card surface, #341A2B, not assumed: see the per-point
+      colour arrays and the comments beside them. Apex's own defaults for axis
+      text (#373d3f) and grid lines are built for a light card and are set
+      explicitly on every chart below, since on this canvas they would paint
+      near-black on near-black.
+   2. Native axis/category labels can truncate at narrow widths regardless of
+      maxWidth. Checked by eye at 390px for every label used below (segment
+      names on the rent chart, feature names on the effects chart); none is
+      as long as the district names that triggered this defect elsewhere.
+   3. Neither render() nor updateOptions() resolving proves Apex finished
+      repainting its DOM. Nothing below reads Apex's own post-render markup,
+      so this does not apply here.
+   4. Apex's entrance animation tweens a width attribute, not opacity or
+      transform, and ignores prefers-reduced-motion. So it is gated on ANIM
+      below, which is false whenever reduce is set: the draw-in is an
+      enhancement and a static chart is the honest floor. animateGradually is
+      off, because a series trickling in point by point reads as a slow page
+      rather than as a chart being drawn.
+   5. An unset axis min lets Apex auto-scale to negative ticks. Every axis
+      below sets min and max explicitly (the ROC axes are pinned 0 to 1).
+   6. Apex pins an explicit pixel width on its inner svg and never shrinks it
+      back on its own. Every mount below carries min-width:0 (.apex-host,
+      CSS above) and apexAutoResize() forces a redraw at the container's real
+      width on both a real window resize and a tab reveal (main.js dispatches
+      a resize event on every tab switch).
+   7. chart.windowResize() does not exist in this vendored v5.16.0 and throws.
+      apexAutoResize() below uses the documented workaround instead, an empty
+      updateOptions({}, false, false) call, which re-measures the container. */
+
+/* There are no panels to open any more: every chart mounts the first time its
+   own card scrolls into view, through onView() above. That keeps the one thing
+   the tabs were actually buying, which is that a reader who never reaches the
+   segments section never fetches the 164.6 KB Apex bundle. */
+/* Manual resize wiring for a mounted Apex instance (defects 6 and 7 above). */
+function apexAutoResize(container, chart){
+  var raf=0;
+  function fire(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(function(){ chart.updateOptions({}, false, false); }); }
+  if(window.ResizeObserver) new ResizeObserver(fire).observe(container);
+  window.addEventListener('resize', fire);
+}
+/* Apex paints a data-label's colour with the SVG "fill" attribute, never the
+   CSS "color" property. Visually that is all that is needed, the glyph is
+   the right colour either way, measured directly against its own mark. But
+   this project's accessibility gate falls back to reading getComputedStyle().
+   color when axe itself cannot resolve an SVG element's background (an SVG
+   bar is not a CSS background-color axe can read), and an unset color leaves
+   that fallback reading the page's inherited ink instead of the real white
+   glyph, a false failure the gate cannot tell from a real one. Copying fill
+   onto style.color on every data-label node makes the two agree, matching
+   what is actually on screen without changing a single rendered pixel. Runs
+   after every (re)draw, since a resize replaces these text nodes. */
+function apexSyncLabelColor(container){
+  var mo=new MutationObserver(function(){
+    container.querySelectorAll('.apexcharts-datalabel').forEach(function(t){
+      var f=t.getAttribute('fill'); if(f && t.style.color!==f) t.style.color=f;
+    });
+  });
+  mo.observe(container, {childList:true, subtree:true});
+}
+
+/* ===== segments tab: donut + median-rent bars, same panel, one Apex load ===== */
+/* Verbatim from the donut circles this replaces: five segment shares
+   (the old stroke-dasharray values) and their swatch colours. */
+/* One hue moved for the dark conversion. #9c1a6c measures 2.29:1 on --surface and
+   2.09:1 on the tinted end of the card wash, so the High-Rise Exterior slice and
+   its bar were both under the 3:1 graphics floor and visibly sinking into the
+   card. It cannot simply be lightened: every lighter magenta that clears 3:1
+   lands within ΔE 10 of --pink #e84c9a two slots away (measured with
+   scripts/validate-palette.js, --pairs all: #b8478b scores 9.5, #d16aa4 scores
+   6.2, both below the 15 normal-vision floor). #AB36D8 is the same colour pushed
+   round to the violet side of magenta, and it restores the palette to exactly the
+   separation the cream version had: CVD 12.5, normal-vision 16.7, identical
+   binding pairs, and now all five slots clear 3:1 instead of three of them
+   failing. The remaining validator FAIL, the OKLCH lightness band, is inherited
+   unchanged from the cream palette and belongs to the three identity hues. */
+var SEGMENTS=[
+  {name:'Standard Exterior Living', pct:58,   color:'#f4a6c8'},
+  {name:'Entry-Level Interior',     pct:12,   color:'#cde04b'},
+  {name:'High-Rise Exterior',       pct:11.4, color:'#AB36D8'},
+  {name:'Urban Premium',            pct:10.7, color:'#e84c9a'},
+  {name:'Grand Estate',             pct:7.8,  color:'#7cb342'}
+];
+(function(){
+  var el=document.getElementById('segDonut'); if(!el) return;
+  var chart=null;
+  onView(el, function(){
+    if(chart) return;
+    window.loadApex().then(function(Apex){
+      chart=new Apex(el, {
+        chart:{ type:'donut', height:280, width:'100%', fontFamily:'inherit', animations:ANIMOPT },
+        series: SEGMENTS.map(function(s){ return s.pct; }),
+        labels: SEGMENTS.map(function(s){ return s.name; }),
+        colors: SEGMENTS.map(function(s){ return s.color; }),
+        /* the separator between slices is the card's own top-half colour, so it
+           reads as a gap rather than as a white ring drawn on a dark card */
+        stroke:{ width:2, colors:['#241621'] },
+        /* On-slice labels are what silently drops a thin slice on this build
+           (measured on spain's donut, same version). Off; the legend below
+           carries every share as always-visible text instead, never
+           hover-gated, so real values are in the DOM at first paint. */
+        dataLabels:{ enabled:false },
+        /* --ink-soft, 9.74:1 on the card's tinted low end. The cream page's
+           #3a3a37 measures 1.35:1 here. */
+        legend:{ show:true, position:'bottom', fontSize:'11.5px', labels:{colors:'#DBC5D3'},
+          markers:{ offsetX:-2 }, itemMargin:{horizontal:8,vertical:4},
+          formatter:function(name, opts){ return name+': '+SEGMENTS[opts.seriesIndex].pct+'%'; } },
+        plotOptions:{ pie:{ donut:{ size:'60%' } } },
+        tooltip:{ theme:'dark', y:{ formatter:function(v){ return v+'% of listings'; } } }
+      });
+      chart.render().then(function(){ apexAutoResize(el, chart); });
+    }).catch(function(err){
+      console.error('segDonut: ApexCharts failed to load or render', err);
+      el.textContent='Share of listings per segment: Standard Exterior Living 58%, Entry-Level Interior 12%, High-Rise Exterior 11.4%, Urban Premium 10.7%, Grand Estate 7.8%.';
+    });
+  });
+})();
+(function(){
+  var el=document.getElementById('segRentBars'); if(!el) return;
+  var chart=null;
+  /* Verbatim from the old hb rows this replaces (categories, rents, colours,
+     order highest to lowest). "Standard Exterior" and "Entry-Level Interior"
+     are the shorter labels the hb rows used here, not the longer segment
+     names the donut legend used; both names are correct, this chart keeps
+     the one that was already on this specific list.
+     Text-label colour is chosen per bar against that bar's own fill (defect
+     1), so it does not move with the page: ink #111110 still reads 4.5:1+ on
+     every swatch except High-Rise Exterior, which still takes white. Only the
+     number behind that one changed with the hue: white on the old #9c1a6c
+     measured 7.56:1, on #AB36D8 it measures 4.94:1. White on the other four
+     still all fail, as low as 1.46:1 on the palest. */
+  var RENT_ROWS=[
+    {name:'Grand Estate',        rent:4500, color:'#7cb342', label:'#111110'},
+    {name:'Urban Premium',       rent:2100, color:'#e84c9a', label:'#111110'},
+    {name:'High-Rise Exterior',  rent:1600, color:'#AB36D8', label:'#FFFFFF'},
+    {name:'Standard Exterior',   rent:1300, color:'#f4a6c8', label:'#111110'},
+    {name:'Entry-Level Interior',rent:1075, color:'#cde04b', label:'#111110'}
+  ];
+  onView(el, function(){
+    if(chart) return;
+    window.loadApex().then(function(Apex){
+      chart=new Apex(el, {
+        chart:{ type:'bar', height:280, width:'100%', fontFamily:'inherit', toolbar:{show:false}, animations:ANIMOPT },
+        series:[{ name:'Median rent', data: RENT_ROWS.map(function(s){ return s.rent; }) }],
+        colors: RENT_ROWS.map(function(s){ return s.color; }),
+        /* defect 1, the part that only shows up measured, not eyeballed: Apex's
+           chart-wide default fill.opacity (0.85) blends every bar toward the
+           card behind it, so on the cream build High-Rise Exterior's bar
+           actually painted at rgb(171,60,130), not at its own hex, and the
+           white label measured 3.33:1 on the lightened version axe actually
+           saw. The dark card makes the same defect worse, not better: it
+           blends the bars DOWN instead of up. Pinned to 1 so every bar renders
+           at the exact hex the label colours above were checked against. */
+        fill:{ opacity:1 },
+        plotOptions:{ bar:{ horizontal:true, distributed:true, borderRadius:4, barHeight:'62%', dataLabels:{position:'center'} } },
+        dataLabels:{ enabled:true,
+          formatter:function(v){ return '€'+v.toLocaleString('en-US'); },
+          style:{ fontSize:'12px', fontWeight:600, colors:RENT_ROWS.map(function(s){ return s.label; }) } },
+        xaxis:{ categories: RENT_ROWS.map(function(s){ return s.name; }),
+          min:0, max:5000, tickAmount:5,
+          labels:{ formatter:function(v){ return '€'+Math.round(v).toLocaleString('en-US'); }, style:{fontSize:'10.5px', colors:'#A28E9C'} },
+          axisBorder:{show:false}, axisTicks:{show:false} },
+        yaxis:{ labels:{ style:{fontSize:'11px', colors:'#DBC5D3'} } },
+        grid:{ borderColor:'rgba(255,255,255,.09)', xaxis:{lines:{show:true}}, yaxis:{lines:{show:false}} },
+        legend:{ show:false },
+        tooltip:{ theme:'dark', y:{ formatter:function(v){ return '€'+v.toLocaleString('en-US')+' median'; } } },
+        /* defect 2: six full "€1,000"-style tick labels measured overlapping
+           at 390px (Apex's maxWidth truncation does not stop it). Below the
+           same 820px width where .m-two itself collapses to one column, the
+           axis switches to a compact "€1k" formatter instead of a hand-built
+           post-render label layer, since every tick value here is already a
+           round thousand and a k-suffix loses no precision. */
+        responsive:[{ breakpoint:820, options:{ xaxis:{ labels:{
+          formatter:function(v){ return v===0 ? '€0' : '€'+Math.round(v/1000)+'k'; }
+        } } } }]
+      });
+      chart.render().then(function(){ apexAutoResize(el, chart); apexSyncLabelColor(el); });
+    }).catch(function(err){
+      console.error('segRentBars: ApexCharts failed to load or render', err);
+      el.textContent='Median rent by segment: Grand Estate €4,500, Urban Premium €2,100, High-Rise Exterior €1,600, Standard Exterior €1,300, Entry-Level Interior €1,075.';
+    });
+  });
+})();
+
+/* ===== regression tab: feature effects, diverging bar ===== */
+(function(){
+  var el=document.getElementById('fxChart'); if(!el) return;
+  var chart=null;
+  onView(el, function(){
+    if(chart) return;
+    window.loadApex().then(function(Apex){
+      chart=new Apex(el, {
+        chart:{ type:'bar', height:150, width:'100%', fontFamily:'inherit', toolbar:{show:false}, animations:ANIMOPT },
+        series:[{ name:'Effect', data: FX.map(function(d){ return d.v; }) }],
+        /* the two hexes ARE --lime and --mag: the fx-legend swatches under the
+           chart are painted from those tokens, so if these drift the legend
+           stops describing the chart. #d1198a was the cream --mag. */
+        colors: FX.map(function(d){ return d.v>=0 ? '#c3d92f' : '#E8479B'; }),
+        /* pinned for the same reason as the rent chart: Apex's default 0.85
+           bar fill.opacity otherwise renders lime/mag lighter than the hexes
+           the palette gate was run against. */
+        fill:{ opacity:1 },
+        /* 38%, down from 55%: at 125px tall the five rows are 25px each, so a
+           thinner bar is what buys the gap between the variables. */
+        plotOptions:{ bar:{ horizontal:true, distributed:true, borderRadius:3, barHeight:'38%' } },
+        /* No printed values on the bars, matching the design this replaces:
+           these are relative effect sizes with no real unit, so a numeric
+           label would read as more precise than the model actually claims.
+           Direction alone (the fx-legend under the chart, and this custom
+           tooltip) carries the finding without inventing a number for it. */
+        dataLabels:{ enabled:false },
+        xaxis:{ categories: FX.map(function(d){ return d.f; }),
+          min:-1, max:1, tickAmount:4, labels:{ show:false },
+          axisBorder:{show:false}, axisTicks:{show:false} },
+        yaxis:{ labels:{ style:{fontSize:'12.5px', colors:'#DBC5D3'} } },
+        /* Negative top padding removes the band Apex reserves above the first
+           category, which read as the chart being pushed down inside its card.
+           The x axis prints no labels here, so the bottom band is dead space too. */
+        grid:{ borderColor:'rgba(255,255,255,.09)', xaxis:{lines:{show:false}}, yaxis:{lines:{show:false}},
+          padding:{top:-14,bottom:-10,left:0,right:4} },
+        annotations:{ xaxis:[{ x:0, borderColor:'rgba(255,255,255,.28)', strokeDashArray:0 }] },
+        legend:{ show:false },
+        tooltip:{ theme:'dark', custom:function(o){
+          var d=FX[o.dataPointIndex];
+          return '<div style="padding:.5rem .7rem;font-size:.72rem;line-height:1.5">'+
+            '<b>'+d.f+'</b><br>'+(d.v>=0?'Increases':'Decreases')+' predicted rent</div>';
+        } }
+      });
+      chart.render().then(function(){ apexAutoResize(el, chart); });
+    }).catch(function(err){
+      console.error('fxChart: ApexCharts failed to load or render', err);
+      el.textContent='Feature effects on predicted rent, ordered by size of effect: central location and size increase rent the most; being a special listing or a studio decreases it, studio the most.';
+    });
+  });
+})();
+
+/* ===== classifier tab: ROC curve, replacing the SVG line and the removed gauge =====
+   Same generating formula the old hand-drawn SVG used (tpr = fpr^a, solved so
+   AUC = 1/(1+a)), now built as real Apex series data instead of an SVG path
+   string, so points are real, hoverable data rather than pixels. The random-
+   classifier diagonal is a second series with its own dash pattern: per the
+   chart lab, a curve and its reference line must be tellable apart without
+   colour alone. */
+(function(){
+  var el=document.getElementById('rocChart'); if(!el) return;
+  var chart=null;
+  var a=1/AUC-1, rocPts=[];
+  for(var i=0;i<=40;i++){ var fpr=i/40; rocPts.push({ x:+fpr.toFixed(3), y:+Math.pow(fpr,a).toFixed(4) }); }
+  var baseline=[{x:0,y:0},{x:1,y:1}];
+  onView(el, function(){
+    if(chart) return;
+    window.loadApex().then(function(Apex){
+      chart=new Apex(el, {
+        chart:{ type:'line', height:125, width:'100%', fontFamily:'inherit', toolbar:{show:false}, animations:ANIMOPT },
+        series:[
+          { name:'Classifier (AUC '+AUC+')', type:'area', data: rocPts },
+          { name:'Random baseline', type:'line', data: baseline }
+        ],
+        /* --mag, not the cream page's #d1198a: that measured 3.17:1 on this
+           card's tinted low end against a 3:1 floor, with no margin left for a
+           2.5px stroke. #E8479B measures 4.37:1. The grey baseline keeps its
+           value, 4.73:1 here. */
+        colors:['#E8479B','#8a8f7a'],
+        /* eighth ApexCharts defect, measured while building this chart, not
+           on the standing list of seven: in a mixed area+line combo chart
+           this build (v5.16.0) leaks fill.opacity[seriesIndex] into that
+           series' own STROKE alpha too, not just its fill. [0.12, 0] made
+           the baseline line's stroke fully transparent, an invisible
+           reference line with a legend entry pointing at nothing. The
+           baseline gets 1 here to cancel that leak out, verified against the
+           rendered stroke attribute (rgba(138,143,122,1)), not assumed. */
+        fill:{ opacity:[0.12, 1] },
+        stroke:{ curve:'straight', width:[2.5,1.5], dashArray:[0,6] },
+        markers:{ size:0, hover:{size:4}, strokeColors:'#241621' },
+        /* defect 5: pin both axes, a bare probability chart auto-scaling to
+           negative ticks would be actively misleading here. */
+        /* Axis titles are dropped at this width: in a third of the row they
+           took more room than the plot. The axes are named in the caption
+           under the chart instead, once, in words. */
+        xaxis:{ type:'numeric', min:0, max:1, tickAmount:2,
+          labels:{ formatter:function(v){ return v.toFixed(1); }, style:{fontSize:'10px', colors:'#A28E9C'} },
+          axisBorder:{show:false}, axisTicks:{show:false} },
+        yaxis:{ min:0, max:1, tickAmount:2,
+          labels:{ formatter:function(v){ return v.toFixed(1); }, style:{fontSize:'10px', colors:'#A28E9C'} } },
+        /* Same fix as the feature-effects chart: with the legend off, the band
+           Apex reserves for it is dead space, and it was leaving the curve
+           drawn in a 65px strip inside a 125px card.
+           Bottom padding back to +4: at -8 the tick labels were half outside
+           the plot box and rendered clipped. Only the top band is dead here. */
+        grid:{ borderColor:'rgba(255,255,255,.09)', padding:{top:-20,bottom:4,left:0,right:6} },
+        /* Off at this size: two legend rows over a 150px plot left almost no
+           chart. The dashed baseline is named in the caption under it. */
+        legend:{ show:false },
+        tooltip:{ theme:'dark', shared:false,
+          x:{ formatter:function(v){ return 'FPR '+v.toFixed(2); } },
+          y:{ formatter:function(v){ return 'TPR '+v.toFixed(2); } } }
+      });
+      chart.render().then(function(){ apexAutoResize(el, chart); });
+    }).catch(function(err){
+      console.error('rocChart: ApexCharts failed to load or render', err);
+      el.textContent='ROC curve for the high-rent classifier: area under the curve 0.94, well above the random-classifier diagonal.';
+    });
+  });
+})();
+</script>
+<script>
+/* ===== SECTION RAIL: scrollspy =====
+   The rail's anchors already work without this. All this adds is which pill is
+   lit, the offset jump so a target never lands under the sticky rail, and
+   keeping the lit pill inside the rail's own horizontal scroll on a phone.
+   aria-current, not aria-selected: these are links now, not tabs. */
+(function(){
+  var rail=document.getElementById('secnav'); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll('a[href^="#s-"]'));
+  var secs=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  if(secs.some(function(s){ return !s; })) return;
+
+  var cur=-1;
+  function light(i){
+    if(i===cur) return;
+    cur=i;
+    links.forEach(function(a,j){
+      if(i===j) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    /* Keep the lit pill visible in the rail's own scroller. scrollIntoView
+       would scroll the PAGE as well, which fights the reader. */
+    var a=links[i];
+    if(rail.scrollWidth>rail.clientWidth){
+      var want=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2;
+      rail.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+    }
+  }
+
+  /* A section counts as current once its top passes the rail. Reading position
+     beats intersection ratio here: the sections are wildly different heights,
+     so the tallest one would otherwise hold the marker while a short one owns
+     the screen. */
+  var raf=0;
+  function measure(){
+    raf=0;
+    var line=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76)+110;
+    var i=0;
+    for(var k=0;k<secs.length;k++){ if(secs[k].getBoundingClientRect().top<=line) i=k; }
+    light(i);
+  }
+  function onScroll(){ if(!raf) raf=requestAnimationFrame(measure); }
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',onScroll);
+  measure();
+
+  /* Offset jump. Native anchor scrolling honours scroll-margin-top, so this
+     only exists to stay in step with Lenis when enhance.js has it running. */
+  /* Jump target is computed here rather than handed to Lenis as an element plus
+     an offset. Measured: passing {offset:-(navH+70)} landed the section 52px
+     too high, with the eyebrow entirely behind the rail, because Lenis resolves
+     an element target from offsetTop and does not account for this page's
+     sticky chrome the way the CSS scroll-margin path does. An absolute pixel
+     target has no such ambiguity, and the chrome is measured at click time so a
+     hidden nav (scroll-down) and a restored one (scroll-up) both work.
+     fix() re-asserts the landing after the travel, because the nav can change
+     state mid-flight and shift the rail under the heading we just parked. */
+  function pad(){
+    var navH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||76;
+    return navH+rail.getBoundingClientRect().height+12;
+  }
+  function jump(i){
+    var y=Math.max(0,scrollY+secs[i].getBoundingClientRect().top-pad());
+    function fix(){
+      var top=secs[i].getBoundingClientRect().top;
+      var need=rail.getBoundingClientRect().bottom+12;
+      if(top<need-1){
+        var to=Math.max(0,scrollY-(need-top));
+        if(window.lenis) window.lenis.scrollTo(to,{immediate:true});
+        else window.scrollTo(0,to);
+      }
+    }
+    if(window.lenis) window.lenis.scrollTo(y,{duration:1.1,onComplete:fix});
+    else { window.scrollTo({top:y,behavior:'smooth'}); setTimeout(fix,700); }
+  }
+
+  links.forEach(function(a,i){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      jump(i);
+      history.replaceState(null,'',a.getAttribute('href'));
+      light(i);
+    });
+  });
+
+  /* A deep link lands before this script has measured anything, and the browser
+     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+  if(location.hash){
+    var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
+    if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+<script src="enhance.js" defer></script>
+<!-- Shared with index and the other project pages: snow-bg.js, the #snowBg rules
+     in styles.css, and the two lines that opt a page in. The colour is this
+     page's own text-safe pink, --mag-ink, named on the canvas because the
+     project pages do not carry --accent. -->
+<script src="snow-bg.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Project · Marian Garabana</title>
+<meta name="description" content="Selected data science and analytics projects by Marian Garabana." />
+<meta name="author" content="Marian Garabana" />
+<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/project.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#F3F2EE" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Project · Marian Garabana" />
+<meta property="og:description" content="Selected data science and analytics projects by Marian Garabana." />
+<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/project.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Marian Garabana" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Project · Marian Garabana" />
+<meta name="twitter:description" content="Selected data science and analytics projects by Marian Garabana." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#pdRoot">Skip to content</a>
+
+<!-- NAV -->
+<div class="nav-outer" id="navOuter">
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <div class="nav-brand">
+      <div class="nav-ava" id="navAva">MG</div>
+      <span class="nav-name">Marian Garabana</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html#projects">Work</a>
+      <a href="index.html#services">Skills</a>
+      <a href="index.html#education">Education</a>
+      <a href="index.html#about">About</a>
+    </div>
+    <a href="index.html#contact" class="nav-cta">Contact</a>
+    <button class="nav-burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+</div>
+
+<!-- PROJECT CONTENT (rendered by JS) -->
+<main class="wrap" id="pdRoot">
+  <div class="pd-head">
+    <a href="index.html#projects" class="pd-back">← All projects</a>
+    <div class="pd-cat" id="pdCat"></div>
+    <h1 class="pd-title" id="pdTitle"></h1>
+    <p class="pd-sub" id="pdSub"></p>
+    <div class="pd-facts" id="pdFacts"></div>
+    <div class="pd-links" id="pdLinks"></div>
+  </div>
+  <div class="pd-hero reveal" id="pdHero"><div class="ph" id="pdHeroNum"></div></div>
+  <div id="pdBlocks"></div>
+  <div class="pd-next" id="pdNext"></div>
+</main>
+
+<!-- FOOTER -->
+<div class="wrap">
+  <footer>
+    <div class="foot">
+      <div class="fl">Marian Garabana</div>
+      <div class="fr">
+        <a href="mailto:marian.garabana@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/MarianGarabana" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="foot-copy">© <span id="yr"></span> Marian Garabana. Built from scratch.</div>
+  </footer>
+</div>
+
+<!-- FLOATING PILL -->
+<div class="float-pill" id="floatPill">
+  <div class="fp-txt"><b>Get in touch</b><span>Email me anytime</span></div>
+  <a href="mailto:marian.garabana@gmail.com" class="fp-ico" aria-label="Email Marian"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg></a>
+</div>
+
+<script src="projects-data.js"></script>
+<script>
+/* ---------- render the project from ?id= ---------- */
+(function(){
+  var params = new URLSearchParams(location.search);
+  var id = params.get('id');
+  // these have their own dedicated pages
+  if(id === 'datathon-2025'){ location.replace('datathon.html'); return; }
+  if(id === 'hospital-mlops'){ location.replace('hospital.html'); return; }
+  if(id === 'madrid-rental'){ location.replace('madrid.html'); return; }
+  if(id === 'trading-system'){ location.replace('trading.html'); return; }
+  if(id === 'titan-sentinel'){ location.replace('titan.html'); return; }
+  if(id === 'spanish-grid'){ location.replace('spain.html'); return; }
+  if(id === 'aerospace-maintenance'){ location.replace('aerospace.html'); return; }
+  if(id === 'rlgym'){ location.replace('rl.html'); return; }
+  if(id === 'dicorsa-forecasting'){ location.replace('dicorsa.html'); return; }
+  var d = (typeof PROJECTS !== 'undefined') ? PROJECTS[id] : null;
+
+  if(!d){
+    document.getElementById('pdRoot').innerHTML =
+      '<div class="pd-head"><a href="index.html#projects" class="pd-back">← All projects</a>' +
+      '<h1 class="pd-title">Project not found</h1>' +
+      '<p class="pd-sub">This project link is not valid. Head back to see all projects.</p></div>';
+    return;
+  }
+
+  document.title = d.title + ' · Marian Garabana';
+  document.documentElement.style.setProperty('--c1', d.c1);
+  document.documentElement.style.setProperty('--c2', d.c2);
+
+  document.getElementById('pdCat').textContent = d.cat || '';
+  document.getElementById('pdTitle').textContent = d.title || '';
+  document.getElementById('pdSub').textContent = d.sub || '';
+
+  // facts
+  document.getElementById('pdFacts').innerHTML = (d.facts||[]).map(function(f){
+    return '<div class="pd-fact"><div class="k">'+f.k+'</div><div class="v">'+f.v+'</div></div>';
+  }).join('');
+
+  // links (optional)
+  var linksEl = document.getElementById('pdLinks');
+  if(d.links && d.links.length){
+    linksEl.innerHTML = d.links.map(function(l,i){
+      var ext = (l.url && l.url!=='#') ? ' target="_blank" rel="noopener"' : '';
+      var cls = i===0 ? '' : 'ghost';
+      return '<a class="'+cls+'" href="'+l.url+'"'+ext+'>'+l.label+' <span>↗</span></a>';
+    }).join('');
+  } else { linksEl.style.display='none'; }
+
+  // hero
+  var hero = document.getElementById('pdHero');
+  hero.style.setProperty('--c1', d.c1); hero.style.setProperty('--c2', d.c2);
+  if(d.hero){
+    hero.innerHTML = '<img src="'+d.hero+'" alt="'+d.title+'"/>';
+    var heroImg = hero.querySelector('img');
+    heroImg.addEventListener('error', function(){ hero.innerHTML = '<div class="ph">'+(d.num||'')+'</div>'; });
+  }
+  else { document.getElementById('pdHeroNum').textContent = d.num || ''; }
+
+  // helper to build an image slot
+  function imgSlot(o, cls){
+    o = o || {};
+    var fit = (o.img && o.fit==='contain') ? ' contain' : '';
+    var inner = o.img ? '<img src="'+o.img+'" alt="'+(o.alt||'')+'" loading="lazy" onerror="this.remove()"/>' : '<div class="ph">'+(o.ph||'Image')+'</div>';
+    return '<div class="pd-img '+(cls||'')+fit+'">'+inner+'</div>';
+  }
+
+  // blocks
+  var html = (d.blocks||[]).map(function(b){
+    if(b.type==='text'){
+      return '<div class="pd-text reveal"><h3>'+(b.h||'')+'</h3>'+(b.p||[]).map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+    }
+    if(b.type==='wide'){
+      return '<div class="pd-block reveal">'+imgSlot({img:b.img,ph:b.ph,alt:b.alt},'wide')+'</div>';
+    }
+    if(b.type==='pair'){
+      return '<div class="pd-block reveal"><div class="pd-pair">'+imgSlot(b.a,'tall')+imgSlot(b.b,'tall')+'</div></div>';
+    }
+    if(b.type==='shot'){
+      var cap = b.caption ? '<div class="pd-shot-cap">'+b.caption+'</div>' : '';
+      var sp = (b.spotlight ? ' spotlight' : '') + (b.light ? ' light' : '');
+      return '<div class="pd-block reveal"><div class="pd-shot'+sp+'">' +
+        '<div class="pd-shot-bar"><i></i><i></i><i></i><span class="u"></span></div>' +
+        '<img src="'+b.img+'" alt="'+(b.alt||b.caption||'')+'" loading="lazy" onerror="this.remove()"/>' + cap +
+        '</div></div>';
+    }
+    if(b.type==='pdf'){
+      var lbl = b.label || 'Presentation';
+      return '<div class="pd-block reveal"><div class="pd-embed">' +
+        '<iframe src="'+b.src+'#view=FitH" title="'+lbl+'" loading="lazy"></iframe>' +
+        '<div class="pd-embed-bar"><span class="lbl">'+lbl+'</span>' +
+        '<a href="'+b.src+'" target="_blank" rel="noopener">Open full screen <span>↗</span></a></div>' +
+        '</div></div>';
+    }
+    return '';
+  }).join('');
+  document.getElementById('pdBlocks').innerHTML = html;
+
+  // prev / next
+  var order = (typeof PROJECT_ORDER!=='undefined') ? PROJECT_ORDER : Object.keys(PROJECTS);
+  var i = order.indexOf(id);
+  var nextId = order[(i+1) % order.length];
+  var nd = PROJECTS[nextId];
+  if(nd){
+    var dedicated = {'datathon-2025':'datathon.html','hospital-mlops':'hospital.html','madrid-rental':'madrid.html','trading-system':'trading.html','titan-sentinel':'titan.html','spanish-grid':'spain.html','aerospace-maintenance':'aerospace.html','rlgym':'rl.html','dicorsa-forecasting':'dicorsa.html'};
+    var nextHref = dedicated[nextId] || ('project.html?id='+nextId);
+    document.getElementById('pdNext').innerHTML =
+      '<span class="lbl">Next project</span>' +
+      '<a href="'+nextHref+'">'+nd.title+' <span>→</span></a>';
+  }
+})();
+</script>
+<script src="main.js" defer></script>
+</body>
+</html>
