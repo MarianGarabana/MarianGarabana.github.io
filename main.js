@@ -31,10 +31,10 @@
   }
   /* Direction-aware chrome. Both the nav and the pill are fixed elements that
      sit on top of running text, and blurring them did not fix that: it left
-     grey letter ghosts that read as a rendering fault, and at 834 the nav cut
+     gray letter ghosts that read as a rendering fault, and at 834 the nav cut
      across the "1ST PLACE" badge. Reading happens while scrolling down, so
      both leave on the way down and come back on the way up, where you are
-     looking for navigation rather than reading. One behaviour, two problems.
+     looking for navigation rather than reading. One behavior, two problems.
 
      UP_SLACK exists so a trackpad's jitter around zero cannot flicker the nav
      back in mid-sentence: it takes a deliberate 6px upward move. */

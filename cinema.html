@@ -6,21 +6,21 @@
 <title>Cinema Chain Database · Marian Garabana</title>
 <meta name="description" content="A relational database for a cinema chain across Madrid, Barcelona, and Sevilla: 17 tables in third normal form, 817 seed rows, and five business questions answered in SQL." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/cinema.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/cinema.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#0d0606" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Cinema Chain Database · Marian Garabana" />
 <meta property="og:description" content="A relational database for a cinema chain across Madrid, Barcelona, and Sevilla: 17 tables in third normal form, 817 seed rows, and five business questions answered in SQL." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/cinema.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/cinema.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Cinema Chain Database · Marian Garabana" />
 <meta name="twitter:description" content="A relational database for a cinema chain across Madrid, Barcelona, and Sevilla: 17 tables in third normal form, 817 seed rows, and five business questions answered in SQL." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="preload" as="image" href="assets/hero-cinema-poster.webp" fetchpriority="high" />
 <link rel="stylesheet" href="styles.css" />
@@ -61,7 +61,7 @@
      in before their clips arrived. With no source the video never plays and
      simply displays its poster attribute, so normal motion and reduced motion
      read identically: a still. The poster itself is derived from the
-     project's own ERD (assets/cinema-erd.png), recoloured into a dark
+     project's own ERD (assets/cinema-erd.png), recolored into a dark
      red/gold duotone so it reads as hero art instead of a pasted screenshot,
      with no stock photography anywhere in it. The vhero-still fallback image
      is intentionally not hidden, following the fix documented on
@@ -274,7 +274,7 @@
 </head>
 <body class="theme-cinema">
 <!-- Shared PixelSnow background, the same file index and the other project
-     pages load. Coloured with this page's own --red-ink: --red itself is
+     pages load. Colored with this page's own --red-ink: --red itself is
      4.45:1 on the canvas and the deep red would sink into #0c0505. The hero
      paints over it by itself, so the flakes start below the fold. -->
 <canvas id="snowBg" data-color="#ff7a86" aria-hidden="true"></canvas>
@@ -350,7 +350,7 @@
   <div class="h-sec">
     <span class="eyebrow">The schema</span>
     <h2>17 tables, third normal <em>form</em>.</h2>
-    <p class="lead">The database models a cinema chain with three locations in Spain: Gran Via in Madrid, Diagonal in Barcelona, and Centro in Sevilla. Movie tickets are sold only through the website, so every ticket carries a registered customer, a card payment and a specific seat; concessions accept any payment method and anonymous walk-ins, so they needed their own transaction structure rather than a variant of the first. Below, the seventeen tables in the five functional groups they were designed in, with the seed rows each group carries, and the entity relationship diagram colour-coded by the same groups.</p>
+    <p class="lead">The database models a cinema chain with three locations in Spain: Gran Via in Madrid, Diagonal in Barcelona, and Centro in Sevilla. Movie tickets are sold only through the website, so every ticket carries a registered customer, a card payment and a specific seat; concessions accept any payment method and anonymous walk-ins, so they needed their own transaction structure rather than a variant of the first. Below, the seventeen tables in the five functional groups they were designed in, with the seed rows each group carries, and the entity relationship diagram color-coded by the same groups.</p>
   </div>
   <table class="phz">
     <caption class="sr-only">The seventeen tables in five functional groups, with seed row counts per group. Location and facilities, three tables, 16 rows. Films and scheduling, five tables, 62 rows. Movie ticket sales, three tables, 418 rows. Concessions, four tables, 303 rows. Shared entities, two tables, 18 rows. 817 rows in total.</caption>
@@ -373,7 +373,7 @@
       <tr>
         <th scope="row" class="phz-b">Films &amp; scheduling</th>
         <td class="phz-m">film<br />film_genre<br />genre<br />showtime<br />showtime_group</td>
-        <td class="phz-d">The catalogue and the schedule. <code>film_genre</code> is a junction table, so a film can carry several genres.</td>
+        <td class="phz-d">The catalog and the schedule. <code>film_genre</code> is a junction table, so a film can carry several genres.</td>
         <td class="phz-n">62<span>5 tables</span></td>
       </tr>
       <tr>
@@ -451,7 +451,7 @@
   <div class="h-sec">
     <span class="eyebrow">Run it yourself</span>
     <h2>Everything you need.</h2>
-    <p class="lead">Built with a team for the SQL II course at IE. Clone the repo, or download the schema script, the seed data and the Workbench model and run the whole database locally. The full eleven-page report is below: the business context, the design decisions, the normalisation check, and all five business questions with their queries and output.</p>
+    <p class="lead">Built with a team for the SQL II course at IE. Clone the repo, or download the schema script, the seed data and the Workbench model and run the whole database locally. The full eleven-page report is below: the business context, the design decisions, the normalization check, and all five business questions with their queries and output.</p>
     <div class="pd-links" style="margin-top:2rem">
       <a href="https://github.com/MarianGarabana/SQL-Cinema-Project" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
       <a class="ghost" href="assets/cinema-ddl.sql" target="_blank" rel="noopener">DDL script <span>↗</span></a>
@@ -574,7 +574,7 @@
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});

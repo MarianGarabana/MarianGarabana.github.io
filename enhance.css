@@ -5,7 +5,7 @@
    Delete this file and the two <script> tags in index.html and the site is
    exactly as it was.
 
-   Palette-neutral on purpose: every colour below resolves through the existing
+   Palette-neutral on purpose: every color below resolves through the existing
    tokens (--accent, --ink, --bg), so it inherits whatever canvas the page is
    on. To move the site to the cobalt direction, link theme-cobalt.css after
    this file. One line, reversible.
@@ -20,7 +20,7 @@
    the card is white and the paragraph is cream on white: measured 1.06:1.
 
    The card is now a dark surface (see CONTACT CARD below), so the mix runs the
-   other way and the cream this was written to catch is the correct colour
+   other way and the cream this was written to catch is the correct color
    again. Kept as a token mix rather than a hex so it still tracks the canvas on
    the cream project pages. */
 .cta p{color:color-mix(in srgb,var(--ink) 76%,var(--surface))}
@@ -38,7 +38,7 @@
    THE FRAME. Ported from a Uiverse card by Tiagoadag. The trick is that the
    gradient is not on the card, it is BEHIND it: the wrapper is the gradient and
    the card sits on top at full size, so the gradient is invisible until the
-   card scales to .98 and lets a rim of it show on all four sides. Recoloured
+   card scales to .98 and lets a rim of it show on all four sides. Recolored
    from the original green-to-blue to the site accent and a deep plum of the
    same hue family, with the glow at the original's .30 alpha.
 
@@ -156,7 +156,7 @@ html.lenis{scroll-behavior:auto}
 /* ============================================================================
    CUSTOM CURSOR
    Two nodes, both driven from one rAF loop. mix-blend-mode:difference means the
-   ring never needs a colour of its own: it inverts whatever it sits on, so it
+   ring never needs a color of its own: it inverts whatever it sits on, so it
    stays legible over the video, the glass panel and the cards alike.
 
    .cur-on lands on <html> only when the pointer is fine AND motion is allowed,

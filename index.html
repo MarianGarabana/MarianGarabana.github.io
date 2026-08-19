@@ -6,21 +6,21 @@
 <title>Marian Garabana · Data Scientist & Business Analytics</title>
 <meta name="description" content="Portfolio of Marian Garabana, MSc Business Analytics &amp; Data Science at IE University, Madrid. Machine learning, forecasting, dashboards, and agentic AI projects with live demos." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/" />
+<link rel="canonical" href="https://mariangarabana.github.io/" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#F3F2EE" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Marian Garabana · Data Scientist &amp; Business Analytics" />
 <meta property="og:description" content="Portfolio of Marian Garabana, MSc Business Analytics &amp; Data Science at IE University, Madrid. Machine learning, forecasting, dashboards, and agentic AI projects with live demos." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Marian Garabana · Data Scientist &amp; Business Analytics" />
 <meta name="twitter:description" content="Portfolio of Marian Garabana, MSc Business Analytics &amp; Data Science at IE University, Madrid. Machine learning, forecasting, dashboards, and agentic AI projects with live demos." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 <!-- Additive motion layer. Delete this line and the three script tags before </body> to revert. -->
@@ -32,8 +32,8 @@
   "name": "Marian Garabana",
   "email": "mailto:marian.garabana@gmail.com",
   "jobTitle": "Data Scientist",
-  "url": "https://mariangarabana.github.io/MyPortfolio/",
-  "image": "https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png",
+  "url": "https://mariangarabana.github.io/",
+  "image": "https://mariangarabana.github.io/assets/og-cover.png",
   "sameAs": [
     "https://www.linkedin.com/in/marian-garabana-garrido",
     "https://github.com/MarianGarabana"
@@ -53,7 +53,7 @@
    ramp on near-black, #5F0928 (344 deg), #772041 (340), #9C4064 (338), no violet
    end, darkest family #050001. The footage is retired, in assets/_to_delete/,
    and the PixelSnow canvas is the background now, but these values stay: they
-   are what every text colour below was measured against on the #0B0509 canvas.
+   are what every text color below was measured against on the #0B0509 canvas.
    Scoped to this page: project pages keep their own canvases for now.
    ========================================================================== */
 body.idx-dark{
@@ -61,7 +61,7 @@ body.idx-dark{
   --surface:#160A11;
   --surface2:#1E0F17;
   --ink:#FFFFFF;            /* 20.19 on canvas */
-  --ink-soft:#D9BCC7;       /* 12.3  dusty rose, NOT neutral grey: this is what
+  --ink-soft:#D9BCC7;       /* 12.3  dusty rose, NOT neutral gray: this is what
                                stops it reading as "black page, white text"    */
   --muted:#9B8490;          /*  5.86 */
   --border:rgba(255,205,222,.14);
@@ -130,7 +130,7 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
   background:#160A11;
   box-shadow:0 22px 50px -22px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.18)}
 /* ONE frame, Aug 17 2026. Three boxes at 39% each became a single box holding
-   all eleven photos, cycling at 1.5s. Sized to the span the three used to
+   all ten photos, cycling at 1.5s. Sized to the span the three used to
    occupy rather than to any one of them, so the collage's footprint in the
    hero is unchanged and only the number of frames drops. Portraits and
    landscapes both land in it, which is what object-fit:cover is doing. */
@@ -141,10 +141,11 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
 /* .on is the visible frame. The script moves it; CSS never picks a winner, so
    with the script blocked the first image of each box simply stays. */
 .hcol img.on{opacity:1;transform:scale(1)}
-/* Faces sit high in the portraits and centred in the landscapes. */
+/* Faces sit high in the portraits and centered in the landscapes. */
 .hcol img[src*="a3-munich"],.hcol img[src*="b1-soccer"],
-.hcol img[src*="b3-senior-day"],.hcol img[src*="b4-race"],
-.hcol img[src*="c1-headshot"]{object-position:50% 32%}
+.hcol img[src*="b3-senior-day"],
+.hcol img[src*="b4-race"]{object-position:50% 32%}
+.hcol img[src*="a1-ie-ceremony"]{object-position:70% 50%}
 @media(prefers-reduced-motion:reduce){
   .hcol img{transition:none;transform:none}
   .hcol img.on{transform:none}
@@ -190,14 +191,19 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
 .proj-grid::-webkit-scrollbar{display:none}
 .proj{scroll-snap-align:start}
 /* The card is 420 wide here against 575 in the old two-column grid, so the meta
-   block's clearance for the foot row comes down with it. */
-.proj-meta{padding:1.1rem 1.2rem 4.3rem}
+   block's clearance for the foot row comes down with it. The proof figure came
+   out on Aug 19, so the foot is one links row and the clearance halves. */
+.proj-meta{padding:1.1rem 1.2rem 2.8rem}
 .proj-meta h3{font-size:1.15rem;line-height:1.25}
 .proj-foot{padding:0 1.2rem .95rem}
-/* styles.css hides .proj-links below 820, so the foot drops from 68px to 37px.
-   The meta's clearance has to drop with it or the title floats 27px above
-   nothing. Matching her 820 breakpoint rather than inventing a second one. */
-@media(max-width:820px){ .proj-meta{padding:1.05rem 1.15rem 2.9rem} }
+/* styles.css hides .proj-links below 820. With the proof figure gone the foot
+   has nothing left to show there, so it goes too rather than sitting as an
+   empty bordered strip, and the meta drops to the card floor. Matching her 820
+   breakpoint rather than inventing a second one. */
+@media(max-width:820px){
+  .proj-foot{display:none}
+  .proj-meta{padding:1.05rem 1.15rem 1.15rem}
+}
 @media(max-width:720px){
   .proj-grid{grid-template-columns:none;grid-template-rows:auto;grid-auto-columns:min(420px,86vw)}
 }
@@ -215,7 +221,6 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
 .idx-dark .proj-arrow{color:#FF3D7F}
 .idx-dark .proj-badge{background:rgba(255,61,127,.18);border:1px solid rgba(255,150,190,.42);color:#FFD3E2}
 .idx-dark .proj-foot{border-top:1px solid var(--border);background:rgba(255,255,255,.02)}
-.idx-dark .proj-proof{color:#C7AAB6}
 .idx-dark .proj-link{color:#F79CBE}
 .idx-dark .proj-link:hover{color:#fff}
 /* the art thumbnails were drawn for a cream page: seat them on the dark canvas */
@@ -382,7 +387,7 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
 
 /* EXACTLY the collapsed height, and flex:none. The detail below it is only
    hidden with opacity, so it is still in flow; if this row could shrink or the
-   column centred its overflow, the title would be pushed out through the top
+   column centered its overflow, the title would be pushed out through the top
    edge of a 68px box and clipped away. Pinning the head and letting the detail
    overflow downward is what keeps the collapsed row showing its title. */
 .hx-head{all:unset;box-sizing:border-box;display:flex;align-items:baseline;
@@ -398,8 +403,6 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
   font-size:.7rem;color:var(--muted)}
 
 .hx-body{padding-right:36%;padding-bottom:1.6rem}
-.hx-note{margin:.75rem 0 0;font-size:var(--t-2);line-height:1.6;color:#D9BCC7;
-  max-width:62ch}
 .hx-list{list-style:none;margin:.85rem 0 0;padding:0;display:grid;gap:.45rem;
   max-width:64ch}
 .hx-list li{position:relative;padding-left:1.05rem;font-size:var(--t-2);
@@ -580,10 +583,10 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
          the percentages in the CSS below; change them there, not here.
 
          Grouped by story, not by shape: A is IE and the masters, B is the athlete
-         years, C is Keiser and the portrait. 4 / 4 / 3.
+         years, C is Keiser. 4 / 4 / 2.
 
          The whole block is aria-hidden. It is decoration that swaps every two
-         seconds, and the alt text of eleven photos read out in sequence is noise
+         seconds, and the alt text of ten photos read out in sequence is noise
          in the accessibility tree. Nothing here is stated only in these images.
 
          ADDING A PHOTO: drop the webp in assets/me/hero/ and add one <img> to a
@@ -592,8 +595,7 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
          rest are lazy. -->
     <div class="hero-collage" aria-hidden="true">
       <div class="hcol hcol-solo">
-        <img class="on" src="assets/me/hero/c1-headshot.webp" alt="" width="480" height="720" decoding="async">
-        <img src="assets/me/hero/a1-ie-grad.webp" alt="" width="480" height="492" loading="lazy" decoding="async">
+        <img class="on" src="assets/me/hero/a1-ie-ceremony.webp" alt="" width="720" height="480" decoding="async">
         <img src="assets/me/hero/b1-soccer.webp" alt="" width="480" height="721" loading="lazy" decoding="async">
         <img src="assets/me/hero/a2-datathon.webp" alt="" width="720" height="480" loading="lazy" decoding="async">
         <img src="assets/me/hero/b2-mexico.webp" alt="" width="852" height="480" loading="lazy" decoding="async">
@@ -627,23 +629,23 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
     <button class="rail-nav prev" type="button" aria-label="Previous projects"></button>
     <div class="proj-grid" id="projGrid" tabindex="0" role="group" aria-label="Selected work, scrollable">
       <div class="proj reveal" style="--c1:#e7e9e4;--c2:#ccd2c6"><div class="proj-badge">1st place · €3,000</div><a class="proj-main" href="datathon.html"><div class="proj-thumb"><img src="assets/datathon-team.webp" width="1086" height="725" alt="Aria Mavens winning team" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-datathon">Sustainable Aviation Datathon</h3><p>Winner · Forecasting</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">€123M cost path modelled to 2050</div><div class="proj-links"><a class="proj-link" href="https://github.com/vik01/datathon-2025" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-datathon">Sustainable Aviation Datathon</h3><p>Predictive Modeling &amp; Business Analytics</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://github.com/vik01/datathon-2025" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e7e9ea;--c2:#ccd0d3"><a class="proj-main" href="hospital.html"><div class="proj-thumb"><img src="assets/art/hospital.webp" width="1200" height="825" alt="Isometric hospital ward with beds flagged by readmission risk, feeding a monitoring panel" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-hospital">Hospital Readmission MLOps</h3><p>MLOps</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">9,970 patients evaluated</div><div class="proj-links"><a class="proj-link" href="https://hospital-readmission-risk-predictor-pcv7.onrender.com/docs" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/NOSIEMPRE/Hospital-Prediction-System" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-hospital">Hospital Readmission MLOps</h3><p>MLOps</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://hospital-readmission-risk-predictor-pcv7.onrender.com/docs" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/NOSIEMPRE/Hospital-Prediction-System" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e8e9e4;--c2:#cfd2c8"><a class="proj-main" href="madrid.html"><div class="proj-thumb"><img src="assets/art/madrid.webp" width="1024" height="572" alt="Madrid rental district heat map art" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-madrid">Madrid Rental ML Dashboard</h3><p>ML · Live App</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">0.94 test AUC</div><div class="proj-links"><a class="proj-link" href="https://madridrentalanalysisapp-mariangarabana.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/Madrid_Rental_Analysis_StreamlitApp" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-madrid">Madrid Rental ML Dashboard</h3><p>Machine Learning</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://madridrentalanalysisapp-mariangarabana.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/Madrid_Rental_Analysis_StreamlitApp" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e9e7e2;--c2:#d3ccc2"><a class="proj-main" href="aerospace.html"><div class="proj-thumb"><img src="assets/art/aerospace.webp" width="1200" height="825" alt="Aircraft engine health monitoring panel art" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-aerospace">Aerospace Predictive Maintenance</h3><p>Deep Learning</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">13x return vs unplanned failure</div><div class="proj-links"><a class="proj-link" href="https://github.com/MarianGarabana/DeepLearning_PredictiveMaintenance" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-aerospace">Aerospace Predictive Maintenance</h3><p>Deep Learning</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://github.com/MarianGarabana/DeepLearning_PredictiveMaintenance" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e7e8ea;--c2:#ccd0d4"><a class="proj-main" href="trading.html"><div class="proj-thumb"><img src="assets/art/trading.webp" width="1200" height="825" alt="Trading system signal chart art" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-trading">Trading System Automation</h3><p>ML · Live App</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">31 tickers · 22 features</div><div class="proj-links"><a class="proj-link" href="https://pythongroupassignment.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/TradingSystemAutomation" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
-      <div class="proj reveal" style="--c1:#e6e9e6;--c2:#cbd1cb"><a class="proj-main" href="spain.html"><div class="proj-thumb"><img src="assets/art/spain.webp" width="1200" height="825" alt="Map of Spain showing proposed EV charging stations along interurban corridors, coloured by grid status" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-spain">Spanish EV Charging Network</h3><p>Datathon · Geospatial</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">190 stations proposed</div><div class="proj-links"><a class="proj-link" href="https://spanishelectricgrid-datathon-ravistar.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/SpanishElectricGrid" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-trading">Trading System Automation</h3><p>Python &amp; Data Visualization</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://pythongroupassignment.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/TradingSystemAutomation" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+      <div class="proj reveal" style="--c1:#e6e9e6;--c2:#cbd1cb"><a class="proj-main" href="spain.html"><div class="proj-thumb"><img src="assets/art/spain.webp" width="1200" height="825" alt="Map of Spain showing proposed EV charging stations along interurban corridors, colored by grid status" loading="lazy" decoding="async" onerror="this.remove()"></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-spain">Spanish EV Charging Network</h3><p>Datathon / Predictive Modeling</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://spanishelectricgrid-datathon-ravistar.streamlit.app/" target="_blank" rel="noopener">Live app <span aria-hidden="true">↗</span></a><a class="proj-link" href="https://github.com/MarianGarabana/SpanishElectricGrid" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e6e7ec;--c2:#c9ccd6"><a class="proj-main" href="titan.html"><div class="proj-thumb"><img src="assets/art/titan.webp" width="1200" height="825" alt="Isometric illustration of an AI orchestrator coordinating specialist agents" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-titan">Titan Operations Sentinel</h3><p>Multi-Agent AI</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">22,000+ daily alerts triaged</div><div class="proj-links"><a class="proj-link" href="https://github.com/ma731/Agentic-AI-for-IT" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-titan">Titan Operations Sentinel</h3><p>Multi-Agent AI</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://github.com/ma731/Agentic-AI-for-IT" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e8e7ea;--c2:#d0cdd4"><a class="proj-main" href="rl.html"><div class="proj-thumb"><img src="assets/art/rl.webp" width="1200" height="825" alt="Isometric arena with a rocket-powered car boosting toward a ball along a predicted trajectory" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-rl">Reinforcement Learning Bot</h3><p>RL · MLOps</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">Two-stage reward curriculum</div><div class="proj-links"><a class="proj-link" href="https://github.com/moanv2/rlgym" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-rl">Reinforcement Learning Bot</h3><p>Reinforcement Learning</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-links"><a class="proj-link" href="https://github.com/moanv2/rlgym" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a></div></div></div>
       <div class="proj reveal" style="--c1:#e9e8e2;--c2:#d4cdc4"><a class="proj-main" href="dicorsa.html"><div class="proj-thumb"><img src="assets/art/dicorsa.webp" width="1200" height="825" alt="Isometric beverage distribution network with product platforms at varying heights" loading="lazy" decoding="async" onerror="this.remove()"></div>
-        <div class="proj-meta"><div><h3 style="view-transition-name:vt-dicorsa">Beverage Distribution Forecasting</h3><p>Internship · Forecasting &amp; BI</p></div><div class="proj-arrow">↗</div></div></a><div class="proj-foot"><div class="proj-proof">615,615 transactions</div></div></div>
+        <div class="proj-meta"><div><h3 style="view-transition-name:vt-dicorsa">Beverage Distribution Forecasting</h3><p>Business Analytics Internship</p></div><div class="proj-arrow">↗</div></div></a></div>
       <div class="proj reveal" style="--c1:#e8e8e3;--c2:#d1cfc7"><a class="proj-main" href="cinema.html"><div class="proj-thumb"><img src="assets/art/cinema.svg" alt="Abstract database schema art" width="880" height="605" loading="lazy" decoding="async" onerror="this.remove()"></div>
         <div class="proj-meta"><div><h3>Cinema Chain Database</h3><p>SQL · Database Design</p></div><div class="proj-arrow">↗</div></div></a></div>
     </div>
@@ -749,24 +751,17 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="eyebrow">03 · Experience</span>
-      <h2 class="sec-title">Where I've worked.</h2>
+      <h2 class="sec-title">Professional experience.</h2>
     </div>
     <div class="about-grid">
       <div class="about-photo reveal" id="aboutPhoto">
         <img src="assets/portrait.webp" alt="Marian Garabana standing among seated graduates at her graduation ceremony, wearing a blue cap and gown with a yellow stole" width="656" height="820" loading="lazy" decoding="async" />
       </div>
       <div class="about-text reveal">
-        <div class="about-name">Marian Garabana</div>
-        <div class="about-role">Business Analytics &amp; Data Science · Madrid</div>
-        <div class="about-stat">
-          <div class="st"><b>10</b><span>Projects built</span></div>
-          <div class="st"><b>600K+</b><span>Records modelled</span></div>
-          <div class="st"><b>5</b><span>Academic awards</span></div>
-        </div>
         <div class="wh">
           <div class="wh-item">
             <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">Accumin Intelligence · Madrid</span><span class="ro">Business Analyst</span></span><span class="wh-rt"><span class="yr">From Sep 2026</span><span class="wh-chev"></span></span></button>
-            <div class="wh-panel"><p>I join Accumin Intelligence in September 2026 as a Business Analyst, on a transformation project to digitalise the company and put AI into how it operates. The work is automating processes and building the analysis behind better data-driven decisions.</p></div>
+            <div class="wh-panel"><p>I join Accumin Intelligence in September 2026 as a Business Analyst, on a transformation project to digitalize the company and put AI into how it operates. The work is automating processes and building the analysis behind better data-driven decisions.</p></div>
           </div>
           <div class="wh-item">
             <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">IEX Labs · IE University</span><span class="ro">Research Intern</span></span><span class="wh-rt"><span class="yr">2026</span><span class="wh-chev"></span></span></button>
@@ -774,11 +769,11 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
           </div>
           <div class="wh-item">
             <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">Kreston BSG México</span><span class="ro">Tax Reporting Automation Specialist &amp; Project Lead</span></span><span class="wh-rt"><span class="yr">2025</span><span class="wh-chev"></span></span></button>
-            <div class="wh-panel"><p>I automated recurring reporting workflows and cut manual tax reporting by 80 percent, and reduced manual workload by 50 percent per project. I used SQL, Power Query, and AI-driven tools, and cleaned large datasets to improve accuracy by 20 percent while managing several client projects at once.</p></div>
+            <div class="wh-panel"><p>I automated recurring reporting workflows and cut manual tax reporting by 80%, and reduced manual workload by 50% per project. I used SQL, Power Query, and AI-driven tools, and cleaned large datasets to improve accuracy by 20% while managing several client projects at once.</p></div>
           </div>
           <div class="wh-item">
             <button class="wh-head wh-btn" aria-expanded="false"><span class="l"><span class="co">DICORSA</span><span class="ro">Business Analyst Intern: Sales Analytics &amp; Predictive Modeling</span></span><span class="wh-rt"><span class="yr">2024–25</span><span class="wh-chev"></span></span></button>
-            <div class="wh-panel"><p>I developed the MySQL database, built six Tableau dashboards, and my analysis fed three cost-saving strategies and route-optimisation plans.</p></div>
+            <div class="wh-panel"><p>I built the data layer for a beverage distributor in Mexico: a MySQL database that pulled 615,615 transactions from 2023 to 2025 out of spreadsheets into one place, and six Tableau dashboards the team could read demand from by route, product and period without asking an analyst. On top of it I built a weekly forecast of average order size that came within about 25% on average, which is 75% on a mean absolute percentage error basis. The analysis showed how concentrated the business was, with 20 of the 74 delivery routes carrying 56% of revenue, and fed three cost-saving strategies and the route planning that followed. The forecasting half became my undergraduate capstone.</p></div>
           </div>
         </div>
       </div>
@@ -823,12 +818,17 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
           <span class="hx-meta">IE University · 2025–2026 · Madrid</span>
         </button>
         <div class="hx-body">
-          <p class="hx-note">Selected for the Advanced Tech Track, the program for the top 10 to 15 percent of the cohort, and a member of MXT. My work spans machine learning, agentic AI, deep learning, MLOps, and cloud analytics.</p>
           <ul class="hx-list">
-            <li>Coursework across Machine Learning I and II, Agentic AI, Deep Learning, MLOps, Reinforcement Learning, Cloud Data Analytics, and Modern Data Architectures.</li>
-            <li>Advanced Tech Track: advanced SQL with indexing and partitioning, high-performance processing with Polars, and a project joining databases and AI.</li>
-            <li>Built most of the projects on this site here, including the agentic AI systems and the deep learning platform.</li>
-            <li>Class Representative and Wellbeing Ambassador, so I stayed close to both my cohort and the faculty.</li>
+            <li>Grade: Graduate Student.</li>
+            <li>Master's GPA: 3.93 / 4.0.</li>
+            <li>Overall class ranking: 2 of 120.</li>
+            <li>IEX Labs Research Intern.</li>
+            <li>IE Latin America Scholarship.</li>
+            <li>IE Sustainability Datathon, 7th edition winner.</li>
+            <li>Advanced Tech Track member.</li>
+            <li>Class Representative.</li>
+            <li>MXT member.</li>
+            <li>Wellbeing Ambassador.</li>
           </ul>
           <div class="hx-tags"><span>Advanced AI</span><span>Machine Learning</span><span>Agentic AI</span><span>Python</span><span>SQL</span></div>
         </div>
@@ -843,12 +843,15 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
           <span class="hx-meta">Keiser University · 2022–2025 · Summa Cum Laude</span>
         </button>
         <div class="hx-body">
-          <p class="hx-note">Graduated with academic distinction and several research and academic awards. I was also a student athlete on the women’s soccer team, which is where I learned to work under pressure and as part of a team.</p>
           <ul class="hx-list">
-            <li>Finished Summa Cum Laude with a foundation in analytics, statistics, and business intelligence.</li>
-            <li>Led my capstone with DICORSA, a weekly forecast of average order size on more than 600,000 records that came within about 25 percent on average, which is 75 percent on a mean absolute percentage error basis.</li>
-            <li>Took third place at an undergraduate research symposium.</li>
-            <li>Played on the women’s soccer team as a student athlete while keeping top academic standing.</li>
+            <li>Goalkeeper for Keiser women's soccer.</li>
+            <li>Academic Merit Scholarship.</li>
+            <li>Summa Cum Laude Award, GPA 3.98.</li>
+            <li>Class ranking: top 5%.</li>
+            <li>All-Academic Awards from 2022 to 2024.</li>
+            <li>Dean's List and President's List.</li>
+            <li>Research: "Impact of College Life on Student-Athletes: A Study on Mental Health, Lifestyle, and Performance".</li>
+            <li>Research: "Integrating Business Intelligence for Sales Forecasting and Strategic Decision-Making".</li>
           </ul>
           <div class="hx-tags"><span>Analytics</span><span>Statistics</span><span>Leadership</span></div>
         </div>
@@ -863,7 +866,6 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
           <span class="hx-meta">GenAI &amp; Data Science · 2024–2026 · In progress</span>
         </button>
         <div class="hx-body">
-          <p class="hx-note">Generative AI for Data Analysis (Professional Certificate) and the IBM Data Science Professional Specialization. Currently studying for the AWS Cloud Practitioner certification.</p>
           <ul class="hx-list">
             <li>Generative AI for Data Analysis, Professional Certificate.</li>
             <li>IBM Data Science Professional Specialization.</li>
@@ -881,13 +883,14 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
       <div class="hx-in">
         <button class="hx-head" type="button" aria-expanded="false">
           <span class="hx-title">Awards &amp; Recognition</span>
-          <span class="hx-meta">Honors · Academic and research · Five awards</span>
+          <span class="hx-meta">Honors · Academic and research · Six awards</span>
         </button>
         <div class="hx-body">
-          <p class="hx-note">Summa Cum Laude and the Academic Excellence Graduate Award. Third place at an undergraduate research symposium, plus Best Delegate and Outstanding Delegate at Model United Nations.</p>
           <ul class="hx-list">
             <li>Summa Cum Laude.</li>
             <li>Academic Excellence Graduate Award.</li>
+            <li>Dean's List, IE University.</li>
+            <li>IE Sustainability Datathon, 7th edition, 1st place.</li>
             <li>Third place at an undergraduate research symposium.</li>
             <li>Best Delegate and Outstanding Delegate at Model United Nations.</li>
           </ul>
@@ -925,17 +928,16 @@ body.idx-dark{background:var(--bg);color:var(--ink)}
 <!-- ================= CTA + FOOTER ================= -->
 <section id="contact">
   <div class="wrap">
-    <!-- Redesigned Aug 14 2026. Was a centred white slab with one button, and
+    <!-- Redesigned Aug 14 2026. Was a centered white slab with one button, and
          the only element on the page carrying no information: no location, no
          availability, no second route in. Same copy, now with a live
          availability line and the two profiles a recruiter opens next.
-         Kept centred; the three-button row is what stops it reading as the
+         Kept centered; the three-button row is what stops it reading as the
          generic footer banner it was. -->
     <div class="cta-frame reveal">
     <div class="cta">
-      <p class="cta-status"><span class="cta-dot" aria-hidden="true"></span>Open to 2026 roles · Madrid</p>
       <h2>Let's build something<br>with your <em>data</em>.</h2>
-      <p class="cta-lead">Have a project, a role, or just want to talk data? I'd love to hear from you.</p>
+      <p class="cta-lead">Always up for connecting and getting to know new people. Say hello.</p>
       <div class="cta-acts">
         <a href="mailto:marian.garabana@gmail.com" class="btn">Get in touch <span aria-hidden="true">↗</span></a>
         <a href="https://www.linkedin.com/in/marian-garabana-garrido" target="_blank" rel="noopener" class="btn btn-ghost cta-alt">
@@ -1002,7 +1004,7 @@ function cancelPendingHide(panel){
 }
 function openPanel(panel){
   // the accordion closes every panel before opening one, so a pending hide from that
-  // close must be cancelled or it fires at the end of THIS panel's open transition
+  // close must be canceled or it fires at the end of THIS panel's open transition
   cancelPendingHide(panel);
   panel.hidden = false;
   requestAnimationFrame(()=>{ panel.style.maxHeight = panel.scrollHeight + 'px'; });
@@ -1021,7 +1023,7 @@ function closePanel(panel){
 }
 
 /* ---------- hero collage ----------
-   ONE frame, all eleven photos, a new one every 1.5 seconds. Rewritten Aug 17
+   ONE frame, all ten photos, a new one every 1.5 seconds. Rewritten Aug 17
    2026; it used to be three boxes swapping one at a time on a 2s scatter.
 
    In order, not at random: with a single frame the reader sees every photo in a
@@ -1069,7 +1071,7 @@ function closePanel(panel){
 
    This is a hand-rolled port of typed.js, not the library. Marian pointed at
    mattboldt/typed.js and CLAUDE.md forbids shipped dependencies, so the three
-   behaviours that make that library feel right were reproduced directly:
+   behaviors that make that library feel right were reproduced directly:
 
    1. HUMANIZER. typed.js never uses a flat interval. Its delay is
       Math.round(Math.random() * speed / 2) + speed, so every keystroke lands
@@ -1212,7 +1214,7 @@ function initRail(wrapId, railId, dotsId, cardSel, noun){
 
   /* Nearest column to the rail's left edge. Snap points are
      scroll-snap-align:start, so "current" is the one closest to the start, not
-     the one nearest the centre. */
+     the one nearest the center. */
   function current(){
     var x = rail.getBoundingClientRect().left, best = 0, bestD = Infinity;
     columns().forEach(function(col, i){
@@ -1267,7 +1269,7 @@ initRail('projWrap', 'projGrid', 'projDots', '.proj', 'column');
    use a spring instead of a timed accordion is that the open and the close
    feel physical. A cubic-bezier of the same duration reads as an easing curve,
    which is the one thing it is not. Fifteen lines of Euler integration buys
-   the actual behaviour, including a close that carries velocity out of an
+   the actual behavior, including a close that carries velocity out of an
    interrupted open.
 
    HEIGHT IS A LAYOUT PROPERTY and animating it is not free. That is inherent:

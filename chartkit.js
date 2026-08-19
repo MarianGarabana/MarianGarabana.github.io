@@ -4,7 +4,7 @@
    Three things it fixes that the per-page charts get wrong:
    1. Geometry is generated at TRUE pixel size and redrawn on resize, so
       preserveAspectRatio="none" is never needed and nothing is distorted.
-   2. Ticks come from niceTicks(), so the gridlines ARE the labelled values.
+   2. Ticks come from niceTicks(), so the gridlines ARE the labeled values.
       No more 5 evenly-spaced lines with 4 hand-picked labels that miss them.
    3. One type scale, defined once, in real px. */
 

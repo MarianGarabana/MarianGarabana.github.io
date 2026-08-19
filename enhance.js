@@ -1,7 +1,7 @@
 /* ============================================================================
    enhance.js — ADDITIVE LAYER. Loads after main.js.
 
-   Adds eight things to index.html and changes none of the behaviour already
+   Adds eight things to index.html and changes none of the behavior already
    there. main.js keeps the nav, the .reveal observer, the floating pill and the
    photo carousel; the rails, the education cards and the typewriter keep their
    own scripts in the page.
@@ -444,7 +444,7 @@
     });
 
     /* ---- magnets ----
-       0.28 of the distance from centre, released on a .6s expo. Strong enough
+       0.28 of the distance from center, released on a .6s expo. Strong enough
        to notice on a 44px control, weak enough that the pointer never loses the
        target it is aiming at. */
     [].forEach.call(document.querySelectorAll(

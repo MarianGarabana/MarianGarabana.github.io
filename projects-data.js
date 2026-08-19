@@ -8,7 +8,7 @@
      { type:'pair',  a:{img:'',ph:''}, b:{img:'',ph:''} } two images side by side
      { type:'text',  h:'Heading', p:['para 1','para 2'] } text section
    Set img to a real image path (e.g. 'assets/datathon-1.png') to show it;
-   leave img empty ('') to show the grey placeholder with the ph label.
+   leave img empty ('') to show the gray placeholder with the ph label.
 
    facts = small role / year / stack row.
    links = optional buttons. First link is the solid button, the rest are outlined.
@@ -34,7 +34,7 @@ const PROJECTS = {
     ],
     blocks: [
       { type:'text', h:'The problem', p:[
-        'The case client is a global manufacturer that gets more than 22,000 unprioritised sensor alerts a day across five teams that do not talk to each other. One downed machine costs 180,000 dollars a day, and one quarter lost 14 million dollars to missing parts.',
+        'The case client is a global manufacturer that gets more than 22,000 unprioritized sensor alerts a day across five teams that do not talk to each other. One downed machine costs 180,000 dollars a day, and one quarter lost 14 million dollars to missing parts.',
         'Dashboards show the data but do not make a call, and scripts cannot reason across teams. The system had to actually decide.'
       ]},
       { type:'pair', a:{img:'',ph:'Agent graph / supervisor routing'}, b:{img:'',ph:'Action plan output'} },
@@ -108,7 +108,7 @@ const PROJECTS = {
         'I took about 2,085 Idealista listings and built one live app that walks through the full machine learning story, from exploring the data to clustering, predicting rent, and classifying listings. Everything is interactive and trains live when the app starts. The screens below are the real app, which you can open and use yourself.'
       ]},
       { type:'text', h:'Property segments', p:[
-        'A K-Means model groups the listings into five segments, from Entry-Level Interior to Grand Estate. The scatter shows rent against size coloured by segment, and the radar compares each segment across size, rent, and floor level, so the clusters actually mean something you can describe.'
+        'A K-Means model groups the listings into five segments, from Entry-Level Interior to Grand Estate. The scatter shows rent against size colored by segment, and the radar compares each segment across size, rent, and floor level, so the clusters actually mean something you can describe.'
       ]},
       { type:'shot', light:true, img:'assets/madrid-segments.png', caption:'K-Means property segments · rent vs size and segment radar' },
       { type:'text', h:'Predicting rent', p:[
@@ -116,7 +116,7 @@ const PROJECTS = {
       ]},
       { type:'shot', light:true, img:'assets/madrid-predictor.png', caption:'Rent predictor · performance and feature effects' },
       { type:'text', h:'Classifying high rent', p:[
-        'The high-rent classifier is a logistic regression with an adjustable probability threshold. It reaches 87 percent accuracy and a test AUC of 0.94, with almost no gap between train and test, and every prediction comes with a ROC curve and odds ratios you can read.'
+        'The high-rent classifier is a logistic regression with an adjustable probability threshold. It reaches 87% accuracy and a test AUC of 0.94, with almost no gap between train and test, and every prediction comes with a ROC curve and odds ratios you can read.'
       ]},
       { type:'shot', light:true, img:'assets/madrid-classifier.png', caption:'High-rent classifier · accuracy, AUC and ROC' }
     ]
@@ -266,12 +266,12 @@ const PROJECTS = {
     ],
     blocks: [
       { type:'text', h:'What I did', p:[
-        'I built a weekly forecast of average order size on more than 600,000 sales records. Across 14 weeks of actuals it came within about 25 percent on average, which is 75 percent on a mean absolute percentage error basis.',
+        'I built a weekly forecast of average order size on more than 600,000 sales records. Across 14 weeks of actuals it came within about 25% on average, which is 75% on a mean absolute percentage error basis.',
         'I designed the MySQL database behind the analysis and built six Tableau dashboards so the business could read the numbers on its own.'
       ]},
       { type:'pair', a:{img:'',ph:'Tableau dashboard'}, b:{img:'',ph:'Forecast vs. actuals'} },
       { type:'text', h:'The impact', p:[
-        'The work fed three cost-saving strategies and route-optimisation plans, so the forecasting turned into decisions the company could act on, not just a report.'
+        'The work fed three cost-saving strategies and route-optimization plans, so the forecasting turned into decisions the company could act on, not just a report.'
       ]}
     ]
   },

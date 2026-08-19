@@ -6,21 +6,21 @@
 <title>Reinforcement Learning Bot · Marian Garabana</title>
 <meta name="description" content="A PPO reinforcement learning bot that learns a 1v1 match in a physics simulator, with reproducible configs, wandb experiment tracking, tests, and CI." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/rl.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/rl.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#0b0a10" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Reinforcement Learning Bot · Marian Garabana" />
 <meta property="og:description" content="A PPO reinforcement learning bot that learns a 1v1 match in a physics simulator, with reproducible configs, wandb experiment tracking, tests, and CI." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/rl.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/rl.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Reinforcement Learning Bot · Marian Garabana" />
 <meta name="twitter:description" content="A PPO reinforcement learning bot that learns a 1v1 match in a physics simulator, with reproducible configs, wandb experiment tracking, tests, and CI." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 <style>
@@ -140,7 +140,7 @@
 
   /* ===== TERMINAL GLASS =====
      Rolled forward from titan.html. The cards were --surface (#111826) with a
-     grey hairline, which is the browser default dressed up. This is one surface
+     gray hairline, which is the browser default dressed up. This is one surface
      class instead: a dark glass panel lit from the top left in the page's own
      accent, a faint plot grid so it reads as an instrument face rather than a
      box, an accent-tinted hairline and a wide soft shadow so it sits above the
@@ -258,9 +258,9 @@
 
   /* ===== TWO-COLUMN TABLE =====
      Was two cards side by side, each holding a paragraph. This is one ruled table
-     with a column each, bullets rather than prose, and the only coloured thing is
+     with a column each, bullets rather than prose, and the only colored thing is
      the two headings: indigo for the algorithm, orange for the architecture. The
-     body copy underneath stays neutral so the colour means "which column", nothing
+     body copy underneath stays neutral so the color means "which column", nothing
      more. Copied from titan.html's .rtab. */
   .rtab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:1.6rem;
     border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
@@ -270,7 +270,7 @@
   .rtab h3{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.1em;
     text-transform:uppercase;color:var(--c);padding:.95rem 0 1rem;margin-bottom:1.1rem;
     border-bottom:1px solid color-mix(in srgb,var(--c) 34%,transparent)}
-  /* Marker is a muted hairline dash, not the column's colour: the colour stays on
+  /* Marker is a muted hairline dash, not the column's color: the color stays on
      the two headings only. */
   .rtab ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
   .rtab li{position:relative;padding-left:1.1rem;font-size:var(--t-2);
@@ -333,7 +333,7 @@
 </head>
 <body class="theme-rl">
 <!-- Shared pixel-snow canvas, fixed behind everything; the hero's own opaque
-     video layer covers it until the case study starts. Colour is this page's
+     video layer covers it until the case study starts. Color is this page's
      own --orange, already the accent on the badge dot, eyebrows and links. -->
 <canvas id="snowBg" data-color="#fb923c" aria-hidden="true"></canvas>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -427,7 +427,7 @@
       <div class="h-sec">
         <span class="eyebrow">How it learns</span>
         <h2>Reward is the only <em>teacher</em>.</h2>
-        <p class="lead">The reward function is the real design work in reinforcement learning. Get it wrong and the agent learns something technically rewarding but useless, so I kept the components separate and combinable to tune the behaviour deliberately.</p>
+        <p class="lead">The reward function is the real design work in reinforcement learning. Get it wrong and the agent learns something technically rewarding but useless, so I kept the components separate and combinable to tune the behavior deliberately.</p>
         <p class="lead">These are the weights from the two staged YAML configs in the repo. They are chosen hyperparameters, not measurements, and they span 0.02 to 12.0, so they are listed rather than charted.</p>
         <p class="lead">The interesting part is what shrinks. Moving toward the ball is worth 0.10 while the agent cannot play, and 0.03 once it can, so the shaping reward is deliberately withdrawn and the agent has to actually score instead of farming the easy signal. The whole thing is wrapped in a zero-sum reward, so what one side gains the other loses, which keeps self-play honest instead of letting both agents settle into a comfortable draw.</p>
       </div>
@@ -435,7 +435,7 @@
     <div class="card tg" id="rewards">
       <h3>Reward weights · the two-stage curriculum</h3>
       <table class="rw-table">
-        <caption class="rw-cap">Reward component weights per curriculum stage. Positive values reward the behaviour, negative values penalise it. Event rows show the effective value, which is the event component weight multiplied by its per-event factor.</caption>
+        <caption class="rw-cap">Reward component weights per curriculum stage. Positive values reward the behavior, negative values penalize it. Event rows show the effective value, which is the event component weight multiplied by its per-event factor.</caption>
         <colgroup><col /><col class="w" /><col class="w" /></colgroup>
         <thead>
           <tr><th scope="col">Component</th><th scope="col">Stage 1<span>basics</span></th><th scope="col">Stage 2<span>offense</span></th></tr>
@@ -646,7 +646,7 @@
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});

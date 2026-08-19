@@ -2,8 +2,8 @@
    PIXEL SNOW BACKGROUND, shared by index and every project page.
    Extracted from index.html on Aug 17 2026, when the same background was asked
    for on the project pages. The shader and every prop below are byte-identical
-   to the version that shipped on index; the only new thing is where the colour
-   comes from (see COLOUR below), because the project pages do not carry
+   to the version that shipped on index; the only new thing is where the color
+   comes from (see COLOR below), because the project pages do not carry
    --accent. Ten inline copies of 250 lines was the alternative.
 
    TO PUT IT ON A PAGE, two lines, no other change:
@@ -36,12 +36,12 @@
   /* Her settings, from the react-bits props. Degrees here, radians in the
      uniform, exactly as the component converts them.
 
-     COLOUR COMES FROM THE PAGE, not from the props. The demo's #fb1ad9 is a
+     COLOR COMES FROM THE PAGE, not from the props. The demo's #fb1ad9 is a
      different magenta from this site's, so the flakes would read as a second
      pink next to the buttons and the nav pill. */
-  /* COLOUR, in order: the canvas's own data-color, then --accent off <body>,
+  /* COLOR, in order: the canvas's own data-color, then --accent off <body>,
      then the homepage pink. index.html has no data-color and keeps reading the
-     token, so its behaviour is unchanged. The project pages each name their own
+     token, so its behavior is unchanged. The project pages each name their own
      hex, because none of them declares --accent: their accents are per-page
      tokens (--cyan, --orange, --violet-ink and so on) with no shared name.
 
@@ -164,7 +164,7 @@
      branches, and derivatives in divergent control flow are undefined.
 
      Coverage goes to alpha, not to brightness, so a rim pixel is a partly
-     transparent flake rather than a dim one and the disc keeps its colour. */
+     transparent flake rather than a dim one and the disc keeps its color. */
   '        float aa = max((t + toIntersection) * invResX, 1e-6);',
   '        if (dist < flakeSize + aa) {',
   '          float cov = 1.0 - smoothstep(flakeSize - aa, flakeSize + aa, dist);',

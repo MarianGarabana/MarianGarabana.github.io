@@ -6,21 +6,21 @@
 <title>Spanish EV Charging Network · Marian Garabana</title>
 <meta name="description" content="Datathon project planning Spain's 2027 interurban EV charging network: demand forecasting, grid capacity analysis, and a 190-station proposal in a Streamlit dashboard." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/spain.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/spain.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#08090B" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Spanish EV Charging Network · Marian Garabana" />
 <meta property="og:description" content="Datathon project planning Spain's 2027 interurban EV charging network: demand forecasting, grid capacity analysis, and a 190-station proposal in a Streamlit dashboard." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/spain.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/spain.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Spanish EV Charging Network · Marian Garabana" />
 <meta name="twitter:description" content="Datathon project planning Spain's 2027 interurban EV charging network: demand forecasting, grid capacity analysis, and a 190-station proposal in a Streamlit dashboard." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="preload" as="image" href="assets/spain-app-charging-network.webp" fetchpriority="high" />
 <!-- The province geometry is INLINED at the bottom of this page (#provgeo)
@@ -136,7 +136,7 @@
   #s-proposal > .h-sec:first-child{margin-top:1.75rem}
   @media(prefers-reduced-motion:reduce){ .secnav{transition:none} }
 
-  /* ===== HERO: Spain map (kept, now panel 1's centrepiece) ===== */
+  /* ===== HERO: Spain map (kept, now panel 1's centerpiece) ===== */
   .ghero{padding:1rem 0 2rem}
   /* Deliberately NOT given the .tg class: .tg's "> *{position:relative}" rule
      outranks .mapsvg{position:absolute} (0,2,1 against 0,1,0) and would drop the
@@ -175,7 +175,7 @@
 
   /* ===== TERMINAL GLASS =====
      Rolled forward from titan, hospital and rl. The chart cards were --surface
-     (#1B1F26) with a grey hairline, which is the browser default dressed up.
+     (#1B1F26) with a gray hairline, which is the browser default dressed up.
      One surface class instead: dark glass lit from the top left in this page's
      green, a faint plot grid so it reads as an instrument face, an
      accent-tinted hairline and a wide soft shadow. Everything derives from
@@ -266,7 +266,7 @@
     font-weight:600;color:var(--ink);white-space:nowrap}
   .phz-n span{display:block;font-size:.62rem;font-weight:500;color:var(--muted);margin-top:.2rem}
   /* what an upgrade costs and how long it takes, per band: the figure that makes
-     the three bands an investment decision rather than three colours */
+     the three bands an investment decision rather than three colors */
   .phz-c{display:block;font-family:var(--mono);font-size:.64rem;color:var(--muted);margin-top:.4rem}
   .phz tr.suf{background:rgba(0,177,64,.055)}  .phz tr.suf .phz-b{color:var(--lime)}
   .phz tr.mod{background:rgba(245,166,35,.055)} .phz tr.mod .phz-b{color:var(--amber)}
@@ -303,7 +303,7 @@
   /* ===== WEIGHTS PIE =====
      The five composite weights are the one thing on this page that is genuinely
      part-of-a-whole: they sum to 100, so a pie states something true about them.
-     Hand-drawn arcs, no chart library: five paths from the same centre, hairline
+     Hand-drawn arcs, no chart library: five paths from the same center, hairline
      gaps in the page's own black between slices, and one green ramp rather than
      five unrelated hues, so lightness carries the ranking as well as the angle.
      Every value is also printed in the legend, which is never hover-gated. */
@@ -428,7 +428,7 @@
      the deployed app itself rather than a rebuild of it. */
 
   /* The .apx* mounts, the .donut-wrap, the .fun-open funnel note and the
-     #fnFunnel on-mark label colours are all gone with the three graphics they
+     #fnFunnel on-mark label colors are all gone with the three graphics they
      styled. */
 </style>
 </head>
@@ -517,7 +517,7 @@
   <div class="h-sec">
     <span class="eyebrow">The proposal</span>
     <h2>The smallest network that <em>covers</em> Spain.</h2>
-    <p class="lead">The goal was coverage with the fewest stations, placed only where the grid can carry them. The proposal is <strong>190</strong> interurban fast-charging stations across the <strong>52</strong> provinces whose demand was modelled, and <strong>164</strong> points where demand outruns the grid. Built out, that is <strong>479</strong> fast chargers at 150 kW each, 71.9 MW of nameplate capacity.</p>
+    <p class="lead">The goal was coverage with the fewest stations, placed only where the grid can carry them. The proposal is <strong>190</strong> interurban fast-charging stations across the <strong>52</strong> provinces whose demand was modeled, and <strong>164</strong> points where demand outruns the grid. Built out, that is <strong>479</strong> fast chargers at 150 kW each, 71.9 MW of nameplate capacity.</p>
   </div>
 
   <!-- The four .k4 cards that sat here are gone. Proposed stations, friction
@@ -654,18 +654,18 @@
     <span class="eyebrow">The model</span>
     <h2>Scoring every candidate.</h2>
     <p class="lead">We screened over 50,000 OpenStreetMap candidates, a cut of at least 263&times;. Each one gets a composite score from five weighted signals, then a greedy spatial set-cover algorithm picks the highest scorer that is not within 40 km of a site already chosen. We capped the network at 300 stations; it converged at <strong>190</strong>, which means coverage saturated before the budget did. Of those 190, <strong>112</strong> sit on TEN-T corridors, 59% of the network.</p>
-    <p class="lead">Traffic carries the most weight because it is the most reliable signal in the data and the best proxy for utilisation. Province-level EV demand carries the least, because it is a blunt instrument and the traffic signal already captures where people actually drive. Grid capacity ranks candidates rather than excluding them: a congested site is buildable with investment, not impossible.</p>
+    <p class="lead">Traffic carries the most weight because it is the most reliable signal in the data and the best proxy for utilization. Province-level EV demand carries the least, because it is a blunt instrument and the traffic signal already captures where people actually drive. Grid capacity ranks candidates rather than excluding them: a congested site is buildable with investment, not impossible.</p>
   </div>
   </div>
 
   <div class="card tg">
     <h3>Composite score weights</h3>
     <svg class="pie" viewBox="0 0 200 240" role="group" aria-label="The five composite score weights as a pie. Each slice states its own name and weight when hovered or focused.">
-      <path id="pw-s1" tabindex="0" role="img" aria-label="Traffic volume, 30 percent" d="M100,100 L100,8 A92,92 0 0,1 187.50,128.43 Z" fill="#00B140" stroke="#08090B" stroke-width="2" />
-      <path id="pw-s2" tabindex="0" role="img" aria-label="Coverage gap, 25 percent" d="M100,100 L187.50,128.43 A92,92 0 0,1 71.57,187.50 Z" fill="#4CC05E" stroke="#08090B" stroke-width="2" />
-      <path id="pw-s3" tabindex="0" role="img" aria-label="Grid capacity, 20 percent" d="M100,100 L71.57,187.50 A92,92 0 0,1 8,100 Z" fill="#7DC855" stroke="#08090B" stroke-width="2" />
-      <path id="pw-s4" tabindex="0" role="img" aria-label="Proximity to stops, 15 percent" d="M100,100 L8,100 A92,92 0 0,1 45.92,25.57 Z" fill="#A6D98C" stroke="#08090B" stroke-width="2" />
-      <path id="pw-s5" tabindex="0" role="img" aria-label="Projected 2027 EV demand, 10 percent" d="M100,100 L45.92,25.57 A92,92 0 0,1 100,8 Z" fill="#CDE8BC" stroke="#08090B" stroke-width="2" />
+      <path id="pw-s1" tabindex="0" role="img" aria-label="Traffic volume, 30%" d="M100,100 L100,8 A92,92 0 0,1 187.50,128.43 Z" fill="#00B140" stroke="#08090B" stroke-width="2" />
+      <path id="pw-s2" tabindex="0" role="img" aria-label="Coverage gap, 25%" d="M100,100 L187.50,128.43 A92,92 0 0,1 71.57,187.50 Z" fill="#4CC05E" stroke="#08090B" stroke-width="2" />
+      <path id="pw-s3" tabindex="0" role="img" aria-label="Grid capacity, 20%" d="M100,100 L71.57,187.50 A92,92 0 0,1 8,100 Z" fill="#7DC855" stroke="#08090B" stroke-width="2" />
+      <path id="pw-s4" tabindex="0" role="img" aria-label="Proximity to stops, 15%" d="M100,100 L8,100 A92,92 0 0,1 45.92,25.57 Z" fill="#A6D98C" stroke="#08090B" stroke-width="2" />
+      <path id="pw-s5" tabindex="0" role="img" aria-label="Projected 2027 EV demand, 10%" d="M100,100 L45.92,25.57 A92,92 0 0,1 100,8 Z" fill="#CDE8BC" stroke="#08090B" stroke-width="2" />
       <line x1="10" y1="209" x2="190" y2="209" stroke="rgba(255,255,255,.09)" stroke-width="1" />
       <text class="ph" x="100" y="230" text-anchor="middle" fill="#94A3B8" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" letter-spacing="1.2">HOVER A SLICE</text>
       <text id="pw-o1" class="out" x="100" y="230" text-anchor="middle" fill="#F1F5F9" font-size="13">Traffic volume <tspan fill="#00B140" font-weight="700">30%</tspan></text>
@@ -699,7 +699,7 @@
     <span class="eyebrow">The constraint</span>
     <h2>Where the grid says no.</h2>
     <p class="lead">Every proposed station is tagged by the capacity of its nearest grid node. The congested ones are not bad locations, they are the places where a grid upgrade is the only thing standing in the way. What separates the three bands is what that upgrade costs and how long it takes.</p>
-    <p class="lead">Spain is not short of chargers. The 6,896 units already near motorway corridors are almost entirely slow AC, of little use to someone crossing the country, and the real wall is the grid: of the 190 highest-scoring sites, only 26 can be built with no grid works at all, and the rest cannot carry even the AFIR minimum of 2×150 kW without a substation upgrade. Across 5,714 CNMC substation nodes, 92.9% held zero firm available capacity as of April 2026, after a 2023–2025 surge in data centre, renewables and industrial connection applications took the headroom.</p>
+    <p class="lead">Spain is not short of chargers. The 6,896 units already near motorway corridors are almost entirely slow AC, of little use to someone crossing the country, and the real wall is the grid: of the 190 highest-scoring sites, only 26 can be built with no grid works at all, and the rest cannot carry even the AFIR minimum of 2×150 kW without a substation upgrade. Across 5,714 CNMC substation nodes, 92.9% held zero firm available capacity as of April 2026, after a 2023–2025 surge in data center, renewables and industrial connection applications took the headroom.</p>
   </div>
   <table class="phz">
     <caption class="mc-cap">The 190 proposed stations by the hosting capacity available at their nearest grid node: 26 sufficient, 2 moderate, 162 congested, with the upgrade each band needs.</caption>
@@ -726,7 +726,7 @@
   </div>
   <div class="roll">
     <div class="roll-item"><div class="rw">Phase 1 · revenue in 9–12 months</div><div class="rt">The 26 Sufficient stations.</div><div class="rp">The sites the grid can already power. No works and no negotiation, so these are the ones earning while the rest are still in approval.</div></div>
-    <div class="roll-item"><div class="rw">Phase 2</div><div class="rt">The 79 i-DE friction points.</div><div class="rp">Congested sites on Iberdrola i-DE nodes, where one distributor can self-authorise the substation upgrade rather than wait on third-party approval.</div></div>
+    <div class="roll-item"><div class="rw">Phase 2</div><div class="rt">The 79 i-DE friction points.</div><div class="rp">Congested sites on Iberdrola i-DE nodes, where one distributor can self-authorize the substation upgrade rather than wait on third-party approval.</div></div>
     <div class="roll-item"><div class="rw">Phase 3</div><div class="rt">The 162 Congested sites.</div><div class="rp">The full congested set, including the nodes managed by Endesa and Viesgo, where the upgrade has to be negotiated with a third party.</div></div>
   </div>
   <p class="wt-note">This is the phasing as presented to the jury. The written report, embedded further down, sequences the same 190 stations in a different order.</p>
@@ -747,8 +747,8 @@
        into the prose of the proposal and the constraint rather than out. -->
   <figure class="app-shot">
     <img src="assets/spain-app-charging-network.webp" width="1600" height="1000" loading="lazy" decoding="async"
-         alt="The Charging Network page of the live app: a dark map of Spain with the 12 TEN-T corridors drawn as coloured lines and proposed 150 kW stations plotted along them, each dot coloured green, yellow or red for the grid capacity available at that location." />
-    <figcaption>Objective 1 in the deployed app: the proposed stations along the TEN-T corridors, coloured by the grid status at each location.</figcaption>
+         alt="The Charging Network page of the live app: a dark map of Spain with the 12 TEN-T corridors drawn as colored lines and proposed 150 kW stations plotted along them, each dot colored green, yellow or red for the grid capacity available at that location." />
+    <figcaption>Objective 1 in the deployed app: the proposed stations along the TEN-T corridors, colored by the grid status at each location.</figcaption>
   </figure>
 
   <div class="pd-links" style="margin-top:1.6rem">
@@ -1093,7 +1093,7 @@ addEventListener('load',vKick);
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
@@ -1102,7 +1102,7 @@ addEventListener('load',vKick);
 </script>
 <script src="main.js" defer></script>
 <!-- Same shared shader as index and the other project pages: one file, ten
-     colour tokens, no per-page fork. -->
+     color tokens, no per-page fork. -->
 <script src="snow-bg.js" defer></script>
 </body>
 </html>

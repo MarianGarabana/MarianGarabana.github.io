@@ -4,23 +4,23 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Beverage Distribution Forecasting · Marian Garabana</title>
-<meta name="description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modelled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
+<meta name="description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modeled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/dicorsa.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/dicorsa.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#0A0828" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Beverage Distribution Forecasting · Marian Garabana" />
-<meta property="og:description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modelled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/dicorsa.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modeled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
+<meta property="og:url" content="https://mariangarabana.github.io/dicorsa.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Beverage Distribution Forecasting · Marian Garabana" />
-<meta name="twitter:description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modelled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:description" content="Sales analytics internship at a beverage distributor in Mexico: 600K+ transactions modeled, a MySQL database, six Tableau dashboards, and an order-size forecast within 25% on average." />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 <style>
@@ -32,18 +32,18 @@
     /* Text-safe companion to --violet, same pattern as titan's --violet/--violet-ink
        and madrid's --mag/--mag-ink. --violet on this canvas measures 3.78:1 and on
        --surface 3.33:1, both under the 4.5:1 floor for the small mono labels that
-       used it; --violet-ink measures 7.16:1 and 6.31:1. Not a new colour: the value
+       used it; --violet-ink measures 7.16:1 and 6.31:1. Not a new color: the value
        already ships as titan's --violet-ink.
        It is deliberately the same value as --lilac and deliberately a second name.
        --lilac is a chart hue with 5 consumers in this file; --violet-ink is the
-       text role. If --lilac ever moves for charting reasons the label colour must
+       text role. If --lilac ever moves for charting reasons the label color must
        not move with it. */
     --violet-ink:#A78BFA;
     /* Text-safe blue for the second column of the two ruled tables, at Marian's
        request. Not --indigo (#3302FD): that measures 1.6:1 on this canvas and is
-       a fill colour, not a text one. This is a light sky blue at 9.4:1, far
+       a fill color, not a text one. This is a light sky blue at 9.4:1, far
        enough from --violet-ink in hue that the two column headings read as two
-       different colours rather than two shades of one. */
+       different colors rather than two shades of one. */
     --blue-ink:#6FB6FF;
     /* KPI card tokens, measured on the composited card: 6.02:1 and 9.86:1 */
     --kpi-accent:var(--violet-ink); --kpi-accent-rgb:167,139,250; --kpi-v2:#C9C5E8;
@@ -59,9 +59,9 @@
   .theme-dico .pd-links a{border-color:var(--violet);background:var(--violet);color:#fff}
   .theme-dico .pd-links a.ghost{background:transparent;color:var(--ink);border-color:var(--border2)}
   /* Status pill for the glass hero's pd-top row. A badge with this class name
-     shipped here before, read "Client work · anonymised", and was removed Aug 8
+     shipped here before, read "Client work · anonymized", and was removed Aug 8
      2026 because that was false: Dicorsa is named in the h1, the prose and the
-     meta tags, so nothing here is anonymised, only not downloadable. This rebuild
+     meta tags, so nothing here is anonymized, only not downloadable. This rebuild
      reintroduces the class in the shared hero's pd-top slot with different,
      checkable text ("Internship -> capstone"), not a restatement of the removed
      claim. */
@@ -74,7 +74,7 @@
      video exists for this page and no non-stock photography exists to derive a
      still from (client data, no footage shot). What the hero draws instead: a
      treated solid built from this page's own accent tokens (the same radial
-     recipe already used for body.theme-dico's canvas, just localised to the
+     recipe already used for body.theme-dico's canvas, just localized to the
      hero), with the real monthly-revenue silhouette from the .dhero chart below
      redrawn faintly across it, at low opacity, aria-hidden, decorative only. Not
      stock photography and not invented numbers: the same 36 values the .dhero
@@ -186,7 +186,7 @@
 
   /* ===== TERMINAL GLASS =====
      Rolled forward from titan, hospital, rl and spain. The chart cards were
-     --surface (#171445) with a grey hairline, which is the browser default
+     --surface (#171445) with a gray hairline, which is the browser default
      dressed up. One surface class instead: dark glass lit from the top left in
      this page's violet, a faint plot grid so each card reads as an instrument
      face, an accent-tinted hairline and a wide soft shadow. Everything derives
@@ -259,7 +259,7 @@
   @media(prefers-reduced-motion:reduce){ .drop-p{transition:opacity .2s linear} }
 
   /* ===== TWO-COLUMN RULED TABLE =====
-     Copied from titan.html. Bullets, and the only coloured things are the two
+     Copied from titan.html. Bullets, and the only colored things are the two
      headings; each column sets its own --c. */
   .rtab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:1.4rem;
     border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
@@ -272,7 +272,7 @@
   .rtab ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
   .rtab li{position:relative;padding-left:1.1rem;font-size:var(--t-2);
     color:var(--ink-soft);line-height:1.55}
-  /* marker is a muted hairline dash, not the column's colour: the colour stays on
+  /* marker is a muted hairline dash, not the column's color: the color stays on
      the two headings only */
   .rtab li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:1px;
     background:var(--muted)}
@@ -327,14 +327,14 @@
   html.js-anim .st{opacity:0;transform:translateY(10px)}
   html.js-anim .st.in{opacity:1;transform:none}
   /* Number and title on one line: the numbers are two characters and the closed
-     card had a whole row to itself for them. The colour difference stays, violet
+     card had a whole row to itself for them. The color difference stays, violet
      mono against ink. baseline alignment, so the small number sits on the
-     title's baseline rather than centred against its cap height. */
+     title's baseline rather than centered against its cap height. */
   .st-h{display:flex;align-items:baseline;justify-content:center;gap:.8rem}
   .st .sn{font-family:var(--mono);font-size:1.05rem;color:var(--violet-ink);
     letter-spacing:.06em;margin-bottom:0;flex:0 0 auto}
   .st h3{font-size:var(--t-4);font-weight:700;margin-bottom:0}
-  /* the description reads centred under a centred head */
+  /* the description reads centered under a centered head */
   .st-p p{text-align:center}
   .st p{font-size:var(--t-2);color:var(--ink-soft);line-height:1.5;margin:0}
   /* Each step opens its own description on hover or on keyboard focus, the same
@@ -484,7 +484,7 @@
        below the work section, below the kpis"). Same panel as the KPIs
        (p-overview, the default-open tab), so this is a reorder within one
        panel, not a move across panels. No role="img"/aria-label on the host:
-       ApexCharts' own legend items are real, individually-labelled,
+       ApexCharts' own legend items are real, individually-labeled,
        keyboard-toggleable buttons, and axe treats role="img" on an ancestor
        of focusable descendants as a nested-interactive violation (confirmed
        on datathon.html's equivalent chart). The figcaption plus sr-only
@@ -495,7 +495,7 @@
         <div class="dh"><span class="dot"></span>Monthly revenue · 2023 to 2025 · real transaction data</div>
       </div>
       <div id="revChart"></div>
-      <p class="sr-only">Line chart of monthly revenue from January 2023 to December 2025 with a straight trend line. Annual revenue grew 8.6 percent in 2024 and 7.9 percent in 2025. Yearly peaks rise from 17.29 million to 18.60 million to 19.79 million and yearly troughs rise from 10.76 million to 11.54 million to 12.72 million, so the swing between the best and worst month of each year stays about as wide throughout.</p>
+      <p class="sr-only">Line chart of monthly revenue from January 2023 to December 2025 with a straight trend line. Annual revenue grew 8.6% in 2024 and 7.9% in 2025. Yearly peaks rise from 17.29 million to 18.60 million to 19.79 million and yearly troughs rise from 10.76 million to 11.54 million to 12.72 million, so the swing between the best and worst month of each year stays about as wide throughout.</p>
     </figure>
   </section>
 
@@ -614,14 +614,14 @@
     <h3>Order frequency against order size</h3>
     <figure>
       <div id="buyChart"></div>
-      <p class="sr-only">Bubble chart of the forty largest customers by revenue. The horizontal axis is total transactions from 0 to about 900, the vertical axis is total boxes sold from 0 to about 203,000, and bubble area is share of revenue. LD is an outlier at 621 transactions and 202,924 boxes, 13.18 percent of revenue. Vinos y Licores Tony took 95,814 boxes across only 117 transactions. Most other customers cluster below 20,000 boxes, and the highest-frequency customers, at 600 to 900 transactions, sit near the bottom of the volume axis.</p>
+      <p class="sr-only">Bubble chart of the forty largest customers by revenue. The horizontal axis is total transactions from 0 to about 900, the vertical axis is total boxes sold from 0 to about 203,000, and bubble area is share of revenue. LD is an outlier at 621 transactions and 202,924 boxes, 13.18% of revenue. Vinos y Licores Tony took 95,814 boxes across only 117 transactions. Most other customers cluster below 20,000 boxes, and the highest-frequency customers, at 600 to 900 transactions, sit near the bottom of the volume axis.</p>
     </figure>
   </div>
 
   <!-- Was two cards each holding a paragraph. One ruled table with a column
-       each, bullets rather than prose, and the only coloured things are the two
+       each, bullets rather than prose, and the only colored things are the two
        headings: violet for the bulk column, lilac for the frequent one. The body
-       copy stays neutral so the colour means "which column", nothing more.
+       copy stays neutral so the color means "which column", nothing more.
        Copied from titan.html's .rtab. -->
   <div class="rtab">
     <div style="--c:var(--violet-ink)">
@@ -645,7 +645,7 @@
   </div>
 
   <div class="h-sec" style="margin-top:2.2rem">
-    <p class="lead">This difference in buying behaviour is the reason the monthly revenue line swings the way it does.</p>
+    <p class="lead">This difference in buying behavior is the reason the monthly revenue line swings the way it does.</p>
   </div>
 
   <!-- ===== CONCENTRATION: the same customers, one question further on, so it
@@ -667,8 +667,8 @@
     <h3>Growth is concentrated in a few products</h3>
     <figure>
       <div id="concChart"></div>
-      <figcaption class="fig-cap">The 202-product catalogue split two ways: by how many products there are, and by how much revenue they bring. Fifteen products are 7.43% of the catalogue and 79.5% of revenue. The remaining 187 divide 20.5% between them, and 17 of those never sold at all.</figcaption>
-      <p class="sr-only">Two 100 percent stacked bars comparing the same fifteen products on two measures. By product count they are 7.43 percent of the 202-product catalogue against 92.57 percent for the other 187. By revenue they are 79.5 percent against 20.5 percent. The proportions are close to inverted.</p>
+      <figcaption class="fig-cap">The 202-product catalog split two ways: by how many products there are, and by how much revenue they bring. Fifteen products are 7.43% of the catalog and 79.5% of revenue. The remaining 187 divide 20.5% between them, and 17 of those never sold at all.</figcaption>
+      <p class="sr-only">Two 100% stacked bars comparing the same fifteen products on two measures. By product count they are 7.43% of the 202-product catalog against 92.57% for the other 187. By revenue they are 79.5% against 20.5%. The proportions are close to inverted.</p>
     </figure>
   </div>
 
@@ -698,7 +698,7 @@
   <div class="steps" id="steps">
     <div class="st" tabindex="0"><div class="st-h"><div class="sn">01</div><h3>Clean</h3></div><div class="st-p"><p>Consolidated years of transaction, customer, and product records, and fixed the inconsistencies that made them impossible to join.</p></div></div>
     <div class="st" tabindex="0"><div class="st-h"><div class="sn">02</div><h3>Database</h3></div><div class="st-p"><p>Designed and built a MySQL database so the data had one reliable home instead of living across spreadsheets.</p></div></div>
-    <div class="st" tabindex="0"><div class="st-h"><div class="sn">03</div><h3>Model</h3></div><div class="st-p"><p>Built a weekly forecast of average order size on more than 600,000 sales records. Across 14 weeks of actuals it came within about 25 percent on average, which is 75 percent on a mean absolute percentage error basis.</p></div></div>
+    <div class="st" tabindex="0"><div class="st-h"><div class="sn">03</div><h3>Model</h3></div><div class="st-p"><p>Built a weekly forecast of average order size on more than 600,000 sales records. Across 14 weeks of actuals it came within about 25% on average, which is 75% on a mean absolute percentage error basis.</p></div></div>
     <div class="st" tabindex="0"><div class="st-h"><div class="sn">04</div><h3>Dashboards</h3></div><div class="st-p"><p>Six Tableau dashboards so the team could read demand by route, product, and period without asking an analyst.</p></div></div>
   </div>
 
@@ -715,7 +715,7 @@
     </thead>
     <tbody>
       <tr><th scope="row">Three cost-saving strategies</th><td>Identified from demand patterns and where the money actually concentrates across products and routes.</td></tr>
-      <tr><th scope="row">Route optimisation</th><td>Delivery planning informed by which routes carry the revenue and how their demand moves through the year.</td></tr>
+      <tr><th scope="row">Route optimization</th><td>Delivery planning informed by which routes carry the revenue and how their demand moves through the year.</td></tr>
       <tr><th scope="row">Self-serve reporting</th><td>The team could answer its own questions in Tableau instead of waiting on a manual export.</td></tr>
     </tbody>
   </table>
@@ -735,7 +735,7 @@
     <tbody>
       <tr><th scope="row">Diversify the customer base</th><td>Bring reliance on top accounts below 25% of revenue, by attracting and keeping more mid-size customers.</td></tr>
       <tr><th scope="row">Grow the frequent buyers</th><td>Push smaller, more regular orders through discounts and deals, so more of the monthly total is the predictable kind.</td></tr>
-      <tr><th scope="row">Expand the product mix</th><td>Lift non-top products to at least 30% of revenue, using the 90% of the catalogue that currently sits idle.</td></tr>
+      <tr><th scope="row">Expand the product mix</th><td>Lift non-top products to at least 30% of revenue, using the 90% of the catalog that currently sits idle.</td></tr>
     </tbody>
   </table>
 
@@ -809,9 +809,9 @@ addEventListener('load',vKick);
    page's transaction-volume chart, further down, also calls it).
 
    Seven ApexCharts defects were measured before writing this config:
-   1. Default centred data labels fail AA (measured 3.79:1 on a dark bar).
+   1. Default centered data labels fail AA (measured 3.79:1 on a dark bar).
       Not applicable here: with 36 monthly points, per-bar numeric labels
-      would be unreadable regardless of colour, so dataLabels stay off and
+      would be unreadable regardless of color, so dataLabels stay off and
       the finding lives in the figcaption and sr-only paragraph instead.
    2. Native axis labels truncate at narrow widths regardless of maxWidth.
       36 monthly categories on a 390px screen is exactly that case, so the
@@ -1102,7 +1102,7 @@ var VIOLET='#6B4BFF', LILAC='#A78BFA', SURFACE='#171445', INK_SOFT='#C9C5E8', MU
         toolbar:{show:false}, zoom:{enabled:false}, animations:{enabled:false} },
       series:[{ name:'Customer', data:PTS }],
       colors:[VIOLET],
-      /* a 2px ring in the card colour keeps overlapping bubbles readable as
+      /* a 2px ring in the card color keeps overlapping bubbles readable as
          separate marks in the crowded bottom-left corner */
       fill:{ opacity:0.55 },
       stroke:{ width:2, colors:[SURFACE] },
@@ -1138,8 +1138,8 @@ var VIOLET='#6B4BFF', LILAC='#A78BFA', SURFACE='#171445', INK_SOFT='#C9C5E8', MU
 
 /* ---- product concentration ---- */
 (function(){
-  /* 202 products in the catalogue, 15 of them take 79.46% of revenue.
-     The count denominator is the catalogue, not the 185 products that actually
+  /* 202 products in the catalog, 15 of them take 79.46% of revenue.
+     The count denominator is the catalog, not the 185 products that actually
      sold; 17 never sold at all across the three years. */
   var TOP15_COUNT=7.43, TOP15_REV=79.46;
 
@@ -1154,11 +1154,11 @@ var VIOLET='#6B4BFF', LILAC='#A78BFA', SURFACE='#171445', INK_SOFT='#C9C5E8', MU
       ],
       colors:[VIOLET, LILAC],
       plotOptions:{ bar:{ horizontal:true, barHeight:'46%', borderRadius:3 } },
-      /* 2px of card colour between the two segments, so the boundary is a real
+      /* 2px of card color between the two segments, so the boundary is a real
          edge rather than two fills touching */
       stroke:{ width:2, colors:[SURFACE] },
       /* white on the violet segment (5.15:1), near-black on the lilac one
-         (11.4:1). One shared label colour would fail on one of the two. */
+         (11.4:1). One shared label color would fail on one of the two. */
       dataLabels:{ enabled:true,
         formatter:function(v){ return (narrow && v<15) ? '' : v.toFixed(1)+'%'; },
         style:{ fontSize:'11px', fontWeight:700, colors:['#FFFFFF','#0A0828'] } },
@@ -1278,7 +1278,7 @@ var VIOLET='#6B4BFF', LILAC='#A78BFA', SURFACE='#171445', INK_SOFT='#C9C5E8', MU
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});

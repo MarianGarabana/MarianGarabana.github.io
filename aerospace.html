@@ -6,21 +6,21 @@
 <title>Aerospace Predictive Maintenance · Marian Garabana</title>
 <meta name="description" content="Deep learning project: a stacked LSTM with attention predicts aircraft engine remaining useful life from NASA CMAPSS telemetry, served through FastAPI and a React dashboard." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/aerospace.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/aerospace.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#060a14" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Aerospace Predictive Maintenance · Marian Garabana" />
 <meta property="og:description" content="Deep learning project: a stacked LSTM with attention predicts aircraft engine remaining useful life from NASA CMAPSS telemetry, served through FastAPI and a React dashboard." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/aerospace.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/aerospace.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Aerospace Predictive Maintenance · Marian Garabana" />
 <meta name="twitter:description" content="Deep learning project: a stacked LSTM with attention predicts aircraft engine remaining useful life from NASA CMAPSS telemetry, served through FastAPI and a React dashboard." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="preload" as="image" href="assets/hero-aerospace-poster.webp" fetchpriority="high" />
 <link rel="stylesheet" href="styles.css" />
@@ -133,7 +133,7 @@
 
   /* ===== TERMINAL GLASS =====
      Rolled forward from titan, hospital, rl, spain and dicorsa. The cards were
-     --surface (#111826) with a grey hairline, which is the browser default
+     --surface (#111826) with a gray hairline, which is the browser default
      dressed up. One surface class instead: dark glass lit from the top left in
      this page's cyan, a faint plot grid so each card reads as an instrument
      face, an accent-tinted hairline and a wide soft shadow. Everything derives
@@ -171,7 +171,7 @@
   .t-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:1.6rem 2.4rem;align-items:start;margin-top:var(--sp-section)}
   .t-split .h-sec{margin-top:0}
-  /* .h-sec .lead in styles.css is what colours and spaces a lead; the paragraphs
+  /* .h-sec .lead in styles.css is what colors and spaces a lead; the paragraphs
      moved out of the h-sec when the heading took its own row, so the same
      treatment is named here rather than lost. */
   .t-body .lead{color:var(--ink-soft);max-width:46rem;margin-top:1rem}
@@ -213,7 +213,7 @@
 
   /* ===== PERFORMANCE TABLE =====
      Four models on two error measures, on the page canvas rather than in a card.
-     ONE thing is coloured, the row that shipped; GRU's lower error is carried by
+     ONE thing is colored, the row that shipped; GRU's lower error is carried by
      the figure and the word beside it, not by a second highlight. */
   /* fixed layout with a measure on each numeric column: left to auto layout the
      architecture column absorbed the spare width and pushed RMSE and MAE against
@@ -301,7 +301,7 @@
 
   /* ===== PERFORMANCE TABLE =====
      Four models on two error measures, on the page canvas rather than in a card.
-     ONE thing is coloured, the row that shipped; GRU's lower error is carried by
+     ONE thing is colored, the row that shipped; GRU's lower error is carried by
      the figure and the word beside it, not by a second highlight. */
   /* fixed layout with a measure on each numeric column: left to auto layout the
      architecture column absorbed the spare width and pushed RMSE and MAE against
@@ -399,7 +399,7 @@
   .g-verdict svg{width:13px;height:13px;flex:0 0 auto}
   /* A 250-degree tick dial in the live app's own language: a ramp of ticks from
      red through amber to green, the act stretch drawn solid over them, labels
-     inside the ring, a ringed hub, and the reading in the band's colour inside the
+     inside the ring, a ringed hub, and the reading in the band's color inside the
      dial. The sweep is 250 rather than 270 on purpose: at 270 the needle's lower
      travel crosses the digits, measured, and this keeps the two apart at every
      value in the run. */
@@ -481,7 +481,7 @@
      numbers that were printed next to them, so the comparison is prose now. */
 
   /* ===== SENSOR DRIFT PANEL =====
-     Six channels, each its own card: name in the channel's colour, the delta with a
+     Six channels, each its own card: name in the channel's color, the delta with a
      direction mark, a gradient sparkline, and low / current / high underneath. */
   .drift{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1.4rem}
   @media(max-width:860px){.drift{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -542,9 +542,9 @@
 
   /* ===== TWO-COLUMN RULED TABLE =====
      Was two cards side by side, each holding a paragraph. One ruled table with a
-     column each, bullets rather than prose, and the only coloured things are the
+     column each, bullets rather than prose, and the only colored things are the
      two headings: cyan for how it is trained, amber for how it is scored. The
-     body copy stays neutral, so the colour means "which column", nothing more.
+     body copy stays neutral, so the color means "which column", nothing more.
      Copied from titan.html's .rtab. (.mlist went with the card it lived in.) */
   .rtab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:1.6rem;
     border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.09)}
@@ -557,7 +557,7 @@
   .rtab ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
   .rtab li{position:relative;padding-left:1.1rem;font-size:var(--t-2);
     color:var(--ink-soft);line-height:1.55}
-  /* marker is a muted hairline dash, not the column's colour */
+  /* marker is a muted hairline dash, not the column's color */
   .rtab li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:1px;
     background:var(--muted)}
   .rtab li b{color:var(--ink);font-weight:600}
@@ -758,7 +758,7 @@
     <div class="kc"><div class="k">AOG cost</div><div class="v">$10–150K</div><div class="s">Per hour on the ground</div></div>
     <div class="kc"><div class="k">Overhaul</div><div class="v">$1–3M</div><div class="s">Widebody turbofan</div></div>
     <div class="kc"><div class="k">Return</div><div class="v">13x</div><div class="s">Per failure avoided</div></div>
-    <div class="kc"><div class="k">Fleet of 50</div><div class="v">$11.2M</div><div class="s">Modelled annual saving</div></div>
+    <div class="kc"><div class="k">Fleet of 50</div><div class="v">$11.2M</div><div class="s">Modeled annual saving</div></div>
   </div>
   </section>
 
@@ -909,7 +909,7 @@
   </div>
 
   <!-- Was two cards side by side, each holding a paragraph. One ruled table with a
-       column each, bullets rather than prose, and the only coloured things are the
+       column each, bullets rather than prose, and the only colored things are the
        two headings. -->
   <div class="rtab">
     <div style="--c:var(--cyan)">
@@ -927,7 +927,7 @@
         <li><b>RMSE</b>, the standard error, in flight cycles.</li>
         <li><b>MAE</b>, the average miss.</li>
         <li><b>NASA score</b>, asymmetric on purpose.</li>
-        <li>It punishes late predictions far harder than early ones, because being optimistic about a failing engine is the dangerous mistake.</li>
+        <li>It punishes late predictions far harder than early ones, because being optimiztic about a failing engine is the dangerous mistake.</li>
       </ul>
     </div>
   </div>
@@ -1255,7 +1255,7 @@ addEventListener('load',vKick);
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});

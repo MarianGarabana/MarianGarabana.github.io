@@ -4,7 +4,7 @@
    file covers every weight the site uses (Inter 400-800, mono 400-600); Instrument
    Serif is static and only its 400 normal and 400 italic are used.
    Characters outside this range (arrows, the CO2 subscript, emoji) already fell back
-   to a system font with Google Fonts, so behaviour is unchanged.
+   to a system font with Google Fonts, so behavior is unchanged.
    To update: refetch from fonts.googleapis.com with a modern UA, keep this header. */
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;
   src:url('assets/fonts/inter-latin-var.woff2') format('woff2');
@@ -97,7 +97,7 @@ img{display:block;max-width:100%}
 /* Hide on scroll down, restore on scroll up.
    Replaces the frosted-glass treatment, which was measured cutting the hero h1
    by 275x58px at scroll 240 and slicing the "1ST PLACE · EUR 3,000" badge at
-   834. Blur does not solve chrome-over-text at any alpha: it leaves grey letter
+   834. Blur does not solve chrome-over-text at any alpha: it leaves gray letter
    ghosts inside the pill that read as a rendering fault. The only fix for fixed
    chrome sitting on running text is for it not to be there while the text is
    being read. Full write-up in DESIGN-DIRECTION.md. */
@@ -329,7 +329,7 @@ html.motion-paused *,html.motion-paused *::before,html.motion-paused *::after{an
 
 /* Pill placement, design pass item 5. Glass fixed the nav on cream but cannot
    fix this: a blur of light body text on a near-black canvas averages to the
-   canvas colour, so on the dark themes the pill reads as solid at any alpha
+   canvas color, so on the dark themes the pill reads as solid at any alpha
    and simply erases the words behind it. The fix is physical, not optical.
    Desktop: move it out of the text column entirely. Content runs to x=1310
    inside the 1180px container at 1440, leaving ~130px of unused right margin.
@@ -338,9 +338,9 @@ html.motion-paused *,html.motion-paused *::before,html.motion-paused *::after{an
    only on hover or focus, which is a deliberate reach rather than an
    obstruction.
    Narrow: no margin to hide in, so it is gated on scroll depth in main.js
-   instead and stays bottom-centre. */
+   instead and stays bottom-center. */
 /* Bottom-right at every width. At 390 there is no margin to hide in, so this
-   does not reach zero occlusion, but it changes WHERE it overlaps: bottom-centre
+   does not reach zero occlusion, but it changes WHERE it overlaps: bottom-center
    covers the middle of a line, which is the worst place to lose text, while
    bottom-right covers the end of a line, which the eye has already left.
    Not chasing zero here; there is no margin and the returns are gone. */
@@ -411,8 +411,8 @@ html.motion-paused *,html.motion-paused *::before,html.motion-paused *::after{an
 .pdf-fac:hover img{opacity:.78}
 .pdf-fac:focus-visible{outline:none}
 .pdf-fac:focus-visible::after{content:"";position:absolute;inset:0;border:3px solid #fff;outline:3px solid #111110;outline-offset:-6px;pointer-events:none}
-/* Top right, not centred: title slides put their headline in the vertical middle,
-   and a centred chip covered it on six of the seven posters. The white ring and
+/* Top right, not centered: title slides put their headline in the vertical middle,
+   and a centered chip covered it on six of the seven posters. The white ring and
    the near-black body are a pair, not decoration: on a dark slide the ring carries
    the edge, on a white report page the body does. */
 .pdf-fac-cta{position:absolute;z-index:1;right:1rem;top:1rem;display:inline-flex;align-items:center;padding:.8rem 1.25rem;border-radius:100px;background:#111110;color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 12px 30px -14px rgba(17,17,16,.8);font-family:var(--mono);font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
@@ -476,7 +476,7 @@ html.motion-paused *,html.motion-paused *::before,html.motion-paused *::after{an
 }
 
 /* ============ ACCESSIBILITY (Phase 1) ============ */
-/* text alternative for graphics whose meaning lives only in geometry or colour. P1-5. */
+/* text alternative for graphics whose meaning lives only in geometry or color. P1-5. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 .skip-link{position:absolute;left:-9999px;top:1rem;z-index:500;background:var(--ink);color:var(--bg);padding:.8rem 1.3rem;border-radius:100px;font-weight:600;font-size:var(--t-2)}
 .skip-link:focus{left:1rem}
@@ -550,7 +550,7 @@ html.motion-paused *,html.motion-paused *::before,html.motion-paused *::after{an
    (the same hue for the rgba glow, since rgba() cannot take a hex token) and
    --kpi-v2 (the far stop of the value gradient). Every one of those is measured
    at 4.5:1 or better against the composited card surface, not against --bg.
-   .kc is the default card. .kpicard is the same behaviour with no substrate of
+   .kc is the default card. .kpicard is the same behavior with no substrate of
    its own, for the two KPI blocks that sit on real imagery and already carry a
    glass pane (hospital's band, datathon's hero strip). Their glass stays: the
    blur there has a photo and a video behind it to refract. */
@@ -605,7 +605,7 @@ body.theme-grid, body.theme-rl, body.theme-dico, body.theme-cinema{
    ramp and read as flat --ink. Hence width:fit-content above. */
 /* color stays set to --kpi-v2, the FAR stop, and only the fill is made
    transparent. Two reasons, both load-bearing. If the clip is supported but the
-   fill property is not, the number renders in a colour that passes rather than
+   fill property is not, the number renders in a color that passes rather than
    vanishing. And scripts/a11y-check.mjs reads computed `color` as the foreground
    it measures: color:transparent made it measure black on every card and report
    28 failures that were not on screen. --kpi-v2 is the darker end of every ramp
@@ -737,7 +737,7 @@ p,li,figcaption,.hero-sub,.lead,.pd-sub{text-wrap:pretty}
    Dark glass + light text over dark footage is the combination that lets the
    tint go low, because light text on a dark backdrop keeps contrast for free.
    Light glass + dark text tops out around 55-60% tint and will never look as
-   glassy. Pick the text colour from the FOOTAGE, not from the page.
+   glassy. Pick the text color from the FOOTAGE, not from the page.
 
    NEVER measure this by eye. Sample composited pixels behind the text at
    several points in the loop and check the worst one against 4.5:1.
@@ -880,7 +880,7 @@ p,li,figcaption,.hero-sub,.lead,.pd-sub{text-wrap:pretty}
    Icons stay silhouettes on hover too, they only brighten. Most of these SVGs
    are single-path marks with no fill attribute, so dropping the filter would
    paint them currentColor black and they would disappear on a dark canvas.
-   Mixed sources also means half the row would light up in brand colour and
+   Mixed sources also means half the row would light up in brand color and
    half would not, which looks like a bug rather than a effect.
    ========================================================================== */
 .marq{position:relative;overflow:hidden;
@@ -896,7 +896,7 @@ p,li,figcaption,.hero-sub,.lead,.pd-sub{text-wrap:pretty}
          color:var(--muted);transition:color .2s var(--ease)}
 .marq li:hover{color:var(--ink)}
 .marq img{width:26px;height:26px;object-fit:contain;flex:none;
-  /* one silhouette colour so eight unrelated brand palettes read as one row */
+  /* one silhouette color so eight unrelated brand palettes read as one row */
   filter:brightness(0) invert(1) opacity(.55);
   transition:filter .25s var(--ease)}
 .marq li:hover img{filter:brightness(0) invert(1) opacity(1)}

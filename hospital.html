@@ -6,21 +6,21 @@
 <title>Hospital Readmission MLOps · Marian Garabana</title>
 <meta name="description" content="MLOps pipeline predicting 30-day hospital readmission for diabetic patients: XGBoost, MLflow, FastAPI, Docker, drift monitoring, and SHAP explanations." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/hospital.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/hospital.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#0a1020" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Hospital Readmission MLOps · Marian Garabana" />
 <meta property="og:description" content="MLOps pipeline predicting 30-day hospital readmission for diabetic patients: XGBoost, MLflow, FastAPI, Docker, drift monitoring, and SHAP explanations." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/hospital.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/hospital.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Hospital Readmission MLOps · Marian Garabana" />
 <meta name="twitter:description" content="MLOps pipeline predicting 30-day hospital readmission for diabetic patients: XGBoost, MLflow, FastAPI, Docker, drift monitoring, and SHAP explanations." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="preload" as="image" href="assets/hero-hospital-poster.webp" fetchpriority="high" />
 <link rel="stylesheet" href="styles.css" />
@@ -52,7 +52,7 @@
   .hosp-hero{margin-inline:0;width:auto;max-width:none;
     border-radius:24px;min-height:clamp(300px,40vh,420px);
     background:#05070e;margin-top:calc(var(--nav-h) + 1.4rem);margin-bottom:1.8rem}
-  /* The footage's glowing core sits dead centre in the original 1920 frame,
+  /* The footage's glowing core sits dead center in the original 1920 frame,
      which is exactly where the panel lands. Cover crops vertically only at this
      aspect, so object-position could not move it; the fix is in the encode, a
      crop off the RIGHT edge that carries the core out to ~71%. No CSS transform
@@ -132,7 +132,7 @@
           padding-top:.75rem;background:var(--bg);transition:top .3s var(--ease)}
   /* main.js hides the nav on scroll-down; the rail rides up with it rather than
      leaving a 76px hole. The page canvas is a radial gradient, so the rail's own
-     background has to be the flat base colour or the strip it paints would not
+     background has to be the flat base color or the strip it paints would not
      match the canvas behind it. */
   body:has(#navOuter.nav-hidden) .secnav{top:.35rem}
   .secnav a{flex:none;scroll-snap-align:start;text-decoration:none;
@@ -190,7 +190,7 @@
     border-radius:9px;padding:.55rem .7rem;box-shadow:0 8px 22px rgba(0,0,0,.45);
     font-size:.76rem;line-height:1.45;color:var(--ink-soft);font-weight:400;
     transition:opacity .15s var(--ease),transform .15s var(--ease)}
-  /* the outer two would run off the panel if they centred on their own node */
+  /* the outer two would run off the panel if they centered on their own node */
   .fl-n:first-child .fl-p{left:0;transform:translateX(0) scale(.97);transform-origin:top left}
   .fl-n:last-child .fl-p{left:auto;right:0;transform:translateX(0) scale(.97);
     transform-origin:top right}
@@ -205,7 +205,7 @@
     opacity:1;transform:translateX(0) scale(1)}
   /* The four stages stay side by side well below the desktop measure: dropping to
      the stacked layout at 820px meant a browser window at anything under a full
-     screen lost the hover behaviour entirely. Only the gap and the tooltip
+     screen lost the hover behavior entirely. Only the gap and the tooltip
      measure tighten here. */
   @media(max-width:820px){
     .fl{gap:1.15rem}
@@ -264,7 +264,7 @@
 
   /* ===== TERMINAL GLASS =====
      Rolled forward from titan.html. The cards were --surface (#111a2e) with a
-     grey hairline, which is the browser default dressed up, and five of them in
+     gray hairline, which is the browser default dressed up, and five of them in
      a column read as five spreadsheets. This is one surface class instead: a
      dark glass panel lit from the top left in the page's own accent, a faint
      plot grid so it reads as an instrument face rather than a box, an
@@ -337,7 +337,7 @@
   .cm td.cell:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
   /* MUST be `.cm .cell > .cm-tip` (0,3,0): `.cm .cell > *` below sets
      position:relative at (0,2,0) and would beat a bare .cm-tip, which left the
-     tooltip in the flow with no box and pushed the percentage off centre. This is
+     tooltip in the flow with no box and pushed the percentage off center. This is
      the third time this same trap has bitten in this file. */
   .cm .cell > .cm-tip{position:absolute;left:50%;bottom:calc(100% + 9px);z-index:5;
     width:max-content;max-width:14rem;white-space:nowrap;text-align:center;
@@ -396,7 +396,7 @@
 
   /* ===== charts =====
      All three are drawn by chartkit.js: true-pixel geometry redrawn on resize,
-     gridlines that ARE the labelled values, one type scale. Nothing here gates
+     gridlines that ARE the labeled values, one type scale. Nothing here gates
      visibility, so the charts are complete the moment they are drawn. */
   .ck{display:block;width:100%}
   .ck-grid{stroke:rgba(255,255,255,.09);stroke-width:1}
@@ -469,7 +469,7 @@
 <body class="theme-dark">
 <!-- Shared PixelSnow background, same file as index; the hero's opaque #0c0e11
      video layer keeps it out of the top of the page, so it only reads once the
-     scroll passes into the case study. Coloured with this page's own --teal. -->
+     scroll passes into the case study. Colored with this page's own --teal. -->
 <canvas id="snowBg" data-color="#34d399" aria-hidden="true"></canvas>
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -607,7 +607,7 @@
   </div>
   <div class="h-card tg" style="margin-top:1.3rem">
     <h3>Flagged versus actual · 9,970 patients</h3>
-    <div class="ck-wrap"><svg class="ck" id="dist" role="img" aria-label="Two bars on a shared 0 to 100 percent scale. Patients actually readmitted within 30 days: 11.3 percent, drawn in neutral grey. Patients the model predicts will readmit: 33.8 percent, drawn in red. The model flags 3.0 times as many patients as actually readmit."></svg><div class="ck-tip" role="presentation"></div></div>
+    <div class="ck-wrap"><svg class="ck" id="dist" role="img" aria-label="Two bars on a shared 0 to 100% scale. Patients actually readmitted within 30 days: 11.3%, drawn in neutral gray. Patients the model predicts will readmit: 33.8%, drawn in red. The model flags 3.0 times as many patients as actually readmit."></svg><div class="ck-tip" role="presentation"></div></div>
   </div>
   </section>
 
@@ -741,7 +741,7 @@ addEventListener('load',vKick);
    Shared by all three charts. Every value shown here is already printed on the
    chart or named in the svg's aria-label, so this adds no information that a
    pointer is required to reach. The latency chart, whose 15 readings are not
-   all labelled, additionally takes keyboard focus and announces each reading
+   all labeled, additionally takes keyboard focus and announces each reading
    through a live region. */
 function ckTip(wrap){
   var tip=wrap.querySelector('.ck-tip'), svg=wrap.querySelector('.ck');
@@ -752,7 +752,7 @@ function ckTip(wrap){
       tip.innerHTML=html; tip.classList.add('on');
       var w=wrap.getBoundingClientRect(), t=tip.getBoundingClientRect(), x, y;
       if(mode==='side'){
-        /* beside the bar end, vertically centred on its own row. Centred-above
+        /* beside the bar end, vertically centered on its own row. Centered-above
            flipped below on the top row and parked the panel over the next bar. */
         x=Math.min(Math.max(cx+12, 4), w.width - t.width - 4);
         y=Math.min(Math.max(cy - t.height/2, 4), w.height - t.height - 4);
@@ -793,7 +793,7 @@ function ckBars(svg, describe, mode){
 
 /* ================= SHAP: diverging bars =================
    The zero line is a real axis, not a decorative tick, so the eye can compare a
-   +0.05 against a -0.06 instead of guessing from bar colour alone. */
+   +0.05 against a -0.06 instead of guessing from bar color alone. */
 (function(){
   var svg=document.getElementById('shap'); if(!svg||!window.chartkit) return;
   /* The domain comes from the data, not from a hand-picked constant. It used to
@@ -836,7 +836,7 @@ function ckBars(svg, describe, mode){
         /* label inside the bar when it fits. Outside-right, a bar at MAX had
            nowhere to put "+0.82" and it was clipped by the svg edge at 390. */
         var inside = bw>60;
-        /* a short negative bar sits hard against the left edge, so labelling it
+        /* a short negative bar sits hard against the left edge, so labeling it
            outside-LEFT ran off the svg at 390. Outside goes on the zero side. */
         var vx = pos ? (inside ? bx+bw-8 : bx+bw+7) : (inside ? bx+8 : zx+7);
         var anch = pos ? (inside?'end':'start') : (inside?'start':'start');
@@ -871,7 +871,7 @@ function ckBars(svg, describe, mode){
   ];
   var RATIO=(ROWS[1].v/ROWS[0].v).toFixed(1);
   chartkit.mount(svg,{
-    /* the 0% and 100% ticks are centred on the plot edges, so the padding has to
+    /* the 0% and 100% ticks are centered on the plot edges, so the padding has to
        carry half a label on each side or they clip against the card */
     pad:{l:22,r:34,t:16,b:30},
     heightOf:function(){ return 182; },
@@ -889,7 +889,7 @@ function ckBars(svg, describe, mode){
         var y=top + i*(barH+gap);
         g+='<g data-i="'+i+'">';
         g+=chartkit.text(x0, y-7, r.l, 'axis', {size:12});
-        /* no track rect: the gridlines already carry the scale, and a grey
+        /* no track rect: the gridlines already carry the scale, and a gray
            capsule behind every bar is the browser download UI, not a chart.
            width is the SPAN from the origin, not the x coordinate: X(v) already
            includes x0, so using it as the width overstated every bar. */
@@ -928,7 +928,7 @@ function ckBars(svg, describe, mode){
 /* ================= monitoring: latency line =================
    The old version stretched a fixed 1000x180 viewBox with
    preserveAspectRatio="none", so the line was distorted at every width and had
-   no axis at all. Now the gridlines are the labelled millisecond values. */
+   no axis at all. Now the gridlines are the labeled millisecond values. */
 (function(){
   var svg=document.getElementById('mon'); if(!svg||!window.chartkit) return;
   var MIN=140, MAX=250;
@@ -1028,7 +1028,7 @@ function ckBars(svg, describe, mode){
     place(i,false);
   });
   svg.addEventListener('pointerleave', clear);
-  /* the 15 readings are not individually labelled on the chart, so the pointer
+  /* the 15 readings are not individually labeled on the chart, so the pointer
      affordance needs a keyboard equivalent, not just a text alternative */
   svg.setAttribute('tabindex','0');
   svg.addEventListener('focus', function(){ place(cur<0?0:cur, true); });
@@ -1128,7 +1128,7 @@ function ckBars(svg, describe, mode){
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});

@@ -6,21 +6,21 @@
 <title>Trading System Automation · Marian Garabana</title>
 <meta name="description" content="An ML trading system predicting next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks, from SimFin data and 22 engineered features to a live Streamlit app." />
 <meta name="author" content="Marian Garabana" />
-<link rel="canonical" href="https://mariangarabana.github.io/MyPortfolio/trading.html" />
+<link rel="canonical" href="https://mariangarabana.github.io/trading.html" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#080b12" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Trading System Automation · Marian Garabana" />
 <meta property="og:description" content="An ML trading system predicting next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks, from SimFin data and 22 engineered features to a live Streamlit app." />
-<meta property="og:url" content="https://mariangarabana.github.io/MyPortfolio/trading.html" />
-<meta property="og:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta property="og:url" content="https://mariangarabana.github.io/trading.html" />
+<meta property="og:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="Marian Garabana" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Trading System Automation · Marian Garabana" />
 <meta name="twitter:description" content="An ML trading system predicting next-day BUY, SELL, or HOLD signals for 31 large-cap US stocks, from SimFin data and 22 engineered features to a live Streamlit app." />
-<meta name="twitter:image" content="https://mariangarabana.github.io/MyPortfolio/assets/og-cover.png" />
+<meta name="twitter:image" content="https://mariangarabana.github.io/assets/og-cover.png" />
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-latin-var.woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="enhance.css" />
@@ -34,7 +34,7 @@
     --down-ink:#f87171;
     /* KPI card tokens, measured on the composited card: 8.23:1 and 10.67:1.
        --cyan rather than --up or --down: the four cards are neutral readings,
-       not signals, and colouring them green would read as a buy. */
+       not signals, and coloring them green would read as a buy. */
     --kpi-accent:var(--cyan); --kpi-accent-rgb:56,189,248; --kpi-v2:#a8cfe4;
   }
   body.theme-trade{background:radial-gradient(1100px 560px at 72% -12%,#0e1a2c 0%,var(--bg) 55%)}
@@ -164,14 +164,14 @@
   body.theme-trade{--eo:cubic-bezier(.23,1,.32,1)}
 
   /* ===== TERMINAL GLASS =====
-     The page's card was #111826 with a grey hairline, which is the browser
+     The page's card was #111826 with a gray hairline, which is the browser
      default dressed up, and six of them in a row read as six spreadsheets.
      This is one surface class instead: a dark glass panel lit from the top
      left in the theme's own green, a faint plot grid so it reads as an
      instrument face rather than a box, an accent-tinted hairline and a wide
      soft shadow so it sits above the canvas instead of being drawn onto it.
      Everything derives from --up, so each project page inherits its own
-     colour by changing one token. */
+     color by changing one token. */
   .tg{position:relative;border-radius:18px;
     background:linear-gradient(180deg,rgba(24,34,52,.82) 0%,rgba(11,17,28,.94) 100%);
     border:1px solid color-mix(in srgb,var(--up) 22%,var(--border));
@@ -377,7 +377,7 @@
   .pipe{margin-top:1.4rem;padding:1.7rem 1.8rem 1.6rem}
   /* One positioned wrapper holds the payload, the belt line and the stations,
      so the line can be laid on the dot row itself rather than floating in a
-     band above it. --rail-y is the dots' measured centre. */
+     band above it. --rail-y is the dots' measured center. */
   .belt-wrap{position:relative}
   .belt{position:relative;height:62px}
   .belt-line{position:absolute;top:var(--rail-y,0px);height:1px;background:rgba(255,255,255,.13);
@@ -556,7 +556,7 @@
   <div class="h-sec">
     <span class="eyebrow">The models</span>
     <h2>Two models, one <em>problem</em>.</h2>
-    <p class="lead">Most stocks share one model, a <strong>logistic regression</strong> on 26 tickers and 16 features that tests at <strong>50.1 percent</strong>. Banks and payment providers report their financials differently, so they get their own: a <strong>gradient boosting</strong> model on 5 tickers and 11 features, testing at <strong>54.7 percent</strong> and the stronger of the two on the financial-sector stocks, where the standard fundamental ratios do not translate. Neither is far from a coin toss, which is why accuracy is not the number this project is judged on.</p>
+    <p class="lead">Most stocks share one model, a <strong>logistic regression</strong> on 26 tickers and 16 features that tests at <strong>50.1%</strong>. Banks and payment providers report their financials differently, so they get their own: a <strong>gradient boosting</strong> model on 5 tickers and 11 features, testing at <strong>54.7%</strong> and the stronger of the two on the financial-sector stocks, where the standard fundamental ratios do not translate. Neither is far from a coin toss, which is why accuracy is not the number this project is judged on.</p>
   </div>
   <!-- Both figures on one track with the coin toss drawn on it. As two cards
        printing 50.1% and 54.7% at 3rem they read as results; against a 50%
@@ -582,11 +582,11 @@
   <div class="h-sec">
     <span class="eyebrow">The real win</span>
     <h2>Recall over accuracy.</h2>
-    <p class="lead">Before balancing, the model scored 52 percent by calling "up" almost every day, catching only <strong>35 percent</strong> of down moves. After balancing the classes, it catches <strong>61 percent</strong> of them. That is a genuinely more useful model, even if headline accuracy barely moves.</p>
+    <p class="lead">Before balancing, the model scored 52% by calling "up" almost every day, catching only <strong>35%</strong> of down moves. After balancing the classes, it catches <strong>61%</strong> of them. That is a genuinely more useful model, even if headline accuracy barely moves.</p>
   </div>
   <!-- Same instrument as the accuracy gauge, same declared axis. Bar length is
-       the recall value against a full 1.0 track, so 0.61 fills 61 percent.
-       These read 50 and 87 percent until Aug 10 2026, which put them on an
+       the recall value against a full 1.0 track, so 0.61 fills 61%.
+       These read 50 and 87% until Aug 10 2026, which put them on an
        undeclared 0 to 0.7 axis: the ratio between the two bars was right, but
        both levels were inflated about 1.43x against a track that looks full at
        the end, so 0.61 read as nearly maxed out. -->
@@ -644,7 +644,7 @@
     <p class="lead">The ETL pipeline cleans five years of SimFin data, handles stock-split artefacts and missing fields, and engineers 22 columns in four groups. <strong>Sixteen</strong> of them are model inputs; the other six are computed only to draw the app's charts. The financial fallback drops the five fundamental ratios and trains on <strong>eleven</strong>.</p>
   </div>
   <!-- Four disclosures, one group each, exactly as the ETL notebook's data
-       dictionary splits them: 6 price-based, 5 volatility-normalised and 5
+       dictionary splits them: 6 price-based, 5 volatility-normalized and 5
        fundamental are the 16 model inputs, and 6 display-only columns make up
        the 22. Hover, focus or click a group and its features come up; every
        group is expanded with the script blocked. -->
@@ -658,7 +658,7 @@
       </div></div></div>
     </div>
     <div class="fxg" data-open="true" style="--c:var(--cyan)">
-      <button class="fxg-b" type="button" aria-expanded="true" aria-controls="fxp2"><i></i><span class="fxg-n">Volatility-normalised · 5 inputs</span><span class="fxg-c" aria-hidden="true">›</span></button>
+      <button class="fxg-b" type="button" aria-expanded="true" aria-controls="fxp2"><i></i><span class="fxg-n">Volatility-normalized · 5 inputs</span><span class="fxg-c" aria-hidden="true">›</span></button>
       <div class="fxg-p" id="fxp2"><div class="fxg-in"><div class="fx-chips">
         <span class="fx-chip">Log_Return</span><span class="fx-chip">Volatility_20</span>
         <span class="fx-chip">Return_norm</span><span class="fx-chip">Return_norm_Lag1</span>
@@ -691,7 +691,7 @@
     <h2>One prediction, end to <em>end</em>.</h2>
     <p class="lead">One prediction, left to right. The app asks SimFin for live prices through a wrapper that renames every field to match the training schema, the <strong>same</strong> <code>engineer_features()</code> the training script ran turns them into 22 columns, <code>strategy.py</code> routes the ticker to its feature list, the matching model returns a probability, and one shared rule turns that into the signal the app shows. Because training and serving import the same two modules, the signal the model learned is exactly the signal you see. The wrapper and the app are the two pieces I built.</p>
   </div>
-  <!-- The stations are the content and ship as plain text; the travelling
+  <!-- The stations are the content and ship as plain text; the traveling
        payload above them is the enhancement and only appears once the script
        can drive it. -->
   <div class="tg pipe" id="pipe">
@@ -699,7 +699,7 @@
       <span class="belt-line" aria-hidden="true"></span>
       <span class="belt-stream" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
       <div class="belt" aria-hidden="true"></div>
-      <!-- The travelling dot and its tooltip. aria-hidden and non-interactive:
+      <!-- The traveling dot and its tooltip. aria-hidden and non-interactive:
            every word it shows is in the paragraph above, so it is a way of
            watching the run, not a control that hides content behind a hover. -->
       <span class="load" id="load" aria-hidden="true"><span class="tip" id="loadTip">Live prices, renamed to the training schema</span></span>
@@ -871,15 +871,15 @@
     ];
     var i=-1, xs=[], timer=0, swap=0;
 
-    /* Dot centres, measured rather than derived from the grid: the columns are
-       fractional and the dot is not at the column's centre, so any formula for
+    /* Dot centers, measured rather than derived from the grid: the columns are
+       fractional and the dot is not at the column's center, so any formula for
        this goes wrong at one breakpoint. The belt line, the stream and the
-       travelling dot all read the same three numbers. */
+       traveling dot all read the same three numbers. */
     function measure(){
       /* The belt spacer is sized FIRST. It reserves room for the tooltip above
          the line, and changing its height moves the whole stations row down:
          reading the dot geometry before this write measured the pre-resize
-         layout, which put the line and the travelling dot 14px above the
+         layout, which put the line and the traveling dot 14px above the
          station dots on every first paint and only corrected itself if the
          reader happened to resize the window. Height comes from the tooltip
          itself, so a string that wraps to two lines at one width cannot end up
@@ -891,7 +891,7 @@
       wrap.style.setProperty('--rail-span', (xs[xs.length-1]-xs[0])+'px');
       wrap.style.setProperty('--rail-y', (d0.offsetTop+d0.offsetHeight/2)+'px');
     }
-    /* The tooltip is centred on its dot, except at the ends, where it would run
+    /* The tooltip is centered on its dot, except at the ends, where it would run
        past the panel edge and be cut by overflow:hidden. It slides back inside
        and the stem slides the opposite way, so it still points at the dot. */
     function placeTip(){
@@ -1019,7 +1019,7 @@
   });
 
   /* A deep link lands before this script has measured anything, and the browser
-     honours scroll-margin-top, not the rail's real height. Re-park it once. */
+     honors scroll-margin-top, not the rail's real height. Re-park it once. */
   if(location.hash){
     var idx=links.findIndex(function(a){ return a.getAttribute('href')===location.hash; });
     if(idx>-1) addEventListener('load',function(){ setTimeout(function(){ jump(idx); },60); },{once:true});
